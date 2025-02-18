@@ -1,30 +1,27 @@
 <div>
-    <!-- <form [formGroup]="formGroup">
-        <div>
-            <label for="flightDate" class="block">Flight date</label>
-            <p-datepicker formControlName="flightDate" [iconDisplay]="'input'" [showIcon]="true" [showButtonBar]="true"
-                [readonlyInput]="true" [dateFormat]="'yy-mm-dd'" />
+    <form [formGroup]="formGroup">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="flightDate">Flight date</label>
+            </div>
+            <div>
+                <p-datepicker formControlName="flightDate" [iconDisplay]="'input'" [showIcon]="true"
+                    [showButtonBar]="true" [readonlyInput]="true" [dateFormat]="'yy-mm-dd'" />
+            </div>
+            <div>
+                <label for="startupTime">Startup</label>
+            </div>
+            <div>
+
+                <p-datepicker formControlName="startupTime" [timeOnly]="true" [iconDisplay]="'input'" [showIcon]="true"
+                    [readonlyInput]="true">
+                    <ng-template #inputicon let-clickCallBack="clickCallBack">
+                        <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+                    </ng-template>
+                </p-datepicker>
+            </div>
         </div>
-        <div>
-            <label for="startupTime" class="block">Startup</label>
-            <p-datepicker formControlName="startupTime" [timeOnly]="true" [iconDisplay]="'input'" [showIcon]="true"
-                [readonlyInput]="true">
-                <ng-template #inputicon let-clickCallBack="clickCallBack">
-                    <i class="pi pi-clock"></i>
-                </ng-template>
-            </p-datepicker>
-        </div>
 
 
-    </form> -->
-
-    <div class="flex-auto">
-        <label for="templatedisplay" class="font-bold block mb-2"> Custom Icon </label>
-        <p-datepicker [(ngModel)]="date3" [iconDisplay]="'input'" [showIcon]="true" [timeOnly]="true"
-            inputId="templatedisplay">
-            <ng-template #inputicon let-clickCallBack="clickCallBack">
-                <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
-            </ng-template>
-        </p-datepicker>
-    </div>
+    </form>
 </div>

@@ -1,17 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DatePickerModule } from 'primeng/datepicker';
 import { FluidModule } from 'primeng/fluid';
 @Component({
     selector: 'app-log-sheet',
-    imports: [FluidModule, FormsModule, /*ReactiveFormsModule,*/ DatePickerModule],
+    imports: [FluidModule, ReactiveFormsModule, DatePickerModule],
     templateUrl: './log-sheet.component.html',
     styleUrl: './log-sheet.component.css'
 })
 export class LogSheetComponent implements OnInit {
 
     formGroup!: FormGroup;
-    date3: Date | undefined;
 
     constructor(/*private productService: ProductService*/) { }
 
