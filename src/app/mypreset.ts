@@ -1,5 +1,5 @@
 import { definePreset } from '@primeng/themes';
-import Nora from '@primeng/themes/Nora';
+import Nora from '@primeng/themes/nora';
 
 const MyPreset = definePreset(Nora, {
     // components: {
