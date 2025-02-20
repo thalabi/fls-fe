@@ -1,0 +1,52 @@
+<div>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+        <div class="grid">
+
+            <!-- line 1 -->
+            <div class="col-5">
+                <label for="initialTsn">Initial TSN</label>
+            </div>
+            <div class="col-7">
+                <p-inputnumber inputId="initialTsn" formControlName="initialTsn" size="small" [min]="0" mode="decimal"
+                    [maxFractionDigits]="1" />
+            </div>
+
+            <!-- line 2 -->
+            <div class="col-5">
+                <label for="initialTsmoh">Initial TSMOH</label>
+            </div>
+            <div class="col-7">
+                <p-inputnumber inputId="initialTsmoh" formControlName="initialTsmoh" size="small" [min]="0"
+                    mode="decimal" [maxFractionDigits]="1" />
+            </div>
+
+            <!-- line 3 -->
+            <div class="col-5">
+                <label for="eachTankCapacity">Each tank capacity</label>
+            </div>
+            <div class="col-7">
+                <p-inputnumber inputId="eachTankCapacity" formControlName="eachTankCapacity" size="small" [min]="0"
+                    mode="decimal" [maxFractionDigits]="1" />
+            </div>
+
+            <!-- line 4 -->
+            <div class="col-5">
+                <label for="fuelBurnPerHour">Fuel burn / hr</label>
+            </div>
+            <div class="col-7">
+                <p-inputnumber inputId="fuelBurnPerHour" formControlName="fuelBurnPerHour" size="small" [min]="0"
+                    mode="decimal" [maxFractionDigits]="1" />
+            </div>
+        </div> <!-- bottom of grid -->
+
+        <div class="formgroup-inline">
+            <div class="field">
+                <button pButton type="submit" label="Submit" icon="pi pi-check" [disabled]="form.invalid"></button>
+            </div>
+            <div class="field">
+                <button pButton type="reset" label="Cancel" (click)="onCancel()"></button>
+            </div>
+        </div>
+    </form>
+</div>
