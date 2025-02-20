@@ -35,7 +35,7 @@ pipeline {
                 cd ../..
                 pwd
 
-                export PATH=/var/lib/jenkins/nodejs/node-v16.13.1-linux-x64/bin/:$PATH
+                export PATH=/var/lib/jenkins/nodejs/node-v22.14.0-linux-x64/bin/:$PATH
                 npm install && node_modules/.bin/ng build
                 '''
             }
