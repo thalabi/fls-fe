@@ -8,7 +8,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 
 @Component({
     selector: 'app-log-sheet',
-    imports: [CommonModule, FluidModule, ReactiveFormsModule, DatePickerModule, ButtonModule, InputNumberModule],
+    imports: [CommonModule, ReactiveFormsModule, DatePickerModule, ButtonModule, InputNumberModule],
     templateUrl: './log-sheet.component.html',
     styleUrl: './log-sheet.component.css'
 })
