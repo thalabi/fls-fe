@@ -226,6 +226,9 @@
     </form>
 </div>
 
+<div class="card flex justify-center gap-4">
+    <p-button label="Save" icon="pi pi-check" (onClick)="onSave()" [disabled]="! timesCaculated || ! fuelCaculated" />
+</div>
 <!-- example of responsive classes -->
 <!-- <div class="grid">
     <div class="col-12 md:col-6 lg:col-3">

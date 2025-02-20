@@ -53,6 +53,9 @@ export class LogSheetComponent implements OnInit {
 
     readonly oneDayMinutes: number = 24 * 60;
 
+    timesCaculated: boolean = false
+    fuelCaculated: boolean = false
+
     constructor(/*private productService: ProductService*/) { }
 
     ngOnInit() {
@@ -120,6 +123,7 @@ export class LogSheetComponent implements OnInit {
         this.totalAirtime = this.initialTsn + this.airtime
         this.tsmoh = this.initialTsmoh + this.airtime
 
+        this.timesCaculated = true
     }
 
     onResetTimesForm() {
@@ -130,6 +134,8 @@ export class LogSheetComponent implements OnInit {
         this.flightTime = 0
         this.totalAirtime = this.initialTsn
         this.tsmoh = this.initialTsmoh
+
+        this.timesCaculated = false
 
         // this.displayDialog = false;
         // this.sessionService.setDisableParentMessages(false)
@@ -182,6 +188,7 @@ export class LogSheetComponent implements OnInit {
         this.fuelRemaining = this.bothTanksFuelPumped - this.totalBothTanksFuelUsed
         this.fuelTimeRemaining = this.toFuelTime(this.fuelRemaining)
 
+        this.fuelCaculated = true
         //this.toFuelTime()
     }
     onResetFuelForm() {
@@ -190,6 +197,8 @@ export class LogSheetComponent implements OnInit {
         this.totalLeftTankFuelUsed = null
         this.totalRightTankFuelUsed = null
         this.totalBothTanksFuelUsed = null
+
+        this.fuelCaculated = false
     }
 
     private getAircraftParameters() {
@@ -215,6 +224,10 @@ export class LogSheetComponent implements OnInit {
         const mins = fuelMinuntes % 60
         const fuelTime = hrs + ':' + (mins < 10 ? '0' + mins : mins)
         return fuelTime
+    }
+
+    onSave() {
+
     }
 }
 
