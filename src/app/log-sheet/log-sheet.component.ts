@@ -30,6 +30,7 @@ export class LogSheetComponent implements OnInit {
     previousFlightsRightTankFuelUsed!: number // from service
     previousFlightsBothTanksFuelUsed!: number
     previousFlightsFuelRemaining!: number
+    previousFlightsFuelTimeRemaining!: string
 
     flightLeftTankFuelUsed!: number
     flightRightTankFuelUsed!: number
@@ -37,6 +38,9 @@ export class LogSheetComponent implements OnInit {
     totalLeftTankFuelUsed!: number | null
     totalRightTankFuelUsed!: number | null
     totalBothTanksFuelUsed!: number | null
+
+    fuelRemaining!: number
+    fuelTimeRemaining!: string
 
     bothTanksFuelPumped!: number
     flightBothTanksFuelUsed!: number | null
@@ -118,12 +122,7 @@ export class LogSheetComponent implements OnInit {
 
     }
 
-    private incrementI(i: number) {
-        console.log(i)
-        i++
-        console.log(i)
-    }
-    onCancelTimesForm() {
+    onResetTimesForm() {
         console.log('onCancel()')
         // this.resetDialoForm();
         this.initTimesForm()
@@ -179,8 +178,13 @@ export class LogSheetComponent implements OnInit {
         this.totalLeftTankFuelUsed = this.previousFlightsLeftTankFuelUsed + this.flightLeftTankFuelUsed
         this.totalRightTankFuelUsed = this.previousFlightsRightTankFuelUsed + this.flightRightTankFuelUsed
         this.totalBothTanksFuelUsed = this.totalLeftTankFuelUsed + this.totalRightTankFuelUsed
+
+        this.fuelRemaining = this.bothTanksFuelPumped - this.totalBothTanksFuelUsed
+        this.fuelTimeRemaining = this.toFuelTime(this.fuelRemaining)
+
+        //this.toFuelTime()
     }
-    onCancelTuelForm() {
+    onResetFuelForm() {
         this.initFuelForm()
         this.flightBothTanksFuelUsed = null
         this.totalLeftTankFuelUsed = null
@@ -203,6 +207,14 @@ export class LogSheetComponent implements OnInit {
         this.previousFlightsRightTankFuelUsed = 5.1
         this.previousFlightsBothTanksFuelUsed = this.previousFlightsLeftTankFuelUsed + this.previousFlightsRightTankFuelUsed
         this.previousFlightsFuelRemaining = this.bothTanksFuelPumped - this.previousFlightsBothTanksFuelUsed
+        this.previousFlightsFuelTimeRemaining = this.toFuelTime(this.previousFlightsFuelRemaining)
+    }
+    private toFuelTime(gallons: number): string {
+        const fuelMinuntes = Math.floor(gallons / this.fuelBurnPerHour * 60)
+        const hrs = Math.floor(fuelMinuntes / 60)
+        const mins = fuelMinuntes % 60
+        const fuelTime = hrs + ':' + (mins < 10 ? '0' + mins : mins)
+        return fuelTime
     }
 }
 
