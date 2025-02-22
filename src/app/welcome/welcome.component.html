@@ -1,0 +1,9 @@
+<div>
+    <div class="p-5">
+        <div *ngIf="logoutMessage" class="lead" style="color: blueviolet;">
+            <h3>{{logoutMessage}}</h3>
+        </div>
+        <h1>Welcome {{userInfo.firstName}} to Flight Log Sheet application</h1>
+        <div *ngIf="! authenticated">Login to see the protected pages</div>
+    </div>
+</div>

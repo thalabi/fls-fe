@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { JwksValidationHandler, OAuthEvent, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, Observable, combineLatest, filter, map, of, tap } from 'rxjs';
 import { AuthRestService } from './auth-rest.service';
+import { authCodeFlowConfig } from './auth-config';
 
 
 export interface UserInfo { username: string, firstName: string, lastName: string, email: string, roles: Array<String>, backEndAuthorities: Array<String> }
@@ -117,6 +118,8 @@ export class AuthService {
 
         this.oauthService.setupAutomaticSilentRefresh();
 
+        this.oauthService.configure(authCodeFlowConfig);
+
 
         return this.oauthService.loadDiscoveryDocumentAndTryLogin()
             // For demo purposes, we pretend the previous call was very slow
@@ -153,6 +156,7 @@ export class AuthService {
     }
 
     login() {
+        console.log('authService.login()')
         this.oauthService.initLoginFlow()
     }
 

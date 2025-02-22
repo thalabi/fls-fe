@@ -1,0 +1,12 @@
+<p-overlayPanel #overlayPanel [showCloseIcon]="true">
+    <ng-template pTemplate="content">
+        <p>{{stackTrace}}</p>
+    </ng-template>
+</p-overlayPanel>
+<ng-container *ngIf="stackTrace">
+    <div style="margin-bottom: 1rem; background: #f8b7bd;">
+        <p-button (click)="overlayPanel.toggle($event)" label="Stacktrace" icon="pi pi-align-justify"
+            styleClass="p-button-link"></p-button>
+        <p-button (click)="clearStackTrace()" label="Clear" icon="pi pi-trash" styleClass="p-button-link"></p-button>
+    </div>
+</ng-container>
