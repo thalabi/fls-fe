@@ -1,8 +1,8 @@
-import { inject, Injectable } from "@angular/core";
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpResponse, HttpErrorResponse, HttpHandlerFn } from "@angular/common/http";
-import { Observable, throwError } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest, HttpResponse } from "@angular/common/http";
+import { inject } from "@angular/core";
 import { MessageService } from "primeng/api";
+import { Observable } from "rxjs";
+import { catchError, map } from "rxjs/operators";
 import { SessionService } from "./service/session.service";
 
 export function httpErrorInterceptor(request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
