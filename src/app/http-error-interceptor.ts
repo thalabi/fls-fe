@@ -5,9 +5,9 @@ import { catchError, map } from "rxjs/operators";
 import { MessageService } from "primeng/api";
 import { SessionService } from "./service/session.service";
 
-export function httpErrorInterceptor3(request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
+export function httpErrorInterceptor(request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
 
-    //const messageService = inject(MessageService)
+    const messageService = inject(MessageService)
     const sessionService = inject(SessionService)
 
     console.log('HttpErrorInterceptor');
@@ -29,15 +29,11 @@ export function httpErrorInterceptor3(request: HttpRequest<unknown>, next: HttpH
                 console.error('Client error: [%s]', errorMessage);
             } else {
                 // server-side error
-                if (httpErrorResponse.status === 0) { // status = 0, is net::ERR_CONNECTION_REFUSED
-                    errorMessage = 'Connection problem';
-                } else {
-                    errorMessage = httpErrorResponse.message;
-                }
+                errorMessage = httpErrorResponse.message;
                 console.error('Server error: [%s]', errorMessage);
                 console.error('httpErrorResponse.status: [%s]', httpErrorResponse.status)
             }
-            //messageService.add({ severity: 'error', summary: getStatusText(httpErrorResponse.status), detail: errorMessage });
+            messageService.add({ severity: 'error', summary: getStatusText(httpErrorResponse.status), detail: errorMessage });
             sessionService.setBackendExceptionstackTrace(httpErrorResponse.error.stackTrace)
             throw httpErrorResponse;
         })
@@ -46,6 +42,7 @@ export function httpErrorInterceptor3(request: HttpRequest<unknown>, next: HttpH
 
 export function getStatusText(statusCode: number) {
     return {
+        0: "Connection Failure", // this is not valid HTTP code but added here for coding simplicity
         100: "Continue",
         101: "Switching Protocols",
         102: "Processing",

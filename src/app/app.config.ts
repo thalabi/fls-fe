@@ -11,7 +11,8 @@ import { provideNgIdle } from '@ng-idle/core';
 import { authAppInitializerFactory } from './auth/auth-app-initializer.factory';
 import { AuthService } from './auth/auth.service';
 import { environment } from '../environments/environment';
-import { httpErrorInterceptor3 } from './http-error-interceptor-3';
+import { httpErrorInterceptor } from './http-error-interceptor';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -32,7 +33,7 @@ export const appConfig: ApplicationConfig = {
 
             // DI-based interceptors must be explicitly enabled for HttpErrorInterceptor below to work
             withInterceptorsFromDi(),
-            withInterceptors([httpErrorInterceptor3]),
+            withInterceptors([httpErrorInterceptor]),
         ),
 
         // for auth module
@@ -51,5 +52,7 @@ export const appConfig: ApplicationConfig = {
         // for ng idle
         provideNgIdle(),
         //
+
+        [MessageService]
     ]
 };
