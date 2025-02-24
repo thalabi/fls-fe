@@ -1,23 +1,23 @@
 export const environment = {
     production: false,
 
-    buildVersion: "@buildVersion@",
-    buildTimestamp: "@buildTimestamp@",
-    beRestServiceUrl: "https://localhost:8443",
+    buildVersion: "",
+    buildTimestamp: "",
+    beRestServiceUrl: "",
     // when adding or changing keycloak json, update auth-config.ts and auth-module-config.ts as well
     keycloak: {
-        issuer: 'https://localhost:8083/realms/fls',
-        clientId: 'fls',
+        issuer: '',
+        clientId: '',
         requireHttps: true,
 
         // prefixes of urls to send with Bearer token
         // prefixes have to be in lowerr case
-        urlPrefixesWithBearerToken: ['https://localhost:8443/protected']
+        urlPrefixesWithBearerToken: ['']
     },
     idle: {
         // times are in seconds
-        inactivityTimer: '299',
-        timeoutTimer: '1'
+        inactivityTimer: '',
+        timeoutTimer: ''
     }
 };
 
