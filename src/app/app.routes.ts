@@ -8,12 +8,10 @@ import { Httpstatus404Component } from './httpstatus404/httpstatus404.component'
 
 export const routes: Routes = [
     { path: 'welcome', component: WelcomeComponent },
-    { path: '', redirectTo: 'log-sheet', pathMatch: 'full' },
     { path: 'test', component: PrimengTestComponent },
     { path: 'log-sheet', component: LogSheetComponent, canActivate: [AuthGuard] },
     { path: 'ac-parameters', component: AircraftParametersComponent, canActivate: [AuthGuard] },
     { path: '', redirectTo: 'welcome', pathMatch: 'full' },
-    //{ path: 'login', component: LoginComponent },
     { path: '**', component: Httpstatus404Component },
 
 ];
