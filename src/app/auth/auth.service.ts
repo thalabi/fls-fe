@@ -1,6 +1,6 @@
 import { Injectable, Optional, SkipSelf } from '@angular/core';
 import { Router } from '@angular/router';
-import { JwksValidationHandler, OAuthEvent, OAuthService } from 'angular-oauth2-oidc';
+import { OAuthEvent, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, Observable, combineLatest, filter, map, of, tap } from 'rxjs';
 import { AuthRestService } from './auth-rest.service';
 import { authCodeFlowConfig } from './auth-config';
@@ -114,7 +114,7 @@ export class AuthService {
 
     runInitialLoginSequence(): Promise<void> {
         console.log('runInitialLoginSequence')
-        this.oauthService.tokenValidationHandler = new JwksValidationHandler();
+        //this.oauthService.tokenValidationHandler = new JwksValidationHandler();
 
         this.oauthService.setupAutomaticSilentRefresh();
 
