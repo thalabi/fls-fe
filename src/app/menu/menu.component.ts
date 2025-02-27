@@ -31,6 +31,7 @@ export class MenuComponent implements OnInit {
                 label: 'Maintenance',
                 items: [
                     { label: 'A/C Parameters', routerLink: ['/ac-parameters'] },
+                    { label: 'Fuel Log Maintenance', routerLink: ['/fuel-log'] },
                 ]
             },
             // {

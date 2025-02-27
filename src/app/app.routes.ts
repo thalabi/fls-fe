@@ -5,12 +5,14 @@ import { AircraftParametersComponent } from './aircraft-parameters/aircraft-para
 import { AuthGuard } from './auth/auth-guard.service';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { Httpstatus404Component } from './httpstatus404/httpstatus404.component';
+import { FuelLogMaintenaceComponent } from './fuel-log-maintenance/fuel-log-maintenance.component';
 
 export const routes: Routes = [
     { path: 'welcome', component: WelcomeComponent },
     { path: 'test', component: PrimengTestComponent },
     { path: 'log-sheet', component: LogSheetComponent, canActivate: [AuthGuard] },
     { path: 'ac-parameters', component: AircraftParametersComponent, canActivate: [AuthGuard] },
+    { path: 'fuel-log', component: FuelLogMaintenaceComponent, canActivate: [AuthGuard] },
     { path: '', redirectTo: 'welcome', pathMatch: 'full' },
     { path: '**', component: Httpstatus404Component },
 

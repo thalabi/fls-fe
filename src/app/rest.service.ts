@@ -1,9 +1,10 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { IGenericEntity } from './domain/i-gerneric-entity';
 import { IGenericEntityResponse } from './response/i-generic-entity-response';
+import { FuelLog } from './fuel-log-maintenance/FuelLog';
 
 @Injectable({
     providedIn: 'root'
@@ -31,7 +32,19 @@ export class RestService {
 
         const entityNameResource = RestService.toPlural(RestService.toCamelCase(tableName))
         console.log('entityNameResource', entityNameResource)
-        return this.httpClient.get(this.serviceUrl + '/protected/genericEntityController/findAll?' + 'tableName=' + tableName + '&search=' + searchCriteria + '&page=' + pageNumber + '&size=' + pageSize + sortQueryParams + projectionParam)
+        return this.httpClient.get(`${this.serviceUrl}/protected/genericEntityController/findAll?tableName=${tableName}&search=${searchCriteria}&page=${pageNumber}&size=${pageSize}${sortQueryParams}${projectionParam}`)
+    }
+    getRecordCount(tableName: string): Observable<any> {
+        return this.httpClient.get(`${this.serviceUrl}/protected/genericEntityController/countAll?tableName=${tableName}`);
+    }
+    getLastFuelLog(registration: string): Observable<any> {
+        return this.httpClient.get(`${this.serviceUrl}/protected/data-rest/fuelLogs/search/findTopByRegistrationOrderByDateDesc?registration=${registration}`);
+    }
+    saveFuelLog(fuelLog: FuelLog): Observable<HttpResponse<any>> {
+        return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs`, fuelLog);
+    }
+    deleteFuelLog(id: number): Observable<HttpResponse<any>> {
+        return this.httpClient.delete<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs/${id}`);
     }
 
     updateGenericEntity(row: IGenericEntity): Observable<IGenericEntityResponse> {
