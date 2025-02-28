@@ -15,10 +15,10 @@ import { AcParameters } from '../domain/AcParameters';
 @Component({
     selector: 'app-aircraft-parameters',
     imports: [CommonModule, ReactiveFormsModule, InputNumberModule, ButtonModule],
-    templateUrl: './aircraft-parameters.component.html',
-    styleUrl: './aircraft-parameters.component.css'
+    templateUrl: './ac-parameters.component.html',
+    styleUrl: './ac-parameters.component.css'
 })
-export class AircraftParametersComponent implements OnInit {
+export class AcParametersComponent implements OnInit {
 
     readonly AC_REGISTRATION: string = 'C-GQGD'
 

@@ -28,6 +28,9 @@ export class MenuComponent implements OnInit {
                 label: 'Log Sheet', routerLink: ['/log-sheet']
             },
             {
+                label: 'Refuel', routerLink: ['/refuel']
+            },
+            {
                 label: 'Maintenance',
                 items: [
                     { label: 'A/C Parameters', routerLink: ['/ac-parameters'] },
