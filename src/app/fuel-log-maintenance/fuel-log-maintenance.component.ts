@@ -73,6 +73,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+        this.messageService.clear()
         this.getFuelLogTable()
         //this.initForm()
         // this.getPortfolioTable();

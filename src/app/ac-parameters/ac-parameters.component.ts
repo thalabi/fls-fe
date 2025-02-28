@@ -51,6 +51,7 @@ export class AcParametersComponent implements OnInit {
         //     eachTankCapacity: new FormControl<number | null>(null, Validators.required),
         //     fuelBurnPerHour: new FormControl<number | null>(null, Validators.required),
         // })
+        this.messageService.clear()
         this.getAcParametersTable()
     }
 

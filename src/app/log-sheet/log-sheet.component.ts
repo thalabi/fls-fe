@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -55,9 +56,10 @@ export class LogSheetComponent implements OnInit {
     timesCaculated: boolean = false
     fuelCaculated: boolean = false
 
-    constructor(/*private productService: ProductService*/) { }
+    constructor(private messageService: MessageService) { }
 
     ngOnInit() {
+        this.messageService.clear()
         this.initTimesForm()
         this.initFuelForm()
 
