@@ -19,7 +19,7 @@
     "@angular/platform-browser-dynamic": "^19.1.7",
     "@angular/router": "^19.1.7",
     "@ng-idle/core": "^16.0.0",
-    "@primeng/themes": "^19.0.6",
+    "@primeng/themes": "^19.0.9",
     "angular-oauth2-oidc": "^19.0.0",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
