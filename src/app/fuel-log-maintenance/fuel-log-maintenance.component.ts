@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { RestService } from '../rest.service';
+import { RestService } from '../service/rest.service';
 import { SessionService } from '../service/session.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IGenericEntity } from '../domain/i-gerneric-entity';
-import { HalResponseLinks } from '../hal/hal-response-links';
-import { HalResponsePage } from '../hal/hal-response-page';
+import { HalResponseLinks } from '../response/hal/hal-response-links'
+import { HalResponsePage } from '../response/hal/hal-response-page';
 import { TableModule } from 'primeng/table';
 import { CrudEnum } from '../crud-enum';
 import { ButtonModule } from 'primeng/button';
@@ -19,7 +19,7 @@ import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { FuelLogResponse } from '../response/FuelLogResponse';
-import { FuelLog } from './FuelLog';
+import { FuelLog } from '../domain/FuelLog';
 
 export enum PriceTypeOptionEnum {
     PER_LITRE = 'Per litre', TOTAL = 'Total'
@@ -40,7 +40,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
     readonly ROWS_PER_PAGE: number = 10; // default rows per page
     firstRowOfTable!: number; // triggers a page change, zero based. 0 -> first page, 1 -> second page, ...
     pageNumber: number = 0;
-    fuelLogs!: Array<FuelLog>;
+    fuelLogArray!: Array<FuelLog>;
     selectedFuelLog!: FuelLog
     crudMode!: CrudEnum;
     crudEnum = CrudEnum; // Used in html to refere to enum
@@ -85,7 +85,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
                 {
                     next: (fuelLogResponse: FuelLogResponse) => {
                         console.log('fuelLogResponse', fuelLogResponse);
-                        this.fuelLogs = fuelLogResponse._embedded.simpleModels || new Array<FuelLog>
+                        this.fuelLogArray = fuelLogResponse._embedded.simpleModels || new Array<FuelLog>
 
                         this.page = fuelLogResponse.page;
                         this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
@@ -101,28 +101,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
                         this.loadingStatus = false
                     }
                 });
-        // const tableName: string = 'portfolio'
-        // const entityNameResource = RestService.toPlural(RestService.toCamelCase(tableName))
-        // this.restService.getTableData(tableName, 0, 999, ['financialInstitution', 'name'])
-        //     .subscribe(
-        //         {
-        //             next: (data: any) => {
-        //                 //                        this.portfolioRows = data._embedded[entityNameResource]
-        //                 const portfolioRowsDeletedAndNonDeleted: Array<Portfolio> = data._embedded[entityNameResource]
-        //                 this.portfolioRows = portfolioRowsDeletedAndNonDeleted.filter((portfolioRow) => portfolioRow.logicallyDeleted == false)
-        //                 console.log('this.portfolioRows', this.portfolioRows)
-        //                 //                        this.portfolioCount = data.page.totalElements
-        //                 this.portfolioCount = this.portfolioRows.length
-        //             },
-        //             complete: () => {
-        //                 console.log('http request completed')
-        //                 this.loadingStatus = false
-        //             },
-        //             error: (httpErrorResponse: HttpErrorResponse) => {
-        //                 this.messageService.add({ severity: 'error', summary: httpErrorResponse.status.toString(), detail: this.extractMessage(httpErrorResponse) })
-        //             }
-        //         });
-
     }
 
     // initForm() {
@@ -294,6 +272,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
                                 this.displayDialog = false;
                                 this.sessionService.setDisableParentMessages(false)
                                 this.selectedFuelLog = {} as FuelLog
+                                this.getFuelLogTable() // do not refactor this and move it after the switch as it needs to execute after request completes
                             },
                             error: (httpErrorResponse: HttpErrorResponse) => {
                                 console.log('httpErrorResponse', httpErrorResponse)
@@ -340,6 +319,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
                                 this.displayDialog = false;
                                 this.sessionService.setDisableParentMessages(false)
                                 this.selectedFuelLog = {} as FuelLog
+                                this.getFuelLogTable() // do not refactor this and move it after the switch as it needs to execute after request completes
                             },
                             error: (httpErrorResponse: HttpErrorResponse) => {
                                 console.log('httpErrorResponse', httpErrorResponse)
@@ -351,7 +331,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
         }
         this.form.reset()
         this.modifyAndDeleteButtonsDisable = true
-        this.getFuelLogTable()
     }
     private calculatePricePerLitre(priceType: PriceTypeOptionEnum, price: number | null, addToLeftTank: number | null, addToRightTank: number | null): number {
         if (priceType == PriceTypeOptionEnum.PER_LITRE) {

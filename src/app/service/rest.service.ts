@@ -1,10 +1,10 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { IGenericEntity } from './domain/i-gerneric-entity';
-import { IGenericEntityResponse } from './response/i-generic-entity-response';
-import { FuelLog } from './fuel-log-maintenance/FuelLog';
+import { IGenericEntity } from '../domain/i-gerneric-entity';
+import { FuelLog } from '../domain/FuelLog';
+import { AcParameters } from '../domain/AcParameters';
 
 @Injectable({
     providedIn: 'root'
@@ -37,6 +37,10 @@ export class RestService {
     getRecordCount(tableName: string): Observable<any> {
         return this.httpClient.get(`${this.serviceUrl}/protected/genericEntityController/countAll?tableName=${tableName}`);
     }
+    updateAcParameters(acParameters: AcParameters): Observable<HttpResponse<any>> {
+        return this.httpClient.put<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/acParameterses/${acParameters.id}`, acParameters);
+    }
+
     getLastFuelLog(registration: string): Observable<any> {
         return this.httpClient.get(`${this.serviceUrl}/protected/data-rest/fuelLogs/search/findTopByRegistrationOrderByDateDesc?registration=${registration}`);
     }
@@ -45,23 +49,6 @@ export class RestService {
     }
     deleteFuelLog(id: number): Observable<HttpResponse<any>> {
         return this.httpClient.delete<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs/${id}`);
-    }
-
-    updateGenericEntity(row: IGenericEntity): Observable<IGenericEntityResponse> {
-        console.log('row: ', row);
-
-        let url: string = row._links.self.href;
-        console.log('url: ', url);
-        return this.httpClient.patch<IGenericEntity>(url, row).pipe(
-            map((response: any) => {
-                console.log('response', response);
-                return response;
-            }),
-            catchError((httpErrorResponse: HttpErrorResponse) => {
-                console.log('httpErrorResponse', httpErrorResponse);
-                RestService.handleError(httpErrorResponse);
-                return throwError(() => new Error());
-            }));
     }
 
     public static toCamelCase(tableName: string): string {

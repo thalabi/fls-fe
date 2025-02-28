@@ -1,4 +1,4 @@
-<p-table [value]="fuelLogs" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [rows]=" 20"
+<p-table [value]="fuelLogArray" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [rows]=" 20"
     [totalRecords]="page.totalElements" [loading]="loadingStatus" selectionMode="single" [(selection)]="selectedFuelLog"
     (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)" dataKey="_links.self.href">
     <!-- <ng-template pTemplate="caption">
