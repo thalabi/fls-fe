@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+import { LazyLoadEvent, MessageService } from 'primeng/api';
 import { RestService } from '../service/rest.service';
 import { SessionService } from '../service/session.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IGenericEntity } from '../domain/i-gerneric-entity';
 import { HalResponseLinks } from '../response/hal/hal-response-links'
 import { HalResponsePage } from '../response/hal/hal-response-page';
-import { TableModule } from 'primeng/table';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { CrudEnum } from '../crud-enum';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
@@ -34,6 +34,7 @@ export enum PriceTypeOptionEnum {
 export class FuelLogMaintenaceComponent implements OnInit {
 
     readonly AC_REGISTRATION: string = 'C-GQGD'
+    readonly TABLE_NAME: string = 'fuel_log'
 
     page: HalResponsePage = {} as HalResponsePage;
     links: HalResponseLinks = {} as HalResponseLinks;
@@ -80,6 +81,75 @@ export class FuelLogMaintenaceComponent implements OnInit {
         // this.getInstrumentTable();
         // this.createForm()
     }
+    //
+    // TODO, to add filter by price and airport 
+    //
+    fetchPage(tableLazyLoadEvent: TableLazyLoadEvent) {
+        console.log(tableLazyLoadEvent)
+        this.loadingStatus = true
+        const pageSize = tableLazyLoadEvent.rows ?? 20
+        const pageNumber = (tableLazyLoadEvent.first ?? 0) / pageSize;
+        //const filters: { [s: string]: FilterMetadata[] } | undefined = lazyLoadEvent.filters
+        const filters: any = tableLazyLoadEvent.filters
+        console.log('filters', filters)
+        console.log('pageNumber', pageNumber, 'pageSize', pageSize, 'filters', filters)
+        let searchCriteria: string = ''
+        if (filters) {
+            console.log('Object.keys(filters)', Object.keys(filters))
+            Object.keys(filters).forEach(columnName => {
+                console.log('columeName', columnName, 'matchMode', filters[columnName][0].matchMode, 'value', filters[columnName][0].value)
+                //searchCriteria += columnName + filters[columnName][0].matchMode + filters[columnName][0].value + ","
+                if (filters[columnName][0].value !== null) {
+                    if (filters[columnName][0].value instanceof Date) {
+                        searchCriteria += columnName + '|' + filters[columnName][0].matchMode + '|' + new Date(filters[columnName][0].value).toISOString() + ","
+                    } else {
+                        searchCriteria += columnName + '|' + filters[columnName][0].matchMode + '|' + filters[columnName][0].value + ","
+                    }
+                }
+            })
+            if (searchCriteria.length > 0) {
+                searchCriteria = searchCriteria.slice(0, searchCriteria.length - 1)
+            }
+            console.log('searchCriteria', searchCriteria)
+        }
+        const entityNameResource = RestService.toPlural(RestService.toCamelCase(this.TABLE_NAME))
+        console.log('entityNameResource 2', entityNameResource)
+        this.restService.getTableData(this.TABLE_NAME, searchCriteria, pageNumber, pageSize, ['date'])
+            .subscribe(
+                {
+                    // next: (data: any) => {
+                    //     console.log('data', data)
+                    //     console.log('data._embedded[' + entityNameResource + ']', data._embedded[entityNameResource])
+                    //     this.tableRows = data._embedded[entityNameResource]
+                    //     this.totalRowCount = data.page.totalElements
+                    //     this.loadingStatus = false
+                    // },
+                    // complete: () => {
+                    // }
+                    // ,
+                    // error: (httpErrorResponse: HttpErrorResponse) => {
+                    //     this.messageService.add({ severity: 'error', summary: httpErrorResponse.status.toString(), detail: 'Server error. Please contact support.' })
+                    // }
+                    next: (fuelLogResponse: FuelLogResponse) => {
+                        console.log('fuelLogResponse', fuelLogResponse);
+                        this.fuelLogArray = fuelLogResponse._embedded.simpleModels || new Array<FuelLog>
+
+                        this.page = fuelLogResponse.page;
+                        this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
+                        this.links = fuelLogResponse._links;
+                    },
+                    complete: () => {
+                        console.log('this.restService.getTableData completed')
+                        this.loadingStatus = false
+                    }
+                    ,
+                    error: (httpErrorResponse: HttpErrorResponse): void => {
+                        console.log('httpErrorResponse', httpErrorResponse)
+                        this.loadingStatus = false
+                    }
+                });
+    }
+
     getFuelLogTable() {
         this.restService.getTableData('fuel_log', `registration|equals|${this.AC_REGISTRATION}`, this.pageNumber, this.ROWS_PER_PAGE, ['date'])
             .subscribe(
@@ -151,7 +221,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
         console.log('this.crudMode', this.crudMode);
         switch (this.crudMode) {
             case CrudEnum.ADD:
-                this.getLastFuelLog()
+                this.getRemainingInFuelTanks()
                 this.form.reset()
                 this.form.enable();
                 break;
@@ -198,7 +268,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
         // }
         // this.displayDialog = true;
     }
-    private getLastFuelLog() {
+    private getRemainingInFuelTanks() {
         this.restService.getLastFuelLog(this.AC_REGISTRATION)
             .subscribe(
                 {

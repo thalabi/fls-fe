@@ -22,18 +22,12 @@ export class AcParametersComponent implements OnInit {
 
     readonly AC_REGISTRATION: string = 'C-GQGD'
 
-    initialTsn!: number // from service
-    initialTsmoh!: number // from service
-    eachTankCapacity!: number // from service
-    fuelBurnPerHour!: number // from service
+    initialTsn!: number
+    initialTsmoh!: number
+    eachTankCapacity!: number
+    fuelBurnPerHour!: number
 
-    page: HalResponsePage = {} as HalResponsePage;
-    links: HalResponseLinks = {} as HalResponseLinks;
-    readonly ROWS_PER_PAGE: number = 10; // default rows per page
-    firstRowOfTable!: number; // triggers a page change, zero based. 0 -> first page, 1 -> second page, ...
-    pageNumber: number = 0;
-    acParameterArray!: Array<AcParameters>
-    loadingStatus!: boolean;
+    acParameters!: AcParameters
 
     form = new FormGroup({
         initialTsn: new FormControl<number | null>(null, Validators.required),
@@ -45,48 +39,37 @@ export class AcParametersComponent implements OnInit {
     constructor(private restService: RestService, private messageService: MessageService) { }
 
     ngOnInit(): void {
-        // this.form = new FormGroup({
-        //     initialTsn: new FormControl<number | null>(null, Validators.required),
-        //     initialTsmoh: new FormControl<number | null>(null, Validators.required),
-        //     eachTankCapacity: new FormControl<number | null>(null, Validators.required),
-        //     fuelBurnPerHour: new FormControl<number | null>(null, Validators.required),
-        // })
         this.messageService.clear()
-        this.getAcParametersTable()
+        this.getAcParameters()
     }
 
-    getAcParametersTable() {
-        this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, this.pageNumber, this.ROWS_PER_PAGE)
+    private getAcParameters() {
+        this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1)
             .subscribe(
                 {
                     next: (acParametersLogResponse: AcParametersResponse) => {
                         console.log('acParametersLogResponse', acParametersLogResponse);
-                        this.acParameterArray = acParametersLogResponse._embedded.simpleModels || new Array<AcParameters>
+                        const acParametersArray = acParametersLogResponse._embedded.simpleModels || new Array<AcParameters>
+                        this.acParameters = acParametersArray[0]
 
-                        this.page = acParametersLogResponse.page;
-                        this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
-                        this.links = acParametersLogResponse._links;
                     },
                     complete: () => {
                         console.log('this.restService.getTableData completed')
-                        this.loadingStatus = false
 
                         this.initForm()
                     }
                     ,
                     error: (httpErrorResponse: HttpErrorResponse): void => {
                         console.log('httpErrorResponse', httpErrorResponse)
-                        this.loadingStatus = false
                     }
                 });
     }
     private initForm() {
-        if (this.acParameterArray.length > 0) {
-            const acRegistration = this.acParameterArray[0]
-            this.form.controls['initialTsn'].patchValue(acRegistration['initialTsn'])
-            this.form.controls['initialTsmoh'].patchValue(acRegistration['initialTsmoh'])
-            this.form.controls['eachTankCapacity'].patchValue(acRegistration['eachTankCapacity'])
-            this.form.controls['fuelBurnPerHour'].patchValue(acRegistration['fuelBurnPerHour'])
+        if (this.acParameters) {
+            this.form.controls.initialTsn.patchValue(this.acParameters.initialTsn)
+            this.form.controls.initialTsmoh.patchValue(this.acParameters.initialTsmoh)
+            this.form.controls.eachTankCapacity.patchValue(this.acParameters.eachTankCapacity)
+            this.form.controls.fuelBurnPerHour.patchValue(this.acParameters.fuelBurnPerHour)
         } else {
             this.form.reset()
         }
@@ -95,7 +78,7 @@ export class AcParametersComponent implements OnInit {
     }
     onSubmit() {
         let acParameters: AcParameters = {} as AcParameters
-        acParameters.id = this.acParameterArray[0].id
+        acParameters.id = this.acParameters.id
         acParameters.registration = this.AC_REGISTRATION
         acParameters.initialTsn = this.form.controls.initialTsn.value || 0
         acParameters.initialTsmoh = this.form.controls.initialTsmoh.value || 0

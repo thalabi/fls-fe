@@ -1,6 +1,7 @@
 <p-table [value]="fuelLogArray" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [rows]=" 20"
     [totalRecords]="page.totalElements" [loading]="loadingStatus" selectionMode="single" [(selection)]="selectedFuelLog"
-    (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)" dataKey="_links.self.href">
+    (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)" [loading]="loadingStatus" [lazy]="true"
+    (onLazyLoad)="fetchPage($event)" dataKey="_links.self.href" size="small">
     <!-- <ng-template pTemplate="caption">
     Show <p-selectButton id="logicallyDeletedOptions" [options]="logicallyDeletedOptions"
         [(ngModel)]="logicallyDeletedOption" (onChange)="onChangeLogicallyDeleted($event)"></p-selectButton>
