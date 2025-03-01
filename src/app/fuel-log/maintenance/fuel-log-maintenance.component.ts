@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LazyLoadEvent, MessageService } from 'primeng/api';
-import { RestService } from '../service/rest.service';
-import { SessionService } from '../service/session.service';
+import { RestService } from '../../service/rest.service';
+import { SessionService } from '../../service/session.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { IGenericEntity } from '../domain/i-gerneric-entity';
-import { HalResponseLinks } from '../response/hal/hal-response-links'
-import { HalResponsePage } from '../response/hal/hal-response-page';
+import { IGenericEntity } from '../../domain/i-gerneric-entity';
+import { HalResponseLinks } from '../../response/hal/hal-response-links'
+import { HalResponsePage } from '../../response/hal/hal-response-page';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { CrudEnum } from '../crud-enum';
+import { CrudEnum } from '../../crud-enum';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
@@ -18,8 +18,8 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { FuelLogResponse } from '../response/FuelLogResponse';
-import { FuelLog } from '../domain/FuelLog';
+import { FuelLogResponse } from '../../response/FuelLogResponse';
+import { FuelLog } from '../../domain/FuelLog';
 
 export enum PriceTypeOptionEnum {
     PER_LITRE = 'Per litre', TOTAL = 'Total'
