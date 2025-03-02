@@ -403,6 +403,11 @@ export class FuelLogMaintenaceComponent implements OnInit {
         this.sessionService.setDisableParentMessages(false)
         this.modifyAndDeleteButtonsDisable = true
     }
+    onChildFormCancel() {
+        this.displayDialog = false;
+        this.sessionService.setDisableParentMessages(false)
+        this.modifyAndDeleteButtonsDisable = true
+    }
     private resetDialoForm() {
         this.form.reset()
         this.selectedFuelLog = {} as FuelLog

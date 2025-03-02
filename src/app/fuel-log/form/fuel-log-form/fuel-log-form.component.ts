@@ -22,12 +22,15 @@ export class FuelLogFormComponent implements OnChanges {
     @Input() fuelLog!: FuelLog
     @Input() acParameters!: AcParameters
     @Output() formSubmitted = new EventEmitter<FuelLog>();
+    @Output() formCancelled = new EventEmitter();
 
     priceTypeOptions: Array<PriceTypeOptionEnum> = [PriceTypeOptionEnum.PER_LITRE, PriceTypeOptionEnum.TOTAL]
     pricePerLitre!: number
 
     form = new FormGroup({
         date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+        left: new FormControl<number>(0),
+        right: new FormControl<number>(0),
         topUp: new FormControl<boolean>(false, { nonNullable: true, validators: Validators.required }),
         addToLeftTank: new FormControl<number | null>(null, Validators.required),
         addToRightTank: new FormControl<number | null>(null, Validators.required),
@@ -48,6 +51,8 @@ export class FuelLogFormComponent implements OnChanges {
     private fillInFormWithValues() {
         console.log('this.fuelLog', this.fuelLog)
         this.form.controls.date.setValue(this.fuelLog.date)
+        this.form.controls.left.setValue(this.fuelLog.left)
+        this.form.controls.right.setValue(this.fuelLog.right)
         this.form.controls.topUp.setValue(false)
         this.form.controls.addToLeftTank.setValue(this.fuelLog.changeInLeft)
         this.form.controls.addToRightTank.setValue(this.fuelLog.changeInRight)
@@ -116,7 +121,7 @@ export class FuelLogFormComponent implements OnChanges {
     }
 
     onCancel() {
-
+        this.formCancelled.emit()
     }
 
     toUpperCase() {

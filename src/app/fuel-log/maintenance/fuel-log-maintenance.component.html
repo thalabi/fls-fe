@@ -50,7 +50,7 @@
     [modal]="true" (onHide)="onCancel()">
 
     <app-fuel-log-form [fuelLog]="fuelLogToForm" [acParameters]="acParameters"
-        (formSubmitted)="onChildFormSubmit($event)"></app-fuel-log-form>
+        (formSubmitted)="onChildFormSubmit($event)" (formCancelled)="onChildFormCancel()"></app-fuel-log-form>
     <!-- <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
         <p-messages></p-messages>
