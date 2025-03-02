@@ -20,7 +20,8 @@
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-fuelLog>
-        <tr [pSelectableRow]="fuelLog.pricePerLitre ? fuelLog : ''">
+        <!-- <tr [pSelectableRow]="fuelLog.pricePerLitre ? fuelLog : ''"> -->
+        <tr [pSelectableRow]="fuelLog">
             <td>{{fuelLog.date | date: 'yy/M/d h:mm a'}}</td>
             <td>{{fuelLog.left}}</td>
             <td>{{fuelLog.right}}</td>
@@ -48,13 +49,14 @@
 <p-dialog header="Fuel log - {{crudMode}}" [(visible)]="displayDialog" [responsive]="true" showEffect="fade"
     [modal]="true" (onHide)="onCancel()">
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <app-fuel-log-form [fuelLog]="fuelLogToForm" [acParameters]="acParameters"
+        (formSubmitted)="onChildFormSubmit($event)"></app-fuel-log-form>
+    <!-- <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
         <p-messages></p-messages>
 
         <div class="grid" style="width: 30em;">
 
-            <!-- date-->
             <div class="col-2">
                 <label for="date">Date</label>
             </div>
@@ -79,7 +81,6 @@
                 </label>
             </div>
 
-            <!-- line 2 -->
             <div class="col-2">
                 <span>In tank</span>
             </div>
@@ -91,7 +92,6 @@
             </div>
 
 
-            <!-- topUp -->
             <div class="col-2">
                 <label for="topUp">
                     Top up
@@ -101,7 +101,6 @@
                 <p-checkbox formControlName="topUp" inputId="topUp" binary="true" (onChange)="onChangeTopUp($event)" />
             </div>
 
-            <!-- addToLeftTank -->
             <div class="col-2">
                 <label for="addToLeftTank">Add to left tank</label>
             </div>
@@ -114,17 +113,14 @@
                     mode="decimal" [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}" />
             </div>
 
-            <!-- priceType -->
             <div class="col-2">
                 <label for="priceType">Price type</label>
             </div>
             <div class="col-10">
                 <p-select id="priceType" [options]="priceTypeOptions" formControlName="priceType" [showClear]="true">
                 </p-select>
-                <!-- (onChange)="onChangeFinancialInstitution($event)"  -->
             </div>
 
-            <!-- price -->
             <div class="col-2">
                 <label for="price">Price</label>
             </div>
@@ -133,7 +129,6 @@
                     [maxFractionDigits]="2" [maxlength]="4" [inputStyle]="{'width':'3rem'}" />
             </div>
 
-            <!-- airport -->
             <div class="col-2">
                 <label for="airport">Airport</label>
             </div>
@@ -142,7 +137,6 @@
                     style="text-transform:uppercase; width: 5rem" />
             </div>
 
-            <!-- fbo -->
             <div class="col-2">
                 <label for="fbo">FBO</label>
             </div>
@@ -150,7 +144,6 @@
                 <input type="text" pInputText inputId="airport" formControlName="fbo" size="small" maxlength="256" />
             </div>
 
-            <!-- comment -->
             <div class="col-2">
                 <label for="comment">Comment</label>
             </div>
@@ -172,5 +165,5 @@
             </p-footer>
 
         </div>
-    </form>
+    </form> -->
 </p-dialog>
