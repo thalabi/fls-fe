@@ -24,6 +24,7 @@ export class FuelLogFormComponent implements OnChanges {
     @Output() formSubmitted = new EventEmitter<FuelLog>();
 
     priceTypeOptions: Array<PriceTypeOptionEnum> = [PriceTypeOptionEnum.PER_LITRE, PriceTypeOptionEnum.TOTAL]
+    pricePerLitre!: number
 
     form = new FormGroup({
         date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
@@ -66,7 +67,7 @@ export class FuelLogFormComponent implements OnChanges {
         fuelLog.right = this.fuelLog.right
         fuelLog.changeInLeft = this.form.controls.addToLeftTank.value!
         fuelLog.changeInRight = this.form.controls.addToRightTank.value!
-        fuelLog.pricePerLitre = this.calculatePricePerLitre(this.form.controls.priceType.value, this.form.controls.price.value, this.form.controls.addToLeftTank.value, this.form.controls.addToRightTank.value)
+        fuelLog.pricePerLitre = this.pricePerLitre
         fuelLog.airport = this.form.controls.airport.value!
         fuelLog.fbo = this.form.controls.fbo.value!
         fuelLog.comment = this.form.controls.comment.value!
@@ -93,6 +94,7 @@ export class FuelLogFormComponent implements OnChanges {
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.addToLeftTank.setErrors({ invalid: true })
         }
+        this.calculatePricePerLitre()
     }
     onInputAddToRightTank(inputNumberInputEvent: InputNumberInputEvent) {
         // turn off Top up checkbox
@@ -103,8 +105,11 @@ export class FuelLogFormComponent implements OnChanges {
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.addToRightTank.setErrors({ invalid: true })
         }
+        this.calculatePricePerLitre()
     }
-
+    onInputPrice() {
+        this.calculatePricePerLitre()
+    }
 
     onSubmit() {
         if (this.form.valid) {
@@ -123,15 +128,20 @@ export class FuelLogFormComponent implements OnChanges {
         airportControl.setValue((airportControl.value ?? '').toUpperCase(), { emitEvent: false });
     }
 
-    private calculatePricePerLitre(priceType: PriceTypeOptionEnum, price: number | null, addToLeftTank: number | null, addToRightTank: number | null): number {
+    private calculatePricePerLitre() {
+        console.log('this.pricePerLitre', this.pricePerLitre)
+        const priceType = this.form.controls.priceType.value
+        const price = this.form.controls.price.value
         if (priceType == PriceTypeOptionEnum.PER_LITRE) {
-            return price!
+            this.pricePerLitre = price!
         } else {
-            return this.round(price! / ((addToLeftTank! + addToRightTank!) * 3.78), 2)
+            const addToLeftTank = this.form.controls.addToLeftTank.value
+            const addToRightTank = this.form.controls.addToRightTank.value
+            this.pricePerLitre = this.round(price! / ((addToLeftTank! + addToRightTank!) * 3.78), 2)
         }
     }
 
     private round(value: number, precision: number): number {
-        return Number(value.toFixed(1))
+        return Number(value.toFixed(precision))
     }
 }

@@ -49,9 +49,9 @@
             <p-checkbox formControlName="topUp" inputId="topUp" binary="true" (onChange)="onChangeTopUp($event)" />
         </div>
 
-        <!-- addToLeftTank -->
+        <!-- addToLeftTank & addToRightTank -->
         <div class="col-2">
-            <label for="addToLeftTank">Add to left tank</label>
+            <label for="addToLeftTank">Add to tank</label>
         </div>
         <div class="col-2">
             <p-inputnumber inputId="addToLeftTank" formControlName="addToLeftTank" size="small"
@@ -69,7 +69,7 @@
             <label for="priceType">Price type</label>
         </div>
         <div class="col-10">
-            <p-select id="priceType" [options]="priceTypeOptions" formControlName="priceType" [showClear]="true">
+            <p-select id="priceType" [options]="priceTypeOptions" formControlName="priceType" size="small">
             </p-select>
             <!-- (onChange)="onChangeFinancialInstitution($event)"  -->
         </div>
@@ -78,9 +78,17 @@
         <div class="col-2">
             <label for="price">Price</label>
         </div>
-        <div class="col-10">
-            <p-inputnumber inputId="price" formControlName="price" size="small" [min]="0" mode="decimal"
-                [maxFractionDigits]="2" [maxlength]="6" [inputStyle]="{'width':'5rem'}" />
+        <div class="col-2">
+            <p-inputnumber inputId="price" formControlName="price" size="small" (onInput)="onInputPrice()" [min]="0"
+                mode="decimal" [maxFractionDigits]="2" [maxlength]="6" [inputStyle]="{'width':'5rem'}" />
+        </div>
+        <!-- pricePerLitre -->
+        <div class="col-1">
+        </div>
+        <div class="col-7">
+            <span
+                *ngIf="form.controls.priceType.value == 'Total' && !form.controls.addToLeftTank.invalid && !form.controls.addToRightTank.invalid  && !form.controls.price.invalid">({{pricePerLitre
+                | number: '1.0-2' }}/litre)</span>
         </div>
 
         <!-- airport -->
