@@ -294,17 +294,17 @@ export class FuelLogMaintenaceComponent implements OnInit {
     private fillInFormWithValues() {
         console.log('this.selectedRow', this.selectedFuelLog)
         //this.form.controls['registration'].patchValue(this.selectedRow['registration']);
-        this.form.controls.date.patchValue(new Date(this.selectedFuelLog['date']));
-        this.inLeftTank = this.selectedFuelLog['left']
-        this.inRightTank = this.selectedFuelLog['right']
-        this.form.controls['topUp'].patchValue(false);
-        this.form.controls['addToLeftTank'].patchValue(this.selectedFuelLog['changeInLeft']);
-        this.form.controls['addToRightTank'].patchValue(this.selectedFuelLog['changeInRight']);
-        this.form.controls['priceType'].patchValue(PriceTypeOptionEnum.PER_LITRE);
-        this.form.controls['price'].patchValue(this.selectedFuelLog['pricePerLitre']);
-        this.form.controls['airport'].patchValue(this.selectedFuelLog['airport']);
-        this.form.controls['fbo'].patchValue(this.selectedFuelLog['fbo']);
-        this.form.controls['comment'].patchValue(this.selectedFuelLog['comment']);
+        this.form.controls.date.patchValue(new Date(this.selectedFuelLog.date));
+        this.inLeftTank = this.selectedFuelLog.left
+        this.inRightTank = this.selectedFuelLog.right
+        this.form.controls.topUp.patchValue(false);
+        this.form.controls.addToLeftTank.patchValue(this.selectedFuelLog.changeInLeft);
+        this.form.controls.addToRightTank.patchValue(this.selectedFuelLog.changeInRight);
+        this.form.controls.priceType.patchValue(PriceTypeOptionEnum.PER_LITRE);
+        this.form.controls.price.patchValue(this.selectedFuelLog.pricePerLitre);
+        this.form.controls.airport.patchValue(this.selectedFuelLog.airport);
+        this.form.controls.fbo.patchValue(this.selectedFuelLog.fbo);
+        this.form.controls.comment.patchValue(this.selectedFuelLog.comment);
         console.log('this.form.value', this.form.value)
     }
 

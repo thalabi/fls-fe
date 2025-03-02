@@ -9,17 +9,12 @@ import { FuelLogResponse } from '../../response/FuelLogResponse';
 import { AcParameters } from '../../domain/AcParameters';
 import { AcParametersResponse } from '../../response/AcParametersResponse';
 import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
-import { DatePickerModule } from 'primeng/datepicker';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { InputTextModule } from 'primeng/inputtext';
-import { MessagesModule } from 'primeng/messages';
-import { SelectModule } from 'primeng/select';
-import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
+import { FuelLogFormComponent } from '../form/fuel-log-form/fuel-log-form.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-refuel',
-    imports: [CommonModule, ReactiveFormsModule, DatePickerModule, CheckboxModule, InputNumberModule, InputTextModule, SelectModule, MessagesModule, ButtonModule],
+    imports: [FuelLogFormComponent],
     templateUrl: './refuel.component.html',
     styleUrl: './refuel.component.css'
 })
@@ -31,73 +26,36 @@ export class RefuelComponent implements OnInit {
 
     priceTypeOptions: Array<PriceTypeOptionEnum> = [PriceTypeOptionEnum.PER_LITRE, PriceTypeOptionEnum.TOTAL]
 
-    inLeftTank!: number
-    inRightTank!: number
-
     acParameters!: AcParameters
 
-    form = new FormGroup({
-        date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
-        topUp: new FormControl<boolean>(false, { nonNullable: true, validators: Validators.required }),
-        addToLeftTank: new FormControl<number | null>(null, Validators.required),
-        addToRightTank: new FormControl<number | null>(null, Validators.required),
-        priceType: new FormControl<PriceTypeOptionEnum>(PriceTypeOptionEnum.PER_LITRE, { nonNullable: true }), // nonNullable: true, means when the form is reset the default value is used
-        price: new FormControl<number | null>(null, Validators.required),
-        airport: new FormControl<string>('', Validators.required),
-        fbo: new FormControl<string>(''),
-        comment: new FormControl<string>(''),
-    });
+    fuelLog: FuelLog = {} as FuelLog
+    fuelLogToForm!: FuelLog
 
     constructor(private messageService: MessageService, private restService: RestService,) { }
 
     ngOnInit(): void {
         this.messageService.clear()
-        this.getAcParameters()
-        this.getRemainingInFuelTanks()
-    }
+        forkJoin({
+            acParametersResponse: this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1),
+            fuelLogResponse: this.restService.getLastFuelLog(this.AC_REGISTRATION)
+        }).subscribe(((result: { acParametersResponse: AcParametersResponse; fuelLogResponse: FuelLogResponse }) => {
+            console.log('acParametersResponse', result.acParametersResponse);
+            const acParametersArray = result.acParametersResponse._embedded.simpleModels || new Array<AcParameters>
+            this.acParameters = acParametersArray[0]
 
-    private getRemainingInFuelTanks() {
-        this.restService.getLastFuelLog(this.AC_REGISTRATION)
-            .subscribe(
-                {
-                    next: (fuelLogResponse: FuelLogResponse) => {
-                        console.log('fuelLogResponse', fuelLogResponse);
-                        const fuelLogs = fuelLogResponse._embedded.fuelLogs || new Array<FuelLog>
-                        this.inLeftTank = fuelLogs[0].left + fuelLogs[0].changeInLeft
-                        this.inRightTank = fuelLogs[0].right + fuelLogs[0].changeInRight;
-                        console.log('in tanks: ', this.inLeftTank, this.inRightTank)
-                    },
-                    complete: () => {
-                        console.log('this.restService.getTableData completed')
-                        this.loadingStatus = false
-                    }
-                    ,
-                    error: (httpErrorResponse: HttpErrorResponse): void => {
-                        console.log('this.restService.getTableData error')
-                        this.loadingStatus = false
-                    }
-                });
+            console.log('fuelLogResponse', result.fuelLogResponse);
+            const fuelLogs = result.fuelLogResponse._embedded.fuelLogs || new Array<FuelLog>
+            const inLeftTank = fuelLogs[0].left + fuelLogs[0].changeInLeft
+            const inRightTank = fuelLogs[0].right + fuelLogs[0].changeInRight;
 
-    }
+            this.fuelLog.date = new Date()
+            this.fuelLog.registration = this.AC_REGISTRATION
+            this.fuelLog.left = inLeftTank
+            this.fuelLog.right = inRightTank
+            console.log('fuelLog', this.fuelLog)
 
-    private getAcParameters() {
-        this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1)
-            .subscribe(
-                {
-                    next: (acParametersLogResponse: AcParametersResponse) => {
-                        console.log('acParametersLogResponse', acParametersLogResponse);
-                        const acParametersArray = acParametersLogResponse._embedded.simpleModels || new Array<AcParameters>
-                        this.acParameters = acParametersArray[0]
-
-                    },
-                    complete: () => {
-                        console.log('this.restService.getTableData completed')
-                    }
-                    ,
-                    error: (httpErrorResponse: HttpErrorResponse): void => {
-                        console.log('httpErrorResponse', httpErrorResponse)
-                    }
-                });
+            this.fuelLogToForm = this.fuelLog // will trigger a change detection and populate the form
+        }));
     }
 
     onChangeTopUp(event: CheckboxChangeEvent) {
@@ -112,6 +70,10 @@ export class RefuelComponent implements OnInit {
     onSubmit() {
 
     }
+    onChildFormSubmit(fuelLog: FuelLog) {
+        console.log('fuelLog', fuelLog)
+    }
+
 
     onCancel() {
 
