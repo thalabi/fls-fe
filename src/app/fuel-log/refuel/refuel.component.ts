@@ -58,20 +58,24 @@ export class RefuelComponent implements OnInit {
         }));
     }
 
-    onChangeTopUp(event: CheckboxChangeEvent) {
-        console.log('onChangeTopUp(), event', event)
-        if (event.checked) {
-
-        } else {
-
-        }
-    }
-
-    onSubmit() {
-
-    }
     onChildFormSubmit(fuelLog: FuelLog) {
         console.log('fuelLog', fuelLog)
+        this.restService.saveFuelLog(fuelLog)
+            .subscribe(
+                {
+                    next: (response: any) => {
+                        console.log('response', response)
+                    },
+                    complete: () => {
+                        console.log('http request completed')
+                        this.messageService.add({ severity: 'info', summary: '200', detail: 'Added sucessfully' });
+
+                    },
+                    error: (httpErrorResponse: HttpErrorResponse) => {
+                        console.log('httpErrorResponse', httpErrorResponse)
+                    }
+                });
+
     }
 
 
