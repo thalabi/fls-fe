@@ -59,19 +59,18 @@ export class FuelLogFormComponent implements OnChanges {
         console.log('this.form.value', this.form.value)
     }
 
-    private fillFuelLogWithValue(): FuelLog {
+    private fillFuelLogWithValue() {
         console.log('this.form.value', this.form.value)
-        let fuelLog: FuelLog = {} as FuelLog
-        fuelLog.date = new Date(this.form.controls.date.value)
-        fuelLog.left = this.fuelLog.left
-        fuelLog.right = this.fuelLog.right
-        fuelLog.changeInLeft = this.form.controls.addToLeftTank.value!
-        fuelLog.changeInRight = this.form.controls.addToRightTank.value!
-        fuelLog.pricePerLitre = this.pricePerLitre
-        fuelLog.airport = this.form.controls.airport.value!
-        fuelLog.fbo = this.form.controls.fbo.value!
-        fuelLog.comment = this.form.controls.comment.value!
-        return fuelLog
+        //let fuelLog: FuelLog = {} as FuelLog
+        this.fuelLog.date = new Date(this.form.controls.date.value)
+        this.fuelLog.left = this.fuelLog.left
+        this.fuelLog.right = this.fuelLog.right
+        this.fuelLog.changeInLeft = this.form.controls.addToLeftTank.value!
+        this.fuelLog.changeInRight = this.form.controls.addToRightTank.value!
+        this.fuelLog.pricePerLitre = this.pricePerLitre
+        this.fuelLog.airport = this.form.controls.airport.value!
+        this.fuelLog.fbo = this.form.controls.fbo.value!
+        this.fuelLog.comment = this.form.controls.comment.value!
     }
     onChangeTopUp(event: CheckboxChangeEvent) {
         console.log('onChangeTopUp(), event', event)
@@ -112,11 +111,8 @@ export class FuelLogFormComponent implements OnChanges {
     }
 
     onSubmit() {
-        if (this.form.valid) {
-            this.formSubmitted.emit(this.fillFuelLogWithValue());
-        } else {
-            console.log('Form is invalid');
-        }
+        this.fillFuelLogWithValue()
+        this.formSubmitted.emit(this.fuelLog)
     }
 
     onCancel() {
