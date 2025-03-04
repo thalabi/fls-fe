@@ -51,7 +51,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
     modifyAndDeleteButtonsDisable: boolean = true;
     displayDialog: boolean = false
     loadingStatus!: boolean;
-
+    savedTableLazyLoadEvent!: TableLazyLoadEvent
     // priceTypeOptions: Array<{ value: string, name: string }> = [{ value: 'per_litre', name: 'Per litre' }, { value: 'total', name: 'Total' }]
     priceTypeOptions: Array<PriceTypeOptionEnum> = [PriceTypeOptionEnum.PER_LITRE, PriceTypeOptionEnum.TOTAL]
 
@@ -62,17 +62,17 @@ export class FuelLogMaintenaceComponent implements OnInit {
     fuelLog: FuelLog = {} as FuelLog
     fuelLogToForm!: FuelLog
 
-    form = new FormGroup({
-        date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
-        topUp: new FormControl<boolean>(false, { nonNullable: true, validators: Validators.required }),
-        addToLeftTank: new FormControl<number | null>(null, Validators.required),
-        addToRightTank: new FormControl<number | null>(null, Validators.required),
-        priceType: new FormControl<PriceTypeOptionEnum>(PriceTypeOptionEnum.PER_LITRE, { nonNullable: true }), // nonNullable: true, means when the form is reset the default value is used
-        price: new FormControl<number | null>(null, Validators.required),
-        airport: new FormControl<string>('', Validators.required),
-        fbo: new FormControl<string>(''),
-        comment: new FormControl<string>(''),
-    });
+    // form = new FormGroup({
+    //     date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+    //     topUp: new FormControl<boolean>(false, { nonNullable: true, validators: Validators.required }),
+    //     addToLeftTank: new FormControl<number | null>(null, Validators.required),
+    //     addToRightTank: new FormControl<number | null>(null, Validators.required),
+    //     priceType: new FormControl<PriceTypeOptionEnum>(PriceTypeOptionEnum.PER_LITRE, { nonNullable: true }), // nonNullable: true, means when the form is reset the default value is used
+    //     price: new FormControl<number | null>(null, Validators.required),
+    //     airport: new FormControl<string>('', Validators.required),
+    //     fbo: new FormControl<string>(''),
+    //     comment: new FormControl<string>(''),
+    // });
 
     constructor(
         private restService: RestService,
@@ -83,7 +83,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
     ngOnInit(): void {
         this.messageService.clear()
         this.getAcParameters()
-        this.getFuelLogTable()
+        // this.getFuelLogTable()
         //this.initForm()
         // this.getPortfolioTable();
         // this.getInstrumentTable();
@@ -95,6 +95,10 @@ export class FuelLogMaintenaceComponent implements OnInit {
             const acParametersArray = acParametersResponse._embedded.simpleModels || new Array<AcParameters>
             this.acParameters = acParametersArray[0]
         })
+    }
+    onLazyLoad(lazyLoadEvent: TableLazyLoadEvent) {
+        this.savedTableLazyLoadEvent = lazyLoadEvent;
+        this.fetchPage(lazyLoadEvent)
     }
     //
     // TODO, to add filter by price and airport 
@@ -129,7 +133,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
         }
         const entityNameResource = RestService.toPlural(RestService.toCamelCase(this.TABLE_NAME))
         console.log('entityNameResource 2', entityNameResource)
-        this.restService.getTableData(this.TABLE_NAME, searchCriteria, pageNumber, pageSize, ['date'])
+        this.restService.getTableData(this.TABLE_NAME, `registration|equals|${this.AC_REGISTRATION}` + searchCriteria, pageNumber, pageSize, ['date'])
             .subscribe(
                 {
                     next: (fuelLogResponse: FuelLogResponse) => {
@@ -152,7 +156,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
                 });
     }
 
-    getFuelLogTable() {
+    private getFuelLogTable() {
         this.restService.getTableData('fuel_log', `registration|equals|${this.AC_REGISTRATION}`, this.pageNumber, this.ROWS_PER_PAGE, ['date'])
             .subscribe(
                 {
@@ -160,6 +164,9 @@ export class FuelLogMaintenaceComponent implements OnInit {
                         console.log('fuelLogResponse', fuelLogResponse);
                         this.fuelLogArray = fuelLogResponse._embedded.simpleModels || new Array<FuelLog>
 
+                        // this.populateDateFields(this.fuelLogArray)
+                        // console.log('this.fuelLogArray', this.fuelLogArray)
+
                         this.page = fuelLogResponse.page;
                         this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
                         this.links = fuelLogResponse._links;
@@ -175,7 +182,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
                     }
                 });
     }
-
     onRowSelect(event: any) {
         console.log(event);
         console.log('onRowSelect()')
@@ -207,198 +213,94 @@ export class FuelLogMaintenaceComponent implements OnInit {
         console.log('this.crudMode', this.crudMode);
         switch (this.crudMode) {
             case CrudEnum.ADD:
-                this.getRemainingInFuelTanks()
-                this.form.reset()
-                this.form.enable();
+                this.fuelLog = {} as FuelLog
+                this.fuelLog.date = new Date()
+                this.fuelLog.registration = this.AC_REGISTRATION
+                this.fuelLogToForm = this.fuelLog // will trigger a change detection and populate the form
                 break;
             case CrudEnum.UPDATE:
-                // this.fillInFormWithValues();
-                this.form.enable();
+                console.log('this.selectedFuelLog', this.selectedFuelLog)
+                this.fuelLogToForm = this.selectedFuelLog // will trigger a change detection and populate the form
+                console.log('this.fuelLogToForm', this.fuelLogToForm)
                 break;
             case CrudEnum.DELETE:
                 // this.fillInFormWithValues();
-                this.form.disable();
+                //this.form.disable();
+                this.fuelLogToForm = this.selectedFuelLog // will trigger a change detection and populate the form
                 break;
             default:
                 console.error('this.crudMode is invalid. this.crudMode: ' + this.crudMode);
         }
     }
-    private getRemainingInFuelTanks() {
-        this.restService.getLastFuelLog(this.AC_REGISTRATION)
-            .subscribe(
-                {
-                    next: (fuelLogResponse: FuelLogResponse) => {
-                        console.log('fuelLogResponse', fuelLogResponse);
-                        const fuelLogs = fuelLogResponse._embedded.fuelLogs || new Array<FuelLog>
-                        const inLeftTank = fuelLogs[0].left + fuelLogs[0].changeInLeft
-                        const inRightTank = fuelLogs[0].right + fuelLogs[0].changeInRight;
-
-                        this.fuelLog.date = new Date()
-                        this.fuelLog.registration = this.AC_REGISTRATION
-                        this.fuelLog.left = inLeftTank
-                        this.fuelLog.right = inRightTank
-                        console.log('fuelLog', this.fuelLog)
-
-                        this.fuelLogToForm = this.fuelLog // will trigger a change detection and populate the form
-                    },
-                    complete: () => {
-                        console.log('this.restService.getTableData completed')
-                        this.loadingStatus = false
-                    }
-                    ,
-                    error: (httpErrorResponse: HttpErrorResponse): void => {
-                        console.log('this.restService.getTableData error')
-                        this.loadingStatus = false
-                    }
-                });
-
-    }
-    // private fillInFormWithValues() {
-    //     console.log('this.selectedRow', this.selectedFuelLog)
-    //     //this.form.controls['registration'].patchValue(this.selectedRow['registration']);
-    //     this.form.controls.date.patchValue(new Date(this.selectedFuelLog.date));
-    //     this.inLeftTank = this.selectedFuelLog.left
-    //     this.inRightTank = this.selectedFuelLog.right
-    //     this.form.controls.topUp.patchValue(false);
-    //     this.form.controls.addToLeftTank.patchValue(this.selectedFuelLog.changeInLeft);
-    //     this.form.controls.addToRightTank.patchValue(this.selectedFuelLog.changeInRight);
-    //     this.form.controls.priceType.patchValue(PriceTypeOptionEnum.PER_LITRE);
-    //     this.form.controls.price.patchValue(this.selectedFuelLog.pricePerLitre);
-    //     this.form.controls.airport.patchValue(this.selectedFuelLog.airport);
-    //     this.form.controls.fbo.patchValue(this.selectedFuelLog.fbo);
-    //     this.form.controls.comment.patchValue(this.selectedFuelLog.comment);
-    //     console.log('this.form.value', this.form.value)
-    // }
-
-    onChangeTopUp(event: CheckboxChangeEvent) {
-        console.log('onChangeTopUp(), event', event)
-        if (event.checked) {
-
-        } else {
-
-        }
-    }
 
     onChildFormSubmit(fuelLog: FuelLog) {
         console.log('fuelLog', fuelLog)
-        this.restService.saveFuelLog(fuelLog)
-            .subscribe(
-                {
-                    next: (response: any) => {
-                        console.log('response', response)
-                    },
-                    complete: () => {
-                        console.log('http request completed')
-                        this.messageService.add({ severity: 'info', summary: '200', detail: 'Added sucessfully' });
+        switch (this.crudMode) {
+            case CrudEnum.ADD:
+                this.restService.addFuelLog(fuelLog)
+                    .subscribe(
+                        {
+                            next: (response: any) => {
+                                console.log('response', response)
+                            },
+                            complete: () => {
+                                console.log('http request completed')
+                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Added sucessfully' });
+                                this.afterCrud()
 
-                    },
-                    error: (httpErrorResponse: HttpErrorResponse) => {
-                        console.log('httpErrorResponse', httpErrorResponse)
-                    }
-                });
-        this.displayDialog = false;
+                            },
+                            error: (httpErrorResponse: HttpErrorResponse) => {
+                                console.log('httpErrorResponse', httpErrorResponse)
+                            }
+                        });
+                break
+            case CrudEnum.UPDATE:
+                this.restService.updateFuelLog(fuelLog)
+                    .subscribe(
+                        {
+                            next: (response: any) => {
+                                console.log('response', response)
+                            },
+                            complete: () => {
+                                console.log('http request completed')
+                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
+                                this.afterCrud()
 
+                            },
+                            error: (httpErrorResponse: HttpErrorResponse) => {
+                                console.log('httpErrorResponse', httpErrorResponse)
+                            }
+                        });
+                break;
+            case CrudEnum.DELETE:
+                this.restService.deleteFuelLog(fuelLog.id)
+                    .subscribe(
+                        {
+                            next: (response: any) => {
+                                console.log('response', response)
+                            },
+                            complete: () => {
+                                console.log('http request completed')
+                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Deleted sucessfully' });
+                                this.afterCrud()
+                            },
+                            error: (httpErrorResponse: HttpErrorResponse) => {
+                                console.log('httpErrorResponse', httpErrorResponse)
+                            }
+                        });
+                break;
+            default:
+                console.error('this.crudMode is invalid. this.crudMode: ' + this.crudMode);
+        }
     }
-
-    // onSubmit() {
-    //     console.log('onSubmit()', this.form.value);
-    //     let saveFuelLog: FuelLog = {} as FuelLog
-    //     switch (this.crudMode) {
-    //         case CrudEnum.ADD:
-    //             saveFuelLog.date = this.form.controls.date.value
-    //             saveFuelLog.registration = this.AC_REGISTRATION
-    //             saveFuelLog.left = this.inLeftTank
-    //             saveFuelLog.right = this.inRightTank
-    //             saveFuelLog.changeInLeft = this.form.controls.addToLeftTank.value!
-    //             saveFuelLog.changeInRight = this.form.controls.addToRightTank.value!
-    //             saveFuelLog.pricePerLitre = this.calculatePricePerLitre(this.form.controls.priceType.value, this.form.controls.price.value, this.form.controls.addToLeftTank.value, this.form.controls.addToRightTank.value)
-    //             saveFuelLog.airport = this.form.controls.airport.value!
-    //             saveFuelLog.fbo = this.form.controls.fbo.value!
-    //             saveFuelLog.comment = this.form.controls.comment.value!
-    //             console.log('saveFuelLog', saveFuelLog)
-    //             this.restService.saveFuelLog(saveFuelLog)
-    //                 .subscribe(
-    //                     {
-    //                         next: (response: any) => {
-    //                             console.log('response', response)
-    //                         },
-    //                         complete: () => {
-    //                             console.log('http request completed')
-    //                             this.displayDialog = false;
-    //                             this.sessionService.setDisableParentMessages(false)
-    //                             this.selectedFuelLog = {} as FuelLog
-    //                             this.getFuelLogTable() // do not refactor this and move it after the switch as it needs to execute after request completes
-    //                         },
-    //                         error: (httpErrorResponse: HttpErrorResponse) => {
-    //                             console.log('httpErrorResponse', httpErrorResponse)
-    //                         }
-    //                     });
-    //             break;
-    //         case CrudEnum.UPDATE:
-    //             // saveFuelLog.id = this.portfolioSelectedRow.id
-    //             // saveFuelLog.version = this.portfolioSelectedRow.version
-    //             // saveFuelLog.name = this.portfolioForm.controls.name.value
-    //             // saveFuelLog.holder = this.portfolioForm.controls.holder.value
-    //             // saveFuelLog.portfolioId = this.portfolioForm.controls.portfolioId.value
-    //             // saveFuelLog.financialInstitution = this.portfolioForm.controls.financialInstitution.value
-    //             // saveFuelLog.currency = this.portfolioForm.controls.currency.value
-    //             // saveFuelLog.logicallyDeleted = this.portfolioForm.controls.logicallyDeleted.value
-    //             // console.log('savePortfolio', saveFuelLog)
-    //             // this.restService.savePortfolio(saveFuelLog)
-    //             //     .subscribe(
-    //             //         {
-    //             //             next: (response: any) => {
-    //             //                 console.log('response', response)
-    //             //             },
-    //             //             complete: () => {
-    //             //                 console.log('http request completed')
-    //             //                 this.getPortfoliosWithDependentFlags()
-    //             //                 this.displayDialog = false;
-    //             //                 this.sessionService.setDisableParentMessages(false)
-    //             //                 this.portfolioSelectedRow = {} as Portfolio
-    //             //             },
-    //             //             error: (httpErrorResponse: HttpErrorResponse) => {
-    //             //                 this.messageService.add({ severity: 'error', summary: httpErrorResponse.status.toString(), detail: this.extractMessage(httpErrorResponse) })
-    //             //             }
-    //             //         });
-    //             break;
-    //         case CrudEnum.DELETE:
-    //             this.restService.deleteFuelLog(this.selectedFuelLog.id)
-    //                 .subscribe(
-    //                     {
-    //                         next: (response: any) => {
-    //                             console.log('response', response)
-    //                         },
-    //                         complete: () => {
-    //                             console.log('http request completed')
-    //                             this.displayDialog = false;
-    //                             this.sessionService.setDisableParentMessages(false)
-    //                             this.selectedFuelLog = {} as FuelLog
-    //                             this.getFuelLogTable() // do not refactor this and move it after the switch as it needs to execute after request completes
-    //                         },
-    //                         error: (httpErrorResponse: HttpErrorResponse) => {
-    //                             console.log('httpErrorResponse', httpErrorResponse)
-    //                         }
-    //                     });
-    //             break;
-    //         default:
-    //             console.error('this.crudMode is invalid. this.crudMode: ' + this.crudMode);
-    //     }
-    //     this.form.reset()
-    //     this.modifyAndDeleteButtonsDisable = true
-    // }
-
     private afterCrud() {
-        // this.displayDialog = false;
+        this.displayDialog = false;
         this.modifyAndDeleteButtonsDisable = true;
-        // this.fetchPage(this.savedLazyLoadEvent.first || 0, this.savedLazyLoadEvent.rows || 0,
-        //     ComponentHelper.buildSearchString(this.savedLazyLoadEvent, this.formAttributes.fields.map(field => field.columnName)),
-        //     this.formAttributes.queryOrderByColumns);
-        // this.resetDialoForm();
-        // this.onLazyLoad(this.savedLazyLoadEvent);
+        this.onLazyLoad(this.savedTableLazyLoadEvent);
+        this.selectedFuelLog = {} as FuelLog
     }
+
     onCancel() {
-        this.resetDialoForm();
         this.displayDialog = false;
         this.sessionService.setDisableParentMessages(false)
         this.modifyAndDeleteButtonsDisable = true
@@ -407,10 +309,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
         this.displayDialog = false;
         this.sessionService.setDisableParentMessages(false)
         this.modifyAndDeleteButtonsDisable = true
-    }
-    private resetDialoForm() {
-        this.form.reset()
-        this.selectedFuelLog = {} as FuelLog
     }
 
 }

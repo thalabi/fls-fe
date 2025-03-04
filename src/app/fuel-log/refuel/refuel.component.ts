@@ -49,7 +49,7 @@ export class RefuelComponent implements OnInit {
             const inRightTank = fuelLogs[0].right + fuelLogs[0].changeInRight;
 
             this.fuelLog.date = new Date()
-            this.fuelLog.registration = this.AC_REGISTRATION
+            this.fuelLog.registration = fuelLogs[0].registration
             this.fuelLog.left = inLeftTank
             this.fuelLog.right = inRightTank
             console.log('fuelLog', this.fuelLog)
@@ -60,7 +60,7 @@ export class RefuelComponent implements OnInit {
 
     onChildFormSubmit(fuelLog: FuelLog) {
         console.log('fuelLog', fuelLog)
-        this.restService.saveFuelLog(fuelLog)
+        this.restService.addFuelLog(fuelLog)
             .subscribe(
                 {
                     next: (response: any) => {

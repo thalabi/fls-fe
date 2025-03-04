@@ -44,8 +44,11 @@ export class RestService {
     getLastFuelLog(registration: string): Observable<any> {
         return this.httpClient.get(`${this.serviceUrl}/protected/data-rest/fuelLogs/search/findTopByRegistrationOrderByDateDesc?registration=${registration}`);
     }
-    saveFuelLog(fuelLog: FuelLog): Observable<HttpResponse<any>> {
+    addFuelLog(fuelLog: FuelLog): Observable<HttpResponse<any>> {
         return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs`, fuelLog);
+    }
+    updateFuelLog(fuelLog: FuelLog): Observable<HttpResponse<any>> {
+        return this.httpClient.put<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs/${fuelLog.id}`, fuelLog);
     }
     deleteFuelLog(id: number): Observable<HttpResponse<any>> {
         return this.httpClient.delete<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs/${id}`);

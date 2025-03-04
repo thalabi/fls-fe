@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterContentInit, Component, DoCheck, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { PriceTypeOptionEnum } from '../../maintenance/fuel-log-maintenance.component';
 import { ButtonModule } from 'primeng/button';
@@ -10,6 +10,7 @@ import { SelectModule } from 'primeng/select';
 import { CommonModule } from '@angular/common';
 import { FuelLog } from '../../../domain/FuelLog';
 import { AcParameters } from '../../../domain/AcParameters';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'app-fuel-log-form',
@@ -17,10 +18,44 @@ import { AcParameters } from '../../../domain/AcParameters';
     templateUrl: './fuel-log-form.component.html',
     styleUrl: './fuel-log-form.component.css'
 })
-export class FuelLogFormComponent implements OnChanges {
+export class FuelLogFormComponent implements OnInit {
+    private fuelLogSource = new BehaviorSubject<FuelLog>({} as FuelLog)
+    public fuelLog$ = this.fuelLogSource.asObservable()
+    private acParametersSource = new BehaviorSubject<AcParameters>({} as AcParameters)
+    public acParameters$ = this.acParametersSource.asObservable()
 
-    @Input() fuelLog!: FuelLog
-    @Input() acParameters!: AcParameters
+    ngOnInit(): void {
+        console.log('ngOnInit')
+        this.fuelLog$.subscribe((fuelLog) => {
+            console.log('subscribe fuelLog')
+            if (fuelLog !== undefined) {
+                console.log('fuelLog', fuelLog)
+                this.fuelLog = fuelLog
+                this.fillInFormWithValues()
+            }
+        })
+        this.acParameters$.subscribe((acParameters) => {
+            console.log('subscribe acParameters')
+            if (acParameters !== undefined) {
+                console.log('acParameters', acParameters)
+                this.acParameters = acParameters
+            }
+        })
+    }
+
+    fuelLog!: FuelLog
+    @Input("fuelLog") set inputFuelLog(value: FuelLog) {
+        console.log('@Input() set inputFuelLog(value: FuelLog) value: ', value)
+        this.fuelLogSource.next(value)
+    }
+
+    acParameters!: AcParameters
+    @Input("acParameters") set inputAcParameters(value: AcParameters) {
+        console.log('@Input() set inputFuelLog(value: FuelLog) value: ', value)
+        this.acParametersSource.next(value)
+    }
+
+    @Input() maintenanceMode: boolean = false
     @Output() formSubmitted = new EventEmitter<FuelLog>();
     @Output() formCancelled = new EventEmitter();
 
@@ -41,16 +76,9 @@ export class FuelLogFormComponent implements OnChanges {
         comment: new FormControl<string>(''),
     });
 
-    ngOnChanges(changes: SimpleChanges): void {
-        console.log('ngOnChanges()')
-        if (changes['fuelLog']?.currentValue !== undefined) {
-            this.fillInFormWithValues()
-        }
-    }
-
     private fillInFormWithValues() {
         console.log('this.fuelLog', this.fuelLog)
-        this.form.controls.date.setValue(this.fuelLog.date)
+        this.form.controls.date.setValue(this.fuelLog.date !== undefined ? new Date(this.fuelLog.date) : new Date())
         this.form.controls.left.setValue(this.fuelLog.left)
         this.form.controls.right.setValue(this.fuelLog.right)
         this.form.controls.topUp.setValue(false)
@@ -68,10 +96,13 @@ export class FuelLogFormComponent implements OnChanges {
         console.log('this.form.value', this.form.value)
         //let fuelLog: FuelLog = {} as FuelLog
         this.fuelLog.date = new Date(this.form.controls.date.value)
-        this.fuelLog.left = this.fuelLog.left
-        this.fuelLog.right = this.fuelLog.right
+        this.fuelLog.left = this.form.controls.left.value!
+        this.fuelLog.right = this.form.controls.right.value!
         this.fuelLog.changeInLeft = this.form.controls.addToLeftTank.value!
         this.fuelLog.changeInRight = this.form.controls.addToRightTank.value!
+        if (this.pricePerLitre === undefined) {
+            this.calculatePricePerLitre()
+        }
         this.fuelLog.pricePerLitre = this.pricePerLitre
         this.fuelLog.airport = this.form.controls.airport.value!
         this.fuelLog.fbo = this.form.controls.fbo.value!
@@ -80,43 +111,65 @@ export class FuelLogFormComponent implements OnChanges {
     onChangeTopUp(event: CheckboxChangeEvent) {
         console.log('onChangeTopUp(), event', event)
         if (event.checked) {
-            const addToLeftTank = this.acParameters.eachTankCapacity - this.fuelLog.left
+            const addToLeftTank = this.acParameters.eachTankCapacity - this.form.controls.left.value!
             this.form.controls.addToLeftTank.setValue(this.round(addToLeftTank, 1))
-            const addToRightTank = this.acParameters.eachTankCapacity - this.fuelLog.right
+            const addToRightTank = this.acParameters.eachTankCapacity - this.form.controls.left.value!
             this.form.controls.addToRightTank.setValue(this.round(addToRightTank, 1))
         } else {
             this.form.controls.addToLeftTank.reset()
             this.form.controls.addToRightTank.reset()
         }
     }
-    onInputAddToLeftTank(inputNumberInputEvent: InputNumberInputEvent) {
+    onInputLeft() {
+        const calculatedTankCapacity = this.round(this.form.controls.left.value! + this.form.controls.addToLeftTank.value!, 1)
+        if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
+            this.form.controls.left.setErrors({ invalid: true })
+        }
+        this.form.controls.addToLeftTank.setErrors(null)
+
+        this.calculatePricePerLitre()
+    }
+    onInputRight() {
+        const calculatedTankCapacity = this.round(this.form.controls.right.value! + this.form.controls.addToRightTank.value!, 1)
+        if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
+            this.form.controls.right.setErrors({ invalid: true })
+        }
+        this.form.controls.addToRightTank.setErrors(null)
+
+        this.calculatePricePerLitre()
+    }
+    onInputAddToLeftTank() {
         // turn off Top up checkbox
         this.form.controls.topUp.setValue(false)
-        const addToLeftTank = Number(inputNumberInputEvent.value)
-        console.log('addToLeftTank', addToLeftTank)
-        const calculatedTankCapacity = this.round(this.fuelLog.left + addToLeftTank, 1)
+        const calculatedTankCapacity = this.round(this.form.controls.left.value! + this.form.controls.addToLeftTank.value!, 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.addToLeftTank.setErrors({ invalid: true })
         }
+        this.form.controls.left.setErrors(null)
+
         this.calculatePricePerLitre()
     }
-    onInputAddToRightTank(inputNumberInputEvent: InputNumberInputEvent) {
+    onInputAddToRightTank() {
         // turn off Top up checkbox
         this.form.controls.topUp.setValue(false)
-        const addToRightTank = Number(inputNumberInputEvent.value)
-        console.log('addToLeftTank', addToRightTank)
-        const calculatedTankCapacity = this.round(this.fuelLog.right + addToRightTank, 1)
+        const calculatedTankCapacity = this.round(this.form.controls.right.value! + this.form.controls.addToRightTank.value!, 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.addToRightTank.setErrors({ invalid: true })
         }
+        this.form.controls.right.setErrors(null)
+
         this.calculatePricePerLitre()
     }
     onInputPrice() {
         this.calculatePricePerLitre()
     }
+    onChangePriceType() {
+        this.calculatePricePerLitre()
+    }
 
     onSubmit() {
         this.fillFuelLogWithValue()
+        console.log('this.fuelLog', this.fuelLog)
         this.formSubmitted.emit(this.fuelLog)
     }
 
