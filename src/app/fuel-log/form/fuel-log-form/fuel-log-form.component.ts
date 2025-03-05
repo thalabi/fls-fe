@@ -1,16 +1,16 @@
-import { AfterContentInit, Component, DoCheck, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { PriceTypeOptionEnum } from '../../maintenance/fuel-log-maintenance.component';
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
-import { InputNumberInputEvent, InputNumberModule } from 'primeng/inputnumber';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { CommonModule } from '@angular/common';
-import { FuelLog } from '../../../domain/FuelLog';
-import { AcParameters } from '../../../domain/AcParameters';
 import { BehaviorSubject } from 'rxjs';
+import { AcParameters } from '../../../domain/AcParameters';
+import { FuelLog } from '../../../domain/FuelLog';
+import { PriceTypeOptionEnum } from '../../maintenance/fuel-log-maintenance.component';
 
 @Component({
     selector: 'app-fuel-log-form',
@@ -78,6 +78,7 @@ export class FuelLogFormComponent implements OnInit {
 
     private fillInFormWithValues() {
         console.log('this.fuelLog', this.fuelLog)
+        this.form.reset()
         this.form.controls.date.setValue(this.fuelLog.date !== undefined ? new Date(this.fuelLog.date) : new Date())
         this.form.controls.left.setValue(this.fuelLog.left)
         this.form.controls.right.setValue(this.fuelLog.right)
@@ -90,20 +91,26 @@ export class FuelLogFormComponent implements OnInit {
         this.form.controls.fbo.setValue(this.fuelLog.fbo)
         this.form.controls.comment.setValue(this.fuelLog.comment)
         console.log('this.form.value', this.form.value)
+
+        // disable fields priceType and price to effectively stop required validation on 
+        // these fields and allow the Submit button to be enabled
+        this.disablePriceTypeAndPrice()
     }
 
     private fillFuelLogWithValue() {
         console.log('this.form.value', this.form.value)
-        //let fuelLog: FuelLog = {} as FuelLog
         this.fuelLog.date = new Date(this.form.controls.date.value)
+        this.fuelLog.registration = this.acParameters.registration
         this.fuelLog.left = this.form.controls.left.value!
         this.fuelLog.right = this.form.controls.right.value!
         this.fuelLog.changeInLeft = this.form.controls.addToLeftTank.value!
         this.fuelLog.changeInRight = this.form.controls.addToRightTank.value!
-        if (this.pricePerLitre === undefined) {
-            this.calculatePricePerLitre()
+        if (this.form.controls.addToLeftTank.value! >= 0 || this.form.controls.addToRightTank.value! >= 0) {
+            if (this.pricePerLitre === undefined) {
+                this.calculatePricePerLitre()
+            }
+            this.fuelLog.pricePerLitre = this.pricePerLitre
         }
-        this.fuelLog.pricePerLitre = this.pricePerLitre
         this.fuelLog.airport = this.form.controls.airport.value!
         this.fuelLog.fbo = this.form.controls.fbo.value!
         this.fuelLog.comment = this.form.controls.comment.value!
@@ -141,8 +148,15 @@ export class FuelLogFormComponent implements OnInit {
     onInputAddToLeftTank() {
         // turn off Top up checkbox
         this.form.controls.topUp.setValue(false)
+
+        if (this.disablePriceTypeAndPrice()) {
+            return
+        }
+
         const calculatedTankCapacity = this.round(this.form.controls.left.value! + this.form.controls.addToLeftTank.value!, 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
+            console.log('calculatedTankCapacity > this.acParameters.eachTankCapacity')
+            console.log(calculatedTankCapacity, this.acParameters.eachTankCapacity)
             this.form.controls.addToLeftTank.setErrors({ invalid: true })
         }
         this.form.controls.left.setErrors(null)
@@ -152,13 +166,36 @@ export class FuelLogFormComponent implements OnInit {
     onInputAddToRightTank() {
         // turn off Top up checkbox
         this.form.controls.topUp.setValue(false)
+
+        if (this.disablePriceTypeAndPrice()) {
+            return
+        }
+
         const calculatedTankCapacity = this.round(this.form.controls.right.value! + this.form.controls.addToRightTank.value!, 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
+            console.log('calculatedTankCapacity > this.acParameters.eachTankCapacity')
+            console.log(calculatedTankCapacity, this.acParameters.eachTankCapacity)
             this.form.controls.addToRightTank.setErrors({ invalid: true })
         }
         this.form.controls.right.setErrors(null)
 
         this.calculatePricePerLitre()
+    }
+
+    private disablePriceTypeAndPrice() {
+        // if addToLeftTanks & addToRightTank are negative then the priceType and price
+        // controls wont appear and by disabling them the Required validtor wont be in effect
+        // and allow the form to be valid
+        console.log(this.form.controls.addToLeftTank.value!, this.form.controls.addToRightTank.value!)
+        if (this.form.controls.addToLeftTank.value! < 0 && this.form.controls.addToRightTank.value! < 0) {
+            this.form.controls.priceType.disable()
+            this.form.controls.price.disable()
+            return true
+        } else {
+            this.form.controls.priceType.enable()
+            this.form.controls.price.enable()
+            return false
+        }
     }
     onInputPrice() {
         this.calculatePricePerLitre()

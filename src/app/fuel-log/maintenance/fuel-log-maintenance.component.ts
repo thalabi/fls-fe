@@ -1,28 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LazyLoadEvent, MessageService } from 'primeng/api';
-import { RestService } from '../../service/rest.service';
-import { SessionService } from '../../service/session.service';
-import { HttpErrorResponse } from '@angular/common/http';
-import { IGenericEntity } from '../../domain/i-gerneric-entity';
-import { HalResponseLinks } from '../../response/hal/hal-response-links'
-import { HalResponsePage } from '../../response/hal/hal-response-page';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { CrudEnum } from '../../crud-enum';
-import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { SelectModule } from 'primeng/select';
-import { MessagesModule } from 'primeng/messages';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
-import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { FuelLogResponse } from '../../response/FuelLogResponse';
-import { FuelLog } from '../../domain/FuelLog';
-import { FuelLogFormComponent } from '../form/fuel-log-form/fuel-log-form.component';
+import { MessagesModule } from 'primeng/messages';
+import { SelectModule } from 'primeng/select';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { CrudEnum } from '../../crud-enum';
 import { AcParameters } from '../../domain/AcParameters';
+import { FuelLog } from '../../domain/FuelLog';
 import { AcParametersResponse } from '../../response/AcParametersResponse';
+import { FuelLogResponse } from '../../response/FuelLogResponse';
+import { HalResponseLinks } from '../../response/hal/hal-response-links';
+import { HalResponsePage } from '../../response/hal/hal-response-page';
+import { RestService } from '../../service/rest.service';
+import { SessionService } from '../../service/session.service';
+import { FuelLogFormComponent } from '../form/fuel-log-form/fuel-log-form.component';
 
 export enum PriceTypeOptionEnum {
     PER_LITRE = 'Per litre', TOTAL = 'Total'
@@ -62,18 +61,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
     fuelLog: FuelLog = {} as FuelLog
     fuelLogToForm!: FuelLog
 
-    // form = new FormGroup({
-    //     date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
-    //     topUp: new FormControl<boolean>(false, { nonNullable: true, validators: Validators.required }),
-    //     addToLeftTank: new FormControl<number | null>(null, Validators.required),
-    //     addToRightTank: new FormControl<number | null>(null, Validators.required),
-    //     priceType: new FormControl<PriceTypeOptionEnum>(PriceTypeOptionEnum.PER_LITRE, { nonNullable: true }), // nonNullable: true, means when the form is reset the default value is used
-    //     price: new FormControl<number | null>(null, Validators.required),
-    //     airport: new FormControl<string>('', Validators.required),
-    //     fbo: new FormControl<string>(''),
-    //     comment: new FormControl<string>(''),
-    // });
-
     constructor(
         private restService: RestService,
         private messageService: MessageService,
@@ -83,11 +70,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
     ngOnInit(): void {
         this.messageService.clear()
         this.getAcParameters()
-        // this.getFuelLogTable()
-        //this.initForm()
-        // this.getPortfolioTable();
-        // this.getInstrumentTable();
-        // this.createForm()
+        this.messageService.add({ severity: 'info', summary: '200', detail: '(Test) Added sucessfully' });
     }
     private getAcParameters() {
         this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1).subscribe((acParametersResponse: AcParametersResponse) => {
@@ -164,9 +147,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
                         console.log('fuelLogResponse', fuelLogResponse);
                         this.fuelLogArray = fuelLogResponse._embedded.simpleModels || new Array<FuelLog>
 
-                        // this.populateDateFields(this.fuelLogArray)
-                        // console.log('this.fuelLogArray', this.fuelLogArray)
-
                         this.page = fuelLogResponse.page;
                         this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
                         this.links = fuelLogResponse._links;
@@ -191,20 +171,10 @@ export class FuelLogMaintenaceComponent implements OnInit {
         }
         this.modifyAndDeleteButtonsDisable = false;
 
-        //     this.crudFlightLog = FlightLogHelper.copyFlogLogProperties(this.selectedFlightLogTotalsV);
-        //     console.log('this.selectedFlightLogTotalsV', this.selectedFlightLogTotalsV)
-        //     console.log('this.crudFlightLog', this.crudFlightLog)
-        //     this.modifyAndDeleteButtonsDisable = false;
-        //     this.fromAirport = {} as Airport;
-        //     this.fromAirport.identifier = this.crudFlightLog.routeFrom;
-        //     this.toAirport = {} as Airport;
-        //     this.toAirport.identifier = this.crudFlightLog.routeTo;
     }
     onRowUnselect(event: any) {
         console.log(event);
         this.modifyAndDeleteButtonsDisable = true;
-        //     //this.selectedFlightLog = {} as FlightLog; // This a hack. If don't init selectedFlightLog, dialog will produce exception
-        //     this.selectedFlightLogTotalsV = {} as IFlightLogTotalsV; // This a hack. If don't init selectedFlightLogTotalsV, dialog will produce exception
     }
     showDialog(crudMode: CrudEnum) {
         this.displayDialog = true;
@@ -297,13 +267,15 @@ export class FuelLogMaintenaceComponent implements OnInit {
         this.displayDialog = false;
         this.modifyAndDeleteButtonsDisable = true;
         this.onLazyLoad(this.savedTableLazyLoadEvent);
-        this.selectedFuelLog = {} as FuelLog
+        //this.selectedFuelLog = {} as FuelLog
     }
 
     onCancel() {
         this.displayDialog = false;
         this.sessionService.setDisableParentMessages(false)
         this.modifyAndDeleteButtonsDisable = true
+        this.selectedFuelLog = {} as FuelLog
+        this.fuelLogToForm = {} as FuelLog
     }
     onChildFormCancel() {
         this.displayDialog = false;
