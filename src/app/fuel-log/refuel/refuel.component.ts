@@ -1,14 +1,14 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
-import { forkJoin } from 'rxjs';
-import { AcParameters } from '../../domain/AcParameters';
-import { FuelLog } from '../../domain/FuelLog';
-import { AcParametersResponse } from '../../response/AcParametersResponse';
-import { FuelLogResponse } from '../../response/FuelLogResponse';
-import { RestService } from '../../service/rest.service';
-import { FuelLogFormComponent } from '../form/fuel-log-form/fuel-log-form.component';
 import { PriceTypeOptionEnum } from '../maintenance/fuel-log-maintenance.component';
+import { RestService } from '../../service/rest.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { FuelLog } from '../../domain/FuelLog';
+import { FuelLogResponse } from '../../response/FuelLogResponse';
+import { AcParameters } from '../../domain/AcParameters';
+import { AcParametersResponse } from '../../response/AcParametersResponse';
+import { FuelLogFormComponent } from '../form/fuel-log-form/fuel-log-form.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-refuel',

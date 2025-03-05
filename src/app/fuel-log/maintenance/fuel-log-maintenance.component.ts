@@ -1,27 +1,27 @@
-import { CommonModule } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
-import { DatePickerModule } from 'primeng/datepicker';
-import { DialogModule } from 'primeng/dialog';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { InputTextModule } from 'primeng/inputtext';
-import { MessagesModule } from 'primeng/messages';
-import { SelectModule } from 'primeng/select';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { CrudEnum } from '../../crud-enum';
-import { AcParameters } from '../../domain/AcParameters';
-import { FuelLog } from '../../domain/FuelLog';
-import { AcParametersResponse } from '../../response/AcParametersResponse';
-import { FuelLogResponse } from '../../response/FuelLogResponse';
-import { HalResponseLinks } from '../../response/hal/hal-response-links';
-import { HalResponsePage } from '../../response/hal/hal-response-page';
 import { RestService } from '../../service/rest.service';
 import { SessionService } from '../../service/session.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { HalResponseLinks } from '../../response/hal/hal-response-links'
+import { HalResponsePage } from '../../response/hal/hal-response-page';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { CrudEnum } from '../../crud-enum';
+import { ButtonModule } from 'primeng/button';
+import { CommonModule } from '@angular/common';
+import { DialogModule } from 'primeng/dialog';
+import { SelectModule } from 'primeng/select';
+import { MessagesModule } from 'primeng/messages';
+import { DatePickerModule } from 'primeng/datepicker';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
+import { FuelLogResponse } from '../../response/FuelLogResponse';
+import { FuelLog } from '../../domain/FuelLog';
 import { FuelLogFormComponent } from '../form/fuel-log-form/fuel-log-form.component';
+import { AcParameters } from '../../domain/AcParameters';
+import { AcParametersResponse } from '../../response/AcParametersResponse';
 
 export enum PriceTypeOptionEnum {
     PER_LITRE = 'Per litre', TOTAL = 'Total'
@@ -51,11 +51,8 @@ export class FuelLogMaintenaceComponent implements OnInit {
     displayDialog: boolean = false
     loadingStatus!: boolean;
     savedTableLazyLoadEvent!: TableLazyLoadEvent
-    // priceTypeOptions: Array<{ value: string, name: string }> = [{ value: 'per_litre', name: 'Per litre' }, { value: 'total', name: 'Total' }]
     priceTypeOptions: Array<PriceTypeOptionEnum> = [PriceTypeOptionEnum.PER_LITRE, PriceTypeOptionEnum.TOTAL]
 
-    // inLeftTank!: number
-    // inRightTank!: number
     acParameters!: AcParameters
 
     fuelLog: FuelLog = {} as FuelLog
@@ -70,7 +67,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
     ngOnInit(): void {
         this.messageService.clear()
         this.getAcParameters()
-        this.messageService.add({ severity: 'info', summary: '200', detail: '(Test) Added sucessfully' });
     }
     private getAcParameters() {
         this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1).subscribe((acParametersResponse: AcParametersResponse) => {
@@ -146,6 +142,9 @@ export class FuelLogMaintenaceComponent implements OnInit {
                     next: (fuelLogResponse: FuelLogResponse) => {
                         console.log('fuelLogResponse', fuelLogResponse);
                         this.fuelLogArray = fuelLogResponse._embedded.simpleModels || new Array<FuelLog>
+
+                        // this.populateDateFields(this.fuelLogArray)
+                        // console.log('this.fuelLogArray', this.fuelLogArray)
 
                         this.page = fuelLogResponse.page;
                         this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
@@ -267,15 +266,13 @@ export class FuelLogMaintenaceComponent implements OnInit {
         this.displayDialog = false;
         this.modifyAndDeleteButtonsDisable = true;
         this.onLazyLoad(this.savedTableLazyLoadEvent);
-        //this.selectedFuelLog = {} as FuelLog
+        this.selectedFuelLog = {} as FuelLog
     }
 
     onCancel() {
         this.displayDialog = false;
         this.sessionService.setDisableParentMessages(false)
         this.modifyAndDeleteButtonsDisable = true
-        this.selectedFuelLog = {} as FuelLog
-        this.fuelLogToForm = {} as FuelLog
     }
     onChildFormCancel() {
         this.displayDialog = false;
