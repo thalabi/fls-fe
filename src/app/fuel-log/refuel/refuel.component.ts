@@ -34,9 +34,13 @@ export class RefuelComponent implements OnInit {
     ngOnInit(): void {
         this.messageService.clear()
         forkJoin({
+
             acParametersResponse: this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1),
+
             fuelLogResponse: this.restService.getLastFuelLog(this.AC_REGISTRATION)
+
         }).subscribe(((result: { acParametersResponse: AcParametersResponse; fuelLogResponse: FuelLogResponse }) => {
+
             console.log('acParametersResponse', result.acParametersResponse);
             const acParametersArray = result.acParametersResponse._embedded.simpleModels || new Array<AcParameters>
             this.acParameters = acParametersArray[0]

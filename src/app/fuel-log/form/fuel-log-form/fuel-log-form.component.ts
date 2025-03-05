@@ -10,7 +10,7 @@ import { SelectModule } from 'primeng/select';
 import { CommonModule } from '@angular/common';
 import { FuelLog } from '../../../domain/FuelLog';
 import { AcParameters } from '../../../domain/AcParameters';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-fuel-log-form',
@@ -20,39 +20,20 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class FuelLogFormComponent implements OnInit {
     private fuelLogSource = new BehaviorSubject<FuelLog>({} as FuelLog)
-    public fuelLog$ = this.fuelLogSource.asObservable()
     private acParametersSource = new BehaviorSubject<AcParameters>({} as AcParameters)
-    public acParameters$ = this.acParametersSource.asObservable()
-
-    ngOnInit(): void {
-        console.log('ngOnInit')
-        this.fuelLog$.subscribe((fuelLog) => {
-            console.log('subscribe fuelLog')
-            if (fuelLog !== undefined) {
-                console.log('fuelLog', fuelLog)
-                this.fuelLog = fuelLog
-                this.fillInFormWithValues()
-            }
-        })
-        this.acParameters$.subscribe((acParameters) => {
-            console.log('subscribe acParameters')
-            if (acParameters !== undefined) {
-                console.log('acParameters', acParameters)
-                this.acParameters = acParameters
-            }
-        })
-    }
 
     fuelLog!: FuelLog
     @Input("fuelLog") set inputFuelLog(value: FuelLog) {
         console.log('@Input() set inputFuelLog(value: FuelLog) value: ', value)
         this.fuelLogSource.next(value)
+        this.fuelLogSource.subscribe(data => console.log('fuelLogSource data', data))
     }
 
     acParameters!: AcParameters
     @Input("acParameters") set inputAcParameters(value: AcParameters) {
-        console.log('@Input() set inputFuelLog(value: FuelLog) value: ', value)
+        console.log('@Input() set inputAcParameters(value: AcParameters) value: ', value)
         this.acParametersSource.next(value)
+        this.acParametersSource.subscribe(data => console.log('acParametersSource data', data))
     }
 
     @Input() maintenanceMode: boolean = false
@@ -62,6 +43,7 @@ export class FuelLogFormComponent implements OnInit {
     priceTypeOptions: Array<PriceTypeOptionEnum> = [PriceTypeOptionEnum.PER_LITRE, PriceTypeOptionEnum.TOTAL]
     pricePerLitre!: number
 
+    formReady: boolean = false
     form = new FormGroup({
         date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
         left: new FormControl<number>(0),
@@ -76,6 +58,36 @@ export class FuelLogFormComponent implements OnInit {
         comment: new FormControl<string>(''),
     });
 
+    ngOnInit(): void {
+        console.log('ngOnInit')
+
+        combineLatest({ // forkJoin doesn't work with BehaviorSubject
+            // combineLatest wait for the 'next' value to emitted vs forkJoin which waits for operation to 'complete'
+
+            acParameters: this.acParametersSource,
+
+            fuelLog: this.fuelLogSource
+
+        }).subscribe(((result: { acParameters: AcParameters; fuelLog: FuelLog }) => {
+
+            console.log('subscribe acParameters & fuelLog')
+
+            if (result.acParameters !== undefined && result.fuelLog !== undefined) {
+                console.log('result.acParameters', result.acParameters)
+                this.acParameters = result.acParameters
+
+                console.log('result.fuelLog', result.fuelLog)
+                this.fuelLog = result.fuelLog
+
+                this.fillInFormWithValues()
+                this.formReady = true
+            }
+
+        }));
+
+
+    }
+
     private fillInFormWithValues() {
         console.log('this.fuelLog', this.fuelLog)
         this.form.controls.date.setValue(this.fuelLog.date !== undefined ? new Date(this.fuelLog.date) : new Date())
@@ -89,21 +101,27 @@ export class FuelLogFormComponent implements OnInit {
         this.form.controls.airport.setValue(this.fuelLog.airport)
         this.form.controls.fbo.setValue(this.fuelLog.fbo)
         this.form.controls.comment.setValue(this.fuelLog.comment)
+
+        this.checkAndDisablePriceTypeAndPrice()
+
         console.log('this.form.value', this.form.value)
     }
 
-    private fillFuelLogWithValue() {
+    private fillFuelLogWithValues() {
         console.log('this.form.value', this.form.value)
-        //let fuelLog: FuelLog = {} as FuelLog
         this.fuelLog.date = new Date(this.form.controls.date.value)
         this.fuelLog.left = this.form.controls.left.value!
         this.fuelLog.right = this.form.controls.right.value!
         this.fuelLog.changeInLeft = this.form.controls.addToLeftTank.value!
         this.fuelLog.changeInRight = this.form.controls.addToRightTank.value!
-        if (this.pricePerLitre === undefined) {
-            this.calculatePricePerLitre()
+        if (this.form.controls.addToLeftTank.value! >= 0 || this.form.controls.addToRightTank.value! >= 0) {
+            if (this.pricePerLitre === undefined) {
+                this.calculatePricePerLitre()
+            }
+            this.fuelLog.pricePerLitre = this.pricePerLitre
+        } else {
+            this.fuelLog.pricePerLitre = null
         }
-        this.fuelLog.pricePerLitre = this.pricePerLitre
         this.fuelLog.airport = this.form.controls.airport.value!
         this.fuelLog.fbo = this.form.controls.fbo.value!
         this.fuelLog.comment = this.form.controls.comment.value!
@@ -141,6 +159,11 @@ export class FuelLogFormComponent implements OnInit {
     onInputAddToLeftTank() {
         // turn off Top up checkbox
         this.form.controls.topUp.setValue(false)
+
+        if (this.checkAndDisablePriceTypeAndPrice()) {
+            return
+        }
+
         const calculatedTankCapacity = this.round(this.form.controls.left.value! + this.form.controls.addToLeftTank.value!, 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.addToLeftTank.setErrors({ invalid: true })
@@ -152,6 +175,11 @@ export class FuelLogFormComponent implements OnInit {
     onInputAddToRightTank() {
         // turn off Top up checkbox
         this.form.controls.topUp.setValue(false)
+
+        if (this.checkAndDisablePriceTypeAndPrice()) {
+            return
+        }
+
         const calculatedTankCapacity = this.round(this.form.controls.right.value! + this.form.controls.addToRightTank.value!, 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.addToRightTank.setErrors({ invalid: true })
@@ -168,7 +196,7 @@ export class FuelLogFormComponent implements OnInit {
     }
 
     onSubmit() {
-        this.fillFuelLogWithValue()
+        this.fillFuelLogWithValues()
         console.log('this.fuelLog', this.fuelLog)
         this.formSubmitted.emit(this.fuelLog)
     }
@@ -196,6 +224,27 @@ export class FuelLogFormComponent implements OnInit {
     }
 
     private round(value: number, precision: number): number {
-        return Number(value.toFixed(precision))
+        console.log('value', value)
+        if (value.toLocaleString() == '-' || value.toLocaleString().endsWith('-')) {
+            return 0
+        } else {
+            return Number(value.toFixed(precision))
+        }
+    }
+
+    private checkAndDisablePriceTypeAndPrice() {
+        // if addToLeftTanks & addToRightTank are negative then the priceType and price
+        // controls wont appear and by disabling them the Required validtor wont be in effect
+        // and allow the form to be valid
+        console.log('this.form.controls.addToLeftTank.value!', this.form.controls.addToLeftTank.value!, 'this.form.controls.addToRightTank.value!', this.form.controls.addToRightTank.value!)
+        if (this.form.controls.addToLeftTank.value! < 0 && this.form.controls.addToRightTank.value! < 0) {
+            this.form.controls.priceType.disable()
+            this.form.controls.price.disable()
+            return true
+        } else {
+            this.form.controls.priceType.enable()
+            this.form.controls.price.enable()
+            return false
+        }
     }
 }

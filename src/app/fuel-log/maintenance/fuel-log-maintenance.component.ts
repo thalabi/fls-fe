@@ -135,32 +135,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
                 });
     }
 
-    private getFuelLogTable() {
-        this.restService.getTableData('fuel_log', `registration|equals|${this.AC_REGISTRATION}`, this.pageNumber, this.ROWS_PER_PAGE, ['date'])
-            .subscribe(
-                {
-                    next: (fuelLogResponse: FuelLogResponse) => {
-                        console.log('fuelLogResponse', fuelLogResponse);
-                        this.fuelLogArray = fuelLogResponse._embedded.simpleModels || new Array<FuelLog>
-
-                        // this.populateDateFields(this.fuelLogArray)
-                        // console.log('this.fuelLogArray', this.fuelLogArray)
-
-                        this.page = fuelLogResponse.page;
-                        this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
-                        this.links = fuelLogResponse._links;
-                    },
-                    complete: () => {
-                        console.log('this.restService.getTableData completed')
-                        this.loadingStatus = false
-                    }
-                    ,
-                    error: (httpErrorResponse: HttpErrorResponse): void => {
-                        console.log('httpErrorResponse', httpErrorResponse)
-                        this.loadingStatus = false
-                    }
-                });
-    }
     onRowSelect(event: any) {
         console.log(event);
         console.log('onRowSelect()')
@@ -174,6 +148,8 @@ export class FuelLogMaintenaceComponent implements OnInit {
     onRowUnselect(event: any) {
         console.log(event);
         this.modifyAndDeleteButtonsDisable = true;
+        this.selectedFuelLog = {} as FuelLog
+        this.fuelLogToForm = {} as FuelLog
     }
     showDialog(crudMode: CrudEnum) {
         this.displayDialog = true;
@@ -233,6 +209,10 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             complete: () => {
                                 console.log('http request completed')
                                 this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
+                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
+                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
+                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
+
                                 this.afterCrud()
 
                             },
@@ -267,12 +247,15 @@ export class FuelLogMaintenaceComponent implements OnInit {
         this.modifyAndDeleteButtonsDisable = true;
         this.onLazyLoad(this.savedTableLazyLoadEvent);
         this.selectedFuelLog = {} as FuelLog
+        this.fuelLogToForm = {} as FuelLog
     }
 
     onCancel() {
         this.displayDialog = false;
         this.sessionService.setDisableParentMessages(false)
         this.modifyAndDeleteButtonsDisable = true
+        this.selectedFuelLog = {} as FuelLog
+        this.fuelLogToForm = {} as FuelLog
     }
     onChildFormCancel() {
         this.displayDialog = false;
