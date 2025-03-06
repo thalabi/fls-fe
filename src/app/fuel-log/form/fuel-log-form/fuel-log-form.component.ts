@@ -41,9 +41,10 @@ export class FuelLogFormComponent implements OnInit {
     }
 
     @Input() maintenanceMode: boolean = false // allows all fields to be editable and will not show top ip checkbox
+
     displayOnly!: boolean
     @Input("displayOnly") set inputDisplayOnly(value: boolean) {
-        // console.log('@Input() set inputDisplayPnly(value: boolean) value: ', value)
+        console.log('@Input() set inputDisplayOnly(value: boolean) value: ', value)
         // this.displayOnlySource.next(value)
         // this.displayOnlySource.subscribe(data => console.log('displayOnlySource data', data))
         if (value) {
