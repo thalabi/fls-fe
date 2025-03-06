@@ -21,23 +21,30 @@ export enum PriceTypeOptionEnum {
     templateUrl: './fuel-log-form.component.html',
     styleUrl: './fuel-log-form.component.css'
 })
-export class FuelLogFormComponent implements OnInit {
-    private fuelLogSource = new BehaviorSubject<FuelLog>({} as FuelLog)
-    private acParametersSource = new BehaviorSubject<AcParameters>({} as AcParameters)
+export class FuelLogFormComponent /*implements OnInit*/ {
+    // private fuelLogSource = new BehaviorSubject<FuelLog>({} as FuelLog)
+    // private acParametersSource = new BehaviorSubject<AcParameters>({} as AcParameters)
     // private displayOnlySource = new BehaviorSubject<boolean>(false)
 
     fuelLog!: FuelLog
     @Input("fuelLog") set inputFuelLog(value: FuelLog) {
         console.log('@Input() set inputFuelLog(value: FuelLog) value: ', value)
-        this.fuelLogSource.next(value)
-        this.fuelLogSource.subscribe(data => console.log('fuelLogSource data', data))
+        if (value === undefined) return
+        // this.fuelLogSource.next(value)
+        // this.fuelLogSource.subscribe(data => console.log('fuelLogSource data', data))
+        this.fuelLog = value
+
+        this.fillInFormWithValues()
+        this.formReady = true
     }
 
     acParameters!: AcParameters
     @Input("acParameters") set inputAcParameters(value: AcParameters) {
         console.log('@Input() set inputAcParameters(value: AcParameters) value: ', value)
-        this.acParametersSource.next(value)
-        this.acParametersSource.subscribe(data => console.log('acParametersSource data', data))
+        if (value === undefined) return
+        // this.acParametersSource.next(value)
+        // this.acParametersSource.subscribe(data => console.log('acParametersSource data', data))
+        this.acParameters = value
     }
 
     @Input() maintenanceMode: boolean = false // allows all fields to be editable and will not show top ip checkbox
@@ -45,6 +52,7 @@ export class FuelLogFormComponent implements OnInit {
     displayOnly!: boolean
     @Input("displayOnly") set inputDisplayOnly(value: boolean) {
         console.log('@Input() set inputDisplayOnly(value: boolean) value: ', value)
+        if (value === undefined) return
         // this.displayOnlySource.next(value)
         // this.displayOnlySource.subscribe(data => console.log('displayOnlySource data', data))
         if (value) {
@@ -76,35 +84,33 @@ export class FuelLogFormComponent implements OnInit {
         comment: new FormControl<string>(''),
     });
 
-    ngOnInit(): void {
-        console.log('ngOnInit')
+    // ngOnInit(): void {
+    //     console.log('ngOnInit')
 
-        combineLatest({ // forkJoin doesn't work with BehaviorSubject
-            // combineLatest wait for the 'next' value to emitted vs forkJoin which waits for operation to 'complete'
+    // combineLatest({ // forkJoin doesn't work with BehaviorSubject
+    //     // combineLatest wait for the 'next' value to emitted vs forkJoin which waits for operation to 'complete'
 
-            acParameters: this.acParametersSource,
+    //     acParameters: this.acParametersSource,
 
-            fuelLog: this.fuelLogSource
+    //     fuelLog: this.fuelLogSource
 
-        }).subscribe(((result: { acParameters: AcParameters; fuelLog: FuelLog }) => {
+    // }).subscribe(((result: { acParameters: AcParameters; fuelLog: FuelLog }) => {
 
-            console.log('subscribe acParameters & fuelLog')
+    //     console.log('subscribe acParameters & fuelLog')
 
-            if (result.acParameters !== undefined && result.fuelLog !== undefined) {
-                console.log('result.acParameters', result.acParameters)
-                this.acParameters = result.acParameters
+    //     if (result.acParameters !== undefined && result.fuelLog !== undefined) {
+    //         console.log('result.acParameters', result.acParameters)
+    //         this.acParameters = result.acParameters
 
-                console.log('result.fuelLog', result.fuelLog)
-                this.fuelLog = result.fuelLog
+    //         console.log('result.fuelLog', result.fuelLog)
+    //         this.fuelLog = result.fuelLog
 
-                this.fillInFormWithValues()
-                this.formReady = true
-            }
+    //         this.fillInFormWithValues()
+    //         this.formReady = true
+    //     }
 
-        }));
-
-
-    }
+    // }));
+    // }
 
     private fillInFormWithValues() {
         console.log('this.fuelLog', this.fuelLog)
@@ -149,7 +155,7 @@ export class FuelLogFormComponent implements OnInit {
         if (event.checked) {
             const addToLeftTank = this.acParameters.eachTankCapacity - this.form.controls.left.value!
             this.form.controls.addToLeftTank.setValue(this.round(addToLeftTank, 1))
-            const addToRightTank = this.acParameters.eachTankCapacity - this.form.controls.left.value!
+            const addToRightTank = this.acParameters.eachTankCapacity - this.form.controls.right.value!
             this.form.controls.addToRightTank.setValue(this.round(addToRightTank, 1))
         } else {
             this.form.controls.addToLeftTank.reset()
