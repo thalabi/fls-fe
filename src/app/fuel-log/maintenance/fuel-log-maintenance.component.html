@@ -47,7 +47,7 @@
 </p-table>
 
 <p-dialog header="Fuel log - {{crudMode}}" [(visible)]="displayDialog" [responsive]="true" showEffect="fade"
-    [modal]="true" (onHide)="onCancel()">
+    [modal]="true" (onHide)="onChildFormCancel()">
 
     <app-fuel-log-form [fuelLog]="fuelLogToForm" [acParameters]="acParameters"
         (formSubmitted)="onChildFormSubmit($event)" (formCancelled)="onChildFormCancel()"

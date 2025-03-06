@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
-import { PriceTypeOptionEnum } from '../maintenance/fuel-log-maintenance.component';
 import { RestService } from '../../service/rest.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FuelLog } from '../../domain/FuelLog';
@@ -21,8 +20,6 @@ export class RefuelComponent implements OnInit {
     readonly AC_REGISTRATION: string = 'C-GQGD'
 
     loadingStatus!: boolean;
-
-    priceTypeOptions: Array<PriceTypeOptionEnum> = [PriceTypeOptionEnum.PER_LITRE, PriceTypeOptionEnum.TOTAL]
 
     acParameters!: AcParameters
 

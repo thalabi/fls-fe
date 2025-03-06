@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { PriceTypeOptionEnum } from '../../maintenance/fuel-log-maintenance.component';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -11,6 +10,10 @@ import { CommonModule } from '@angular/common';
 import { FuelLog } from '../../../domain/FuelLog';
 import { AcParameters } from '../../../domain/AcParameters';
 import { BehaviorSubject, combineLatest, forkJoin } from 'rxjs';
+
+export enum PriceTypeOptionEnum {
+    PER_LITRE = 'Per litre', TOTAL = 'Total'
+}
 
 @Component({
     selector: 'app-fuel-log-form',
@@ -36,7 +39,7 @@ export class FuelLogFormComponent implements OnInit {
         this.acParametersSource.subscribe(data => console.log('acParametersSource data', data))
     }
 
-    @Input() maintenanceMode: boolean = false
+    @Input() maintenanceMode: boolean = false // allows all fields to be editable and will not show top ip checkbox
     @Output() formSubmitted = new EventEmitter<FuelLog>();
     @Output() formCancelled = new EventEmitter();
 

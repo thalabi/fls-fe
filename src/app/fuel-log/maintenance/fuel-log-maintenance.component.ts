@@ -23,9 +23,6 @@ import { FuelLogFormComponent } from '../form/fuel-log-form/fuel-log-form.compon
 import { AcParameters } from '../../domain/AcParameters';
 import { AcParametersResponse } from '../../response/AcParametersResponse';
 
-export enum PriceTypeOptionEnum {
-    PER_LITRE = 'Per litre', TOTAL = 'Total'
-}
 @Component({
     selector: 'app-fuel-log',
     imports: [CommonModule, ReactiveFormsModule, TableModule, ButtonModule, DialogModule, SelectModule, MessagesModule, DatePickerModule, CheckboxModule, InputNumberModule, InputTextModule, FuelLogFormComponent],
@@ -51,7 +48,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
     displayDialog: boolean = false
     loadingStatus!: boolean;
     savedTableLazyLoadEvent!: TableLazyLoadEvent
-    priceTypeOptions: Array<PriceTypeOptionEnum> = [PriceTypeOptionEnum.PER_LITRE, PriceTypeOptionEnum.TOTAL]
 
     acParameters!: AcParameters
 
@@ -190,7 +186,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             },
                             complete: () => {
                                 console.log('http request completed')
-                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Added sucessfully' });
                                 this.afterCrud()
 
                             },
@@ -208,11 +203,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             },
                             complete: () => {
                                 console.log('http request completed')
-                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
-                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
-                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
-                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
-
                                 this.afterCrud()
 
                             },
@@ -230,7 +220,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             },
                             complete: () => {
                                 console.log('http request completed')
-                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Deleted sucessfully' });
                                 this.afterCrud()
                             },
                             error: (httpErrorResponse: HttpErrorResponse) => {
@@ -250,17 +239,12 @@ export class FuelLogMaintenaceComponent implements OnInit {
         this.fuelLogToForm = {} as FuelLog
     }
 
-    onCancel() {
+    onChildFormCancel() {
         this.displayDialog = false;
         this.sessionService.setDisableParentMessages(false)
         this.modifyAndDeleteButtonsDisable = true
         this.selectedFuelLog = {} as FuelLog
         this.fuelLogToForm = {} as FuelLog
-    }
-    onChildFormCancel() {
-        this.displayDialog = false;
-        this.sessionService.setDisableParentMessages(false)
-        this.modifyAndDeleteButtonsDisable = true
     }
 
 }
