@@ -53,6 +53,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
 
     fuelLog: FuelLog = {} as FuelLog
     fuelLogToForm!: FuelLog
+    displayOnly!: boolean
 
     constructor(
         private restService: RestService,
@@ -158,15 +159,18 @@ export class FuelLogMaintenaceComponent implements OnInit {
                 this.fuelLog.date = new Date()
                 this.fuelLog.registration = this.AC_REGISTRATION
                 this.fuelLogToForm = this.fuelLog // will trigger a change detection and populate the form
+                this.displayOnly = false
                 break;
             case CrudEnum.UPDATE:
                 console.log('this.selectedFuelLog', this.selectedFuelLog)
                 this.fuelLogToForm = this.selectedFuelLog // will trigger a change detection and populate the form
                 console.log('this.fuelLogToForm', this.fuelLogToForm)
+                this.displayOnly = false
                 break;
             case CrudEnum.DELETE:
                 // this.fillInFormWithValues();
                 //this.form.disable();
+                this.displayOnly = true
                 this.fuelLogToForm = this.selectedFuelLog // will trigger a change detection and populate the form
                 break;
             default:

@@ -24,6 +24,7 @@ export enum PriceTypeOptionEnum {
 export class FuelLogFormComponent implements OnInit {
     private fuelLogSource = new BehaviorSubject<FuelLog>({} as FuelLog)
     private acParametersSource = new BehaviorSubject<AcParameters>({} as AcParameters)
+    // private displayOnlySource = new BehaviorSubject<boolean>(false)
 
     fuelLog!: FuelLog
     @Input("fuelLog") set inputFuelLog(value: FuelLog) {
@@ -40,6 +41,19 @@ export class FuelLogFormComponent implements OnInit {
     }
 
     @Input() maintenanceMode: boolean = false // allows all fields to be editable and will not show top ip checkbox
+    displayOnly!: boolean
+    @Input("displayOnly") set inputDisplayOnly(value: boolean) {
+        // console.log('@Input() set inputDisplayPnly(value: boolean) value: ', value)
+        // this.displayOnlySource.next(value)
+        // this.displayOnlySource.subscribe(data => console.log('displayOnlySource data', data))
+        if (value) {
+            console.log('disable: true')
+            this.form.disable()
+        } else {
+            console.log('disable: false')
+            this.form.enable()
+        }
+    }
     @Output() formSubmitted = new EventEmitter<FuelLog>();
     @Output() formCancelled = new EventEmitter();
 
