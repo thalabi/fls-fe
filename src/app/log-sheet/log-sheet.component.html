@@ -27,12 +27,10 @@
                 </p-datepicker>
             </div>
             <div class="col-2">
+                <span>Airtime</span>
             </div>
-            <div class="col-2">
-                <span>Flight</span>
-            </div>
-            <div class="col-2">
-                <span>Total</span>
+            <div class="col-4">
+                <span>{{airtime == 0 ? '' : airtime | number: '1.0-1'}}</span>
             </div>
 
             <!-- line 3 -->
@@ -48,13 +46,10 @@
                 </p-datepicker>
             </div>
             <div class="col-2">
-                <span>Airtime</span>
+                <span>Flight time</span>
             </div>
-            <div class="col-2">
-                <span>{{airtime == 0 ? '' : airtime | number: '1.0-1'}}</span>
-            </div>
-            <div class="col-2">
-                <span>{{totalAirtime == 0 ? '' : totalAirtime | number: '1.0-1'}}</span>
+            <div class="col-4">
+                <span>{{flightTime == 0 ? '' : flightTime | number: '1.0-1'}}</span>
             </div>
 
             <!-- line 4 -->
@@ -70,10 +65,10 @@
                 </p-datepicker>
             </div>
             <div class="col-2">
-                <span>Flight time</span>
+                <span>TSN</span>
             </div>
             <div class="col-4">
-                <span>{{flightTime == 0 ? '' : flightTime | number: '1.0-1'}}</span>
+                <span>{{tsn == 0 ? '' : tsn | number: '1.0-1'}}</span>
             </div>
 
             <!-- line 5 -->
@@ -91,9 +86,7 @@
             <div class="col-2">
                 <span>TSMOH</span>
             </div>
-            <div class="col-2">
-            </div>
-            <div class="col-2">
+            <div class="col-4">
                 <span>{{tsmoh == 0 ? '' : tsmoh | number: '1.0-1'}}</span>
             </div>
 
@@ -105,7 +98,7 @@
                     [disabled]="timesForm.invalid"></button>
             </div>
             <div class="field">
-                <button pButton type="reset" label="Reset Times" (click)="onResetTimesForm()"></button>
+                <button pButton type="button" label="Reset Times" (click)="onResetTimesForm()"></button>
             </div>
         </div>
 
@@ -127,86 +120,65 @@
             <div class="col-2">
                 <span>Right</span>
             </div>
-            <div class="col-2">
-                <span>Both</span>
-            </div>
-            <div class="col-4">
-                <span>Remaining</span>
+            <div class="col-6">
+                <span>All</span>
             </div>
 
             <!-- line 2 -->
             <div class="col-2">
-                <span>Used</span>
+                <span>Before</span>
             </div>
             <div class="col-2">
-                <span>{{previousFlightsLeftTankFuelUsed | number: '1.0-1'}}/{{leftTankFuelPumped | number:
-                    '1.0-1'}}</span>
-            </div>
-            <div class="col-2">
-                <span>
-                    {{previousFlightsRightTankFuelUsed | number: '1.0-1'}}/{{rightTankFuelPumped | number: '1.0-1'}}
-                </span>
+                <span>{{leftTankBefore | number: '1.0-1'}}</span>
             </div>
             <div class="col-2">
                 <span>
-                    {{previousFlightsBothTanksFuelUsed | number: '1.0-1'}}/{{bothTanksFuelPumped | number: '1.0-1'}}
+                    {{rightTankBefore | number: '1.0-1'}}
                 </span>
             </div>
-            <div class="col-4">
+            <div class="col-6">
                 <span>
-                    {{previousFlightsFuelRemaining | number: '1.0-1'}} gal
-                </span>
-                <span>
-                    {{previousFlightsFuelTimeRemaining}} <i class="pi pi-clock"></i>
+                    {{bothTanksBefore | number: '1.0-1'}}
                 </span>
             </div>
 
             <!-- line 3 -->
             <div class="col-2">
-                <span>Flight</span>
+                <span>Used</span>
             </div>
             <div class="col-2">
-                <p-inputnumber inputId="flightLeftTankFuelUsed" formControlName="flightLeftTankFuelUsedControl"
-                    size="small" [min]="0" mode="decimal" [maxFractionDigits]="1" [maxlength]="4"
-                    [inputStyle]="{'width':'3rem'}" />
+                <p-inputnumber formControlName="leftTankUsed" size="small" [min]="0" mode="decimal"
+                    [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}" />
             </div>
             <div class="col-2">
-                <p-inputnumber inputId="flightRightTankFuelUsed" formControlName="flightRightTankFuelUsedControl"
-                    size="small" [min]="0" mode="decimal" [maxFractionDigits]="1" [maxlength]="4"
-                    [inputStyle]="{'width':'3rem'}" />
+                <p-inputnumber formControlName="rightTankUsed" size="small" [min]="0" mode="decimal"
+                    [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}" />
             </div>
             <div class="col-6">
                 <span>
-                    {{flightBothTanksFuelUsed | number: '1.0-1'}}
+                    {{bothTanksUsed | number: '1.0-1'}}
                 </span>
             </div>
 
             <!-- line 4 -->
-            <ng-container *ngIf="flightBothTanksFuelUsed">
+            <ng-container *ngIf="bothTanksUsed">
                 <div class="col-2">
-                    <span>Total</span>
+                    <span>Remaining</span>
                 </div>
                 <div class="col-2">
                     <span>
-                        {{totalLeftTankFuelUsed | number: '1.0-1'}}/{{leftTankFuelPumped | number: '1.0-1'}}
+                        {{remainingLeftTank | number: '1.0-1'}}
                     </span>
                 </div>
                 <div class="col-2">
                     <span>
-                        {{totalRightTankFuelUsed | number: '1.0-1'}}/{{rightTankFuelPumped | number: '1.0-1'}}
+                        {{remainingRightTank | number: '1.0-1'}}
                     </span>
                 </div>
-                <div class="col-2">
+                <div class="col-6">
                     <span>
-                        {{totalBothTanksFuelUsed | number: '1.0-1'}}/{{bothTanksFuelPumped | number: '1.0-1'}}
-                    </span>
-                </div>
-                <div class="col-4">
-                    <span>
-                        {{fuelRemaining | number: '1.0-1'}} gal
-                    </span>
-                    <span>
-                        {{fuelTimeRemaining}} <i class="pi pi-clock"></i>
+                        {{remainingInTanks | number: '1.0-1'}} gal -
+                        {{timeRemainingInTanks}} <i class="pi pi-clock"></i>
                     </span>
                 </div>
             </ng-container>

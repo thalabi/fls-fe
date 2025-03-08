@@ -5,6 +5,12 @@ import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { RestService } from '../service/rest.service';
+import { AcParameters } from '../domain/AcParameters';
+import { AcParametersResponse } from '../response/AcParametersResponse';
+import { forkJoin } from 'rxjs';
+import { FuelLog } from '../domain/FuelLog';
+import { FuelLogResponse } from '../response/FuelLogResponse';
 
 @Component({
     selector: 'app-log-sheet',
@@ -14,97 +20,93 @@ import { InputNumberModule } from 'primeng/inputnumber';
 })
 export class LogSheetComponent implements OnInit {
 
-    timesForm!: FormGroup
+    readonly AC_REGISTRATION: string = 'C-GQGD'
+
+    //timesForm!: FormGroup
     now!: Date
     airtime: number = 0
     flightTime: number = 0
-    totalAirtime: number = 0
+    tsn: number = 0
     tsmoh: number = 0
 
-    fuelForm!: FormGroup
+    // fuelForm!: FormGroup
 
-    leftTankFuelPumped!: number // from service
-    rightTankFuelPumped!: number // from service
+    leftTankBefore!: number // from service
+    rightTankBefore!: number // from service
+    bothTanksBefore!: number
 
-    previousFlightsLeftTankFuelUsed!: number // from service
-    previousFlightsRightTankFuelUsed!: number // from service
-    previousFlightsBothTanksFuelUsed!: number
-    previousFlightsFuelRemaining!: number
-    previousFlightsFuelTimeRemaining!: string
+    // leftTankUsed!: number
+    // rightTankUsed!: number
 
-    flightLeftTankFuelUsed!: number
-    flightRightTankFuelUsed!: number
+    remainingLeftTank!: number | null
+    remainingRightTank!: number | null
+    remainingInTanks!: number | null
 
-    totalLeftTankFuelUsed!: number | null
-    totalRightTankFuelUsed!: number | null
-    totalBothTanksFuelUsed!: number | null
-
-    fuelRemaining!: number
-    fuelTimeRemaining!: string
+    timeRemainingInTanks!: string
 
     bothTanksFuelPumped!: number
-    flightBothTanksFuelUsed!: number | null
+    bothTanksUsed!: number | null
 
-    // a/c parameters
-    initialTsn!: number // from service
-    initialTsmoh!: number // from service
-    eachTankCapacity!: number // from service
-    fuelBurnPerHour!: number // from service
+    acParameters!: AcParameters
+    fuelLog!: FuelLog
 
     readonly oneDayMinutes: number = 24 * 60;
 
     timesCaculated: boolean = false
     fuelCaculated: boolean = false
 
-    constructor(private messageService: MessageService) { }
+    timesForm = new FormGroup({
+        flightDate: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+        startupTime: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+        takeoffTime: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+        landingTime: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+        shutdownTime: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+    });
+
+    fuelForm = new FormGroup({
+        leftTankUsed: new FormControl<number | null>(null, Validators.required),
+        rightTankUsed: new FormControl<number | null>(null, Validators.required),
+    });
+
+    constructor(private messageService: MessageService, private restService: RestService) { }
 
     ngOnInit() {
         this.messageService.clear()
         this.initTimesForm()
         this.initFuelForm()
 
-        this.getAircraftParameters()
+        // this.getAcParameters()
         this.getFuelBeforeFlight()
     }
 
     private initTimesForm() {
-        this.now = new Date()
-        this.timesForm = new FormGroup({
-            flightDate: new FormControl<Date>(this.now, Validators.required),
-            startupTime: new FormControl<Date>(this.now, Validators.required),
-            takeoffTime: new FormControl<Date>(this.now, Validators.required),
-            landingTime: new FormControl<Date>(this.now, Validators.required),
-            shutdownTime: new FormControl<Date>(this.now, Validators.required),
-        });
+        this.timesForm.reset()
     }
     private initFuelForm() {
-        this.fuelForm = new FormGroup({
-            flightLeftTankFuelUsedControl: new FormControl<number | null>(null, Validators.required),
-            flightRightTankFuelUsedControl: new FormControl<number | null>(null, Validators.required),
-        });
+        this.fuelForm.reset()
     }
 
     onSubmitTimesForm() {
         console.log('onSubmit()')
-        console.log(this.timesForm.controls['flightDate'].value)
-        console.log(this.timesForm.controls['startupTime'].value)
-        console.log(this.timesForm.controls['takeoffTime'].value)
-        console.log(this.timesForm.controls['landingTime'].value)
-        console.log(this.timesForm.controls['shutdownTime'].value)
-        if (this.timesForm.controls['flightDate'].value instanceof String) {
-            console.log('this.logSheetForm.controls[\'flightDate\'].value is String')
-        } else if (this.timesForm.controls['flightDate'].value instanceof Date) {
-            console.log('this.logSheetForm.controls[\'flightDate\'].value is Date')
+        console.log(this.timesForm.controls.flightDate.value)
+        console.log(this.timesForm.controls.startupTime.value)
+        console.log(this.timesForm.controls.takeoffTime.value)
+        console.log(this.timesForm.controls.landingTime.value)
+        console.log(this.timesForm.controls.shutdownTime.value)
+        if (this.timesForm.controls.flightDate.value instanceof String) {
+            console.log('this.logSheetForm.controls.flightDate.value is String')
+        } else if (this.timesForm.controls.flightDate.value instanceof Date) {
+            console.log('this.logSheetForm.controls.flightDate.value is Date')
         } else {
-            console.log('this.logSheetForm.controls[\'flightDate\'].value is something else')
+            console.log('this.logSheetForm.controls.flightDate.value is something else')
         }
         console.log(this.timesForm.controls)
-        const flightDate: Date = this.timesForm.controls['flightDate'].value
+        const flightDate: Date = this.timesForm.controls.flightDate.value
 
-        const startupMinutes: number = Math.floor(this.timesForm.controls['startupTime'].value.getTime() / (60 * 1000))
-        let takeoffMinutes: number = Math.floor(this.timesForm.controls['takeoffTime'].value.getTime() / (60 * 1000))
-        let landingMinutes: number = Math.floor(this.timesForm.controls['landingTime'].value.getTime() / (60 * 1000))
-        let shutdownMinutes: number = Math.floor(this.timesForm.controls['shutdownTime'].value.getTime() / (60 * 1000))
+        const startupMinutes: number = Math.floor(this.timesForm.controls.startupTime.value.getTime() / (60 * 1000))
+        let takeoffMinutes: number = Math.floor(this.timesForm.controls.takeoffTime.value.getTime() / (60 * 1000))
+        let landingMinutes: number = Math.floor(this.timesForm.controls.landingTime.value.getTime() / (60 * 1000))
+        let shutdownMinutes: number = Math.floor(this.timesForm.controls.shutdownTime.value.getTime() / (60 * 1000))
         let times: number[] = [startupMinutes, takeoffMinutes, landingMinutes, shutdownMinutes]
         console.log('before adjust times')
         this.displayTimes(times)
@@ -121,20 +123,19 @@ export class LogSheetComponent implements OnInit {
         console.log('flightTimeMinutes', flightTimeMinutes)
         console.log('flightTime', this.flightTime)
 
-        this.totalAirtime = this.initialTsn + this.airtime
-        this.tsmoh = this.initialTsmoh + this.airtime
+        this.tsn = this.acParameters.initialTsn + this.airtime
+        this.tsmoh = this.acParameters.initialTsmoh + this.airtime
 
         this.timesCaculated = true
     }
 
     onResetTimesForm() {
         console.log('onCancel()')
-        // this.resetDialoForm();
         this.initTimesForm()
         this.airtime = 0
         this.flightTime = 0
-        this.totalAirtime = this.initialTsn
-        this.tsmoh = this.initialTsmoh
+        this.tsn = 0 //this.acParameters.initialTsn
+        this.tsmoh = 0 //this.acParameters.initialTsmoh
 
         this.timesCaculated = false
 
@@ -177,50 +178,64 @@ export class LogSheetComponent implements OnInit {
     }
 
     onSubmitFuelForm() {
-        this.flightLeftTankFuelUsed = this.fuelForm.controls['flightLeftTankFuelUsedControl'].value
-        this.flightRightTankFuelUsed = this.fuelForm.controls['flightRightTankFuelUsedControl'].value
-        this.flightBothTanksFuelUsed = this.flightLeftTankFuelUsed +
-            this.flightRightTankFuelUsed
+        const leftTankUsed = this.fuelForm.controls.leftTankUsed.value ?? 0
+        const rightTankUsed = this.fuelForm.controls.rightTankUsed.value ?? 0
+        this.bothTanksUsed = leftTankUsed + rightTankUsed
 
-        this.totalLeftTankFuelUsed = this.previousFlightsLeftTankFuelUsed + this.flightLeftTankFuelUsed
-        this.totalRightTankFuelUsed = this.previousFlightsRightTankFuelUsed + this.flightRightTankFuelUsed
-        this.totalBothTanksFuelUsed = this.totalLeftTankFuelUsed + this.totalRightTankFuelUsed
+        this.remainingLeftTank = this.leftTankBefore - leftTankUsed
+        this.remainingRightTank = this.rightTankBefore - rightTankUsed
+        this.remainingInTanks = this.remainingLeftTank + this.remainingRightTank
 
-        this.fuelRemaining = this.bothTanksFuelPumped - this.totalBothTanksFuelUsed
-        this.fuelTimeRemaining = this.toFuelTime(this.fuelRemaining)
 
+        this.timeRemainingInTanks = this.toFuelTime(this.remainingInTanks)
         this.fuelCaculated = true
-        //this.toFuelTime()
     }
     onResetFuelForm() {
         this.initFuelForm()
-        this.flightBothTanksFuelUsed = null
-        this.totalLeftTankFuelUsed = null
-        this.totalRightTankFuelUsed = null
-        this.totalBothTanksFuelUsed = null
+        this.bothTanksUsed = null
+        this.remainingLeftTank = null
+        this.remainingRightTank = null
+        this.remainingInTanks = null
 
         this.fuelCaculated = false
     }
 
-    private getAircraftParameters() {
-        this.initialTsn = 4928.7
-        this.initialTsmoh = 3385
-        this.eachTankCapacity = 24
-        this.fuelBurnPerHour = 9
+    // private getAcParameters() {
+    //     this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1).subscribe((acParametersResponse: AcParametersResponse) => {
+    //         console.log('acParametersResponse', acParametersResponse);
+    //         const acParametersArray = acParametersResponse._embedded.simpleModels || new Array<AcParameters>
+    //         this.acParameters = acParametersArray[0]
+    //     })
+
+    // }
+    private getFuelBeforeFlight() {
+        console.log('before forkJoin')
+        forkJoin({
+
+            acParametersResponse: this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1),
+
+            fuelLogResponse: this.restService.getLastFuelLog(this.AC_REGISTRATION)
+
+        }).subscribe(((result: { acParametersResponse: AcParametersResponse; fuelLogResponse: FuelLogResponse }) => {
+
+            console.log('acParametersResponse', result.acParametersResponse);
+            const acParametersArray = result.acParametersResponse._embedded.simpleModels || new Array<AcParameters>
+            this.acParameters = acParametersArray[0]
+
+            console.log('fuelLogResponse', result.fuelLogResponse);
+            const fuelLogs = result.fuelLogResponse._embedded.fuelLogs || new Array<FuelLog>
+            this.leftTankBefore = fuelLogs[0].left + fuelLogs[0].changeInLeft
+            this.rightTankBefore = fuelLogs[0].right + fuelLogs[0].changeInRight;
+
+            console.log('fuelLog', this.fuelLog)
+
+            //this.fuelLogToForm = this.fuelLog // will trigger a change detection and populate the form
+        }));
+
 
     }
-    private getFuelBeforeFlight() {
-        this.leftTankFuelPumped = 24
-        this.rightTankFuelPumped = 24
-        this.bothTanksFuelPumped = this.leftTankFuelPumped + this.rightTankFuelPumped
-        this.previousFlightsLeftTankFuelUsed = 2.5
-        this.previousFlightsRightTankFuelUsed = 5.1
-        this.previousFlightsBothTanksFuelUsed = this.previousFlightsLeftTankFuelUsed + this.previousFlightsRightTankFuelUsed
-        this.previousFlightsFuelRemaining = this.bothTanksFuelPumped - this.previousFlightsBothTanksFuelUsed
-        this.previousFlightsFuelTimeRemaining = this.toFuelTime(this.previousFlightsFuelRemaining)
-    }
     private toFuelTime(gallons: number): string {
-        const fuelMinuntes = Math.floor(gallons / this.fuelBurnPerHour * 60)
+        const fuelMinuntes = Math.floor(gallons / this.acParameters.fuelBurnPerHour * 60)
         const hrs = Math.floor(fuelMinuntes / 60)
         const mins = fuelMinuntes % 60
         const fuelTime = hrs + ':' + (mins < 10 ? '0' + mins : mins)
