@@ -11,6 +11,7 @@ import { AcParametersResponse } from '../response/AcParametersResponse';
 import { forkJoin } from 'rxjs';
 import { FuelLog } from '../domain/FuelLog';
 import { FuelLogResponse } from '../response/FuelLogResponse';
+import { LogSheetRequest } from '../request/log-sheet-request';
 
 @Component({
     selector: 'app-log-sheet',
@@ -67,6 +68,9 @@ export class LogSheetComponent implements OnInit {
         leftTankUsed: new FormControl<number | null>(null, Validators.required),
         rightTankUsed: new FormControl<number | null>(null, Validators.required),
     });
+
+    leftTankUsed!: number;
+    rightTankUsed!: number;
 
     constructor(private messageService: MessageService, private restService: RestService) { }
 
@@ -178,12 +182,12 @@ export class LogSheetComponent implements OnInit {
     }
 
     onSubmitFuelForm() {
-        const leftTankUsed = this.fuelForm.controls.leftTankUsed.value ?? 0
-        const rightTankUsed = this.fuelForm.controls.rightTankUsed.value ?? 0
-        this.bothTanksUsed = leftTankUsed + rightTankUsed
+        this.leftTankUsed = this.fuelForm.controls.leftTankUsed.value ?? 0
+        this.rightTankUsed = this.fuelForm.controls.rightTankUsed.value ?? 0
+        this.bothTanksUsed = this.leftTankUsed + this.rightTankUsed
 
-        this.remainingLeftTank = this.leftTankBefore - leftTankUsed
-        this.remainingRightTank = this.rightTankBefore - rightTankUsed
+        this.remainingLeftTank = this.leftTankBefore - this.leftTankUsed
+        this.remainingRightTank = this.rightTankBefore - this.rightTankUsed
         this.remainingInTanks = this.remainingLeftTank + this.remainingRightTank
 
 
@@ -200,14 +204,6 @@ export class LogSheetComponent implements OnInit {
         this.fuelCaculated = false
     }
 
-    // private getAcParameters() {
-    //     this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1).subscribe((acParametersResponse: AcParametersResponse) => {
-    //         console.log('acParametersResponse', acParametersResponse);
-    //         const acParametersArray = acParametersResponse._embedded.simpleModels || new Array<AcParameters>
-    //         this.acParameters = acParametersArray[0]
-    //     })
-
-    // }
     private getFuelBeforeFlight() {
         console.log('before forkJoin')
         forkJoin({
@@ -243,7 +239,15 @@ export class LogSheetComponent implements OnInit {
     }
 
     onSave() {
-
+        const logSheetRequest: LogSheetRequest = {
+            date: this.timesForm.controls.flightDate.value,
+            registration: this.AC_REGISTRATION,
+            airtime: this.airtime,
+            flightTime: this.flightTime,
+            leftTankUsed: this.leftTankUsed,
+            rightTankUsed: this.rightTankUsed
+        }
+        this.restService.addLogSheet(logSheetRequest).subscribe()
     }
 }
 

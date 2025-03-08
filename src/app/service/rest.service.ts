@@ -5,6 +5,7 @@ import { catchError, map, Observable, throwError } from 'rxjs';
 import { IGenericEntity } from '../domain/i-gerneric-entity';
 import { FuelLog } from '../domain/FuelLog';
 import { AcParameters } from '../domain/AcParameters';
+import { LogSheetRequest } from '../request/log-sheet-request';
 
 @Injectable({
     providedIn: 'root'
@@ -52,6 +53,10 @@ export class RestService {
     }
     deleteFuelLog(id: number): Observable<HttpResponse<any>> {
         return this.httpClient.delete<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs/${id}`);
+    }
+
+    addLogSheet(logSheetRequest: LogSheetRequest): Observable<HttpResponse<any>> {
+        return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/logSheetController/addLogSheet`, logSheetRequest);
     }
 
     public static toCamelCase(tableName: string): string {
