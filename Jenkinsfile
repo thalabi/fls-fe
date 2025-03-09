@@ -23,14 +23,13 @@ pipeline {
                 ls -l
                 cat *
                 NOW=$(date -u +"%F %H:%M UTC")
-                echo $NOW
+                echo "NOW = ${NOW}"
                 cat environment.prod.ts
                 sed -i -e "s/@buildVersion@/${BRANCH_NAME}/" \
                     -e "s/@buildTimestamp@/${NOW}/" \
                     environment.prod.ts
                 cat environment.prod.ts
                 ls -l
-                cat *
                 pwd
                 cd ../..
                 pwd
