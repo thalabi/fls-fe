@@ -248,7 +248,11 @@ export class LogSheetComponent implements OnInit {
             leftTankUsed: this.leftTankUsed,
             rightTankUsed: this.rightTankUsed
         }
-        this.restService.addLogSheet(logSheetRequest).subscribe()
+        this.restService.addLogSheet(logSheetRequest).subscribe(() => {
+            this.messageService.add({ severity: 'info', summary: '200', detail: 'Saved sucessfully' });
+            this.onResetTimesForm()
+            this.onResetFuelForm()
+        })
     }
 }
 
