@@ -221,7 +221,8 @@ export class LogSheetComponent implements OnInit {
             console.log('fuelLogResponse', result.fuelLogResponse);
             const fuelLogs = result.fuelLogResponse._embedded.fuelLogs || new Array<FuelLog>
             this.leftTankBefore = fuelLogs[0].left + fuelLogs[0].changeInLeft
-            this.rightTankBefore = fuelLogs[0].right + fuelLogs[0].changeInRight;
+            this.rightTankBefore = fuelLogs[0].right + fuelLogs[0].changeInRight
+            this.bothTanksBefore = this.leftTankBefore + this.rightTankBefore
 
             console.log('fuelLog', this.fuelLog)
 
