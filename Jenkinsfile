@@ -27,8 +27,8 @@ pipeline {
                 cat environment.prod.ts
                 sed -i -e "s/@buildVersion@/${BRANCH_NAME}/" \
                     -e "s/@buildTimestamp@/${NOW}/" \
-                    environment.ts
-                cat environment.ts
+                    environment.prod.ts
+                cat environment.prod.ts
                 ls -l
                 cat *
                 pwd
