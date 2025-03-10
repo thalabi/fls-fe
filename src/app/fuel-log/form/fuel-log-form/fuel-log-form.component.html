@@ -82,7 +82,8 @@
             <div class="col-2">
                 <p-inputnumber inputId="addToLeftTank" formControlName="addToLeftTank" size="small"
                     (onInput)="onInputAddToLeftTank()" [min]="maintenanceMode ? (-1*acParameters.eachTankCapacity) : 0"
-                    mode="decimal" [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}" />
+                    mode="decimal" [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}"
+                    inputmode="decimal" />
             </div>
             <div class="col-8">
                 <p-inputnumber inputId="addToRightTank" formControlName="addToRightTank" size="small"
