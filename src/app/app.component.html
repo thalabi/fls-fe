@@ -20,10 +20,6 @@
     </small>
 </div>
 
-
-<p-overlayPanel [showTransitionOptions]="'0ms'" [hideTransitionOptions]="'0ms'" #op [dismissable]="true"
-    [showCloseIcon]="true" #buildInfo>
-    <ng-template pTemplate>
-        BE {{serverBuildInfo}}<br />FE {{clientBuildInfo}}
-    </ng-template>
-</p-overlayPanel>
+<p-popover [dismissable]="true" #buildInfo>
+    BE {{serverBuildInfo}}<br />FE {{clientBuildInfo}}
+</p-popover>

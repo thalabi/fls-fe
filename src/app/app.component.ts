@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SharedModule } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { PopoverModule } from 'primeng/popover';
 import { AuthService } from './auth/auth.service';
 import { BackendStacktraceDisplayComponent } from './backend-stacktrace-display/backend-stacktrace-display.component';
 import { MenuComponent } from './menu/menu.component';
@@ -14,7 +14,7 @@ import { DEFAULT_INTERRUPTSOURCES, Idle } from '@ng-idle/core';
 
 @Component({
     selector: 'app-root',
-    imports: [NgIf, MessagesModule, BackendStacktraceDisplayComponent, MenuComponent, RouterOutlet, OverlayPanelModule, SharedModule],
+    imports: [NgIf, MessagesModule, BackendStacktraceDisplayComponent, MenuComponent, RouterOutlet, PopoverModule, SharedModule],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css'
 })
