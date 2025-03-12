@@ -121,7 +121,7 @@
                 <span>Right</span>
             </div>
             <div class="col-6">
-                <span>All</span>
+                <span>Both</span>
             </div>
 
             <!-- line 2 -->
@@ -138,7 +138,8 @@
             </div>
             <div class="col-6">
                 <span>
-                    {{bothTanksBefore | number: '1.0-1'}}
+                    {{bothTanksBefore | number: '1.0-1'}} gal -
+                    {{timeRemainingInTanksBefore}} <i class="pi pi-clock"></i>
                 </span>
             </div>
 
@@ -178,7 +179,7 @@
                 <div class="col-6">
                     <span>
                         {{remainingInTanks | number: '1.0-1'}} gal -
-                        {{timeRemainingInTanks}} <i class="pi pi-clock"></i>
+                        {{timeRemainingInTanksAfter}} <i class="pi pi-clock"></i>
                     </span>
                 </div>
             </ng-container>

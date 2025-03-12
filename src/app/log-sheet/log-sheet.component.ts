@@ -30,20 +30,16 @@ export class LogSheetComponent implements OnInit {
     tsn: number = 0
     tsmoh: number = 0
 
-    // fuelForm!: FormGroup
-
-    leftTankBefore!: number // from service
-    rightTankBefore!: number // from service
+    leftTankBefore!: number
+    rightTankBefore!: number
     bothTanksBefore!: number
-
-    // leftTankUsed!: number
-    // rightTankUsed!: number
+    timeRemainingInTanksBefore!: string
 
     remainingLeftTank!: number | null
     remainingRightTank!: number | null
     remainingInTanks!: number | null
 
-    timeRemainingInTanks!: string
+    timeRemainingInTanksAfter!: string
 
     bothTanksFuelPumped!: number
     bothTanksUsed!: number | null
@@ -191,7 +187,7 @@ export class LogSheetComponent implements OnInit {
         this.remainingInTanks = this.remainingLeftTank + this.remainingRightTank
 
 
-        this.timeRemainingInTanks = this.toFuelTime(this.remainingInTanks)
+        this.timeRemainingInTanksAfter = this.toFuelTime(this.remainingInTanks)
         this.fuelCaculated = true
     }
     onResetFuelForm() {
@@ -223,6 +219,7 @@ export class LogSheetComponent implements OnInit {
             this.leftTankBefore = fuelLogs[0].left + fuelLogs[0].changeInLeft
             this.rightTankBefore = fuelLogs[0].right + fuelLogs[0].changeInRight
             this.bothTanksBefore = this.leftTankBefore + this.rightTankBefore
+            this.timeRemainingInTanksBefore = this.toFuelTime(this.bothTanksBefore)
 
             console.log('fuelLog', this.fuelLog)
 
