@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { KeyFilterModule } from 'primeng/keyfilter'
 import { SelectModule } from 'primeng/select';
 import { CommonModule } from '@angular/common';
 import { FuelLog } from '../../../domain/FuelLog';
@@ -17,14 +18,11 @@ export enum PriceTypeOptionEnum {
 
 @Component({
     selector: 'app-fuel-log-form',
-    imports: [CommonModule, ReactiveFormsModule, DatePickerModule, CheckboxModule, InputNumberModule, InputTextModule, SelectModule, ButtonModule],
+    imports: [CommonModule, ReactiveFormsModule, DatePickerModule, CheckboxModule, InputNumberModule, InputTextModule, KeyFilterModule, SelectModule, ButtonModule],
     templateUrl: './fuel-log-form.component.html',
     styleUrl: './fuel-log-form.component.css'
 })
-export class FuelLogFormComponent /*implements OnInit*/ {
-    // private fuelLogSource = new BehaviorSubject<FuelLog>({} as FuelLog)
-    // private acParametersSource = new BehaviorSubject<AcParameters>({} as AcParameters)
-    // private displayOnlySource = new BehaviorSubject<boolean>(false)
+export class FuelLogFormComponent {
 
     fuelLog!: FuelLog
     @Input("fuelLog") set inputFuelLog(value: FuelLog) {
@@ -84,33 +82,9 @@ export class FuelLogFormComponent /*implements OnInit*/ {
         comment: new FormControl<string>(''),
     });
 
-    // ngOnInit(): void {
-    //     console.log('ngOnInit')
-
-    // combineLatest({ // forkJoin doesn't work with BehaviorSubject
-    //     // combineLatest wait for the 'next' value to emitted vs forkJoin which waits for operation to 'complete'
-
-    //     acParameters: this.acParametersSource,
-
-    //     fuelLog: this.fuelLogSource
-
-    // }).subscribe(((result: { acParameters: AcParameters; fuelLog: FuelLog }) => {
-
-    //     console.log('subscribe acParameters & fuelLog')
-
-    //     if (result.acParameters !== undefined && result.fuelLog !== undefined) {
-    //         console.log('result.acParameters', result.acParameters)
-    //         this.acParameters = result.acParameters
-
-    //         console.log('result.fuelLog', result.fuelLog)
-    //         this.fuelLog = result.fuelLog
-
-    //         this.fillInFormWithValues()
-    //         this.formReady = true
-    //     }
-
-    // }));
-    // }
+    constructor() {
+        this.validateChangeToTank(this.form.controls.addToLeftTank, -24, 24, 1)
+    }
 
     private fillInFormWithValues() {
         console.log('this.fuelLog', this.fuelLog)
@@ -271,4 +245,30 @@ export class FuelLogFormComponent /*implements OnInit*/ {
             return false
         }
     }
+
+    validateChangeToTank(control: FormControl, minValue: number, maxValue: number, maxFractionDigits: number) {
+        control.valueChanges.subscribe(value => {
+            console.log('Validating', this.getControlName(this.form, control), ' value ', value);
+            if (!value || (typeof value === 'string' && value.trim() === '')) {
+                console.log('required')
+                control.setErrors({ required: true });
+            } else if (value < minValue || value > maxValue) {
+                console.log('minMaxError')
+                control.setErrors({ minMaxError: true });
+            } else {
+                const fractionPart = value.toString().split('.')[1];
+                if (fractionPart && fractionPart.length > maxFractionDigits) {
+                    console.log('maxFractionDigitsError')
+                    control.setErrors({ maxFractionDigitsError: true });
+                } else {
+                    control.setErrors(null);
+                }
+            }
+        })
+    }
+
+    private getControlName(form: FormGroup, control: AbstractControl): string | null {
+        return Object.keys(form.controls).find(name => form.controls[name] === control) || null;
+    }
+
 }
