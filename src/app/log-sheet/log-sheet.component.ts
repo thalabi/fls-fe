@@ -243,8 +243,8 @@ export class LogSheetComponent implements OnInit {
         const logSheetRequest: LogSheetRequest = {
             registration: this.AC_REGISTRATION,
             date: this.timesForm.controls.flightDate.value,
-            from: this.timesForm.controls.from.value!,
-            to: this.timesForm.controls.from.value!,
+            from: this.timesForm.controls.from.value!.toUpperCase(),
+            to: this.timesForm.controls.from.value!.toUpperCase(),
             airtime: this.airtime,
             flightTime: this.flightTime,
             leftTankUsed: this.leftTankUsed,
