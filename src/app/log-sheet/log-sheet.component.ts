@@ -55,6 +55,8 @@ export class LogSheetComponent implements OnInit {
 
     timesForm = new FormGroup({
         flightDate: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+        from: new FormControl<string>('', Validators.required),
+        to: new FormControl<string>('', Validators.required),
         startupTime: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
         takeoffTime: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
         landingTime: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
@@ -86,12 +88,6 @@ export class LogSheetComponent implements OnInit {
     private initFuelForm() {
         this.fuelForm.reset()
     }
-
-    toUpperCase() {
-        // const airportControl = this.form.controls.airport
-        // airportControl.setValue((airportControl.value ?? '').toUpperCase(), { emitEvent: false });
-    }
-
 
     onSubmitTimesForm() {
         console.log('onSubmit()')
@@ -245,8 +241,10 @@ export class LogSheetComponent implements OnInit {
 
     onSave() {
         const logSheetRequest: LogSheetRequest = {
-            date: this.timesForm.controls.flightDate.value,
             registration: this.AC_REGISTRATION,
+            date: this.timesForm.controls.flightDate.value,
+            from: this.timesForm.controls.from.value!,
+            to: this.timesForm.controls.from.value!,
             airtime: this.airtime,
             flightTime: this.flightTime,
             leftTankUsed: this.leftTankUsed,
