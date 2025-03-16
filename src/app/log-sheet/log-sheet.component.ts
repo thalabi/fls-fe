@@ -5,6 +5,7 @@ import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
 import { RestService } from '../service/rest.service';
 import { AcParameters } from '../domain/AcParameters';
 import { AcParametersResponse } from '../response/AcParametersResponse';
@@ -15,7 +16,7 @@ import { LogSheetRequest } from '../request/log-sheet-request';
 
 @Component({
     selector: 'app-log-sheet',
-    imports: [CommonModule, ReactiveFormsModule, DatePickerModule, ButtonModule, InputNumberModule],
+    imports: [CommonModule, ReactiveFormsModule, DatePickerModule, ButtonModule, InputNumberModule, InputTextModule],
     templateUrl: './log-sheet.component.html',
     styleUrl: './log-sheet.component.css'
 })
@@ -85,6 +86,12 @@ export class LogSheetComponent implements OnInit {
     private initFuelForm() {
         this.fuelForm.reset()
     }
+
+    toUpperCase() {
+        // const airportControl = this.form.controls.airport
+        // airportControl.setValue((airportControl.value ?? '').toUpperCase(), { emitEvent: false });
+    }
+
 
     onSubmitTimesForm() {
         console.log('onSubmit()')

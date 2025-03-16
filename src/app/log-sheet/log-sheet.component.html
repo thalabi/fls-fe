@@ -11,10 +11,23 @@
                     [showButtonBar]="true" [dateFormat]="'yy-mm-dd'" size="small" [inputStyle]="{'width':'8rem'}"
                     ngClass="flightDate.invalid && && flightDate.touched ? ng-invalid" />
             </div>
-            <!-- <div class="col-5">
-            </div> -->
 
             <!-- line 2 -->
+            <!-- from -->
+            <div class="col-2">
+                <label for="airport">From/To</label>
+            </div>
+            <div class="col-1">
+                <input type="text" pInputText inputId="airport" formControlName="airport" pSize="small"
+                    (input)="toUpperCase()" size="small" maxlength="4" style="text-transform:uppercase; width: 5rem" />
+            </div>
+            <div class="col-9">
+                <input type="text" pInputText inputId="airport" formControlName="airport" pSize="small"
+                    (input)="toUpperCase()" size="small" maxlength="4" style="text-transform:uppercase; width: 5rem" />
+            </div>
+
+
+            <!-- line 3 -->
             <div class="col-2">
                 <label for="startupTime">Startup</label>
             </div>
@@ -33,7 +46,7 @@
                 <span>{{airtime == 0 ? '' : airtime | number: '1.0-1'}}</span>
             </div>
 
-            <!-- line 3 -->
+            <!-- line 4 -->
             <div class="col-2">
                 <label for="takeoffTime">Takeoff</label>
             </div>
@@ -52,7 +65,7 @@
                 <span>{{flightTime == 0 ? '' : flightTime | number: '1.0-1'}}</span>
             </div>
 
-            <!-- line 4 -->
+            <!-- line 5 -->
             <div class="col-2">
                 <label for="landingTime">Landing</label>
             </div>
@@ -71,7 +84,7 @@
                 <span>{{tsn == 0 ? '' : tsn | number: '1.0-1'}}</span>
             </div>
 
-            <!-- line 5 -->
+            <!-- line 6 -->
             <div class="col-2">
                 <label for="shutdownTime">Shutdown</label>
             </div>
