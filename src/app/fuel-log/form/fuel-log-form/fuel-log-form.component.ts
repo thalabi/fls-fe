@@ -10,10 +10,12 @@ import { SelectModule } from 'primeng/select';
 import { CommonModule } from '@angular/common';
 import { FuelLog } from '../../../domain/FuelLog';
 import { AcParameters } from '../../../domain/AcParameters';
-import { BehaviorSubject, combineLatest, forkJoin } from 'rxjs';
 
 export enum PriceTypeOptionEnum {
     PER_LITRE = 'Per litre', TOTAL = 'Total'
+}
+export enum TankSideEnum {
+    LEFT, RIGHT
 }
 
 @Component({
@@ -32,6 +34,7 @@ export class FuelLogFormComponent {
         // this.fuelLogSource.subscribe(data => console.log('fuelLogSource data', data))
         this.fuelLog = value
 
+        this.validateChangeToTank(this.form.controls.addToLeftTank, TankSideEnum.LEFT)
         this.fillInFormWithValues()
         this.formReady = true
     }
@@ -83,11 +86,12 @@ export class FuelLogFormComponent {
     });
 
     constructor() {
-        this.validateChangeToTank(this.form.controls.addToLeftTank, -24, 24, 1)
+        // this.validateChangeToTank(this.form.controls.addToLeftTank)
     }
 
     private fillInFormWithValues() {
         console.log('this.fuelLog', this.fuelLog)
+        this.form.reset()
         this.form.controls.date.setValue(this.fuelLog.date !== undefined ? new Date(this.fuelLog.date) : new Date())
         this.form.controls.left.setValue(this.fuelLog.left)
         this.form.controls.right.setValue(this.fuelLog.right)
@@ -110,9 +114,9 @@ export class FuelLogFormComponent {
         this.fuelLog.date = new Date(this.form.controls.date.value)
         this.fuelLog.left = this.form.controls.left.value!
         this.fuelLog.right = this.form.controls.right.value!
-        this.fuelLog.changeInLeft = this.form.controls.addToLeftTank.value!
-        this.fuelLog.changeInRight = this.form.controls.addToRightTank.value!
-        if (this.form.controls.addToLeftTank.value! >= 0 || this.form.controls.addToRightTank.value! >= 0) {
+        this.fuelLog.changeInLeft = Number(this.form.controls.addToLeftTank.value!)
+        this.fuelLog.changeInRight = Number(this.form.controls.addToRightTank.value!)
+        if (Number(this.form.controls.addToLeftTank.value!) >= 0 || Number(this.form.controls.addToRightTank.value!) >= 0) {
             if (this.pricePerLitre === undefined) {
                 this.calculatePricePerLitre()
             }
@@ -137,7 +141,7 @@ export class FuelLogFormComponent {
         }
     }
     onInputLeft() {
-        const calculatedTankCapacity = this.round(this.form.controls.left.value! + this.form.controls.addToLeftTank.value!, 1)
+        const calculatedTankCapacity = this.round(this.form.controls.left.value! + Number(this.form.controls.addToLeftTank.value!), 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.left.setErrors({ invalid: true })
         }
@@ -146,7 +150,7 @@ export class FuelLogFormComponent {
         this.calculatePricePerLitre()
     }
     onInputRight() {
-        const calculatedTankCapacity = this.round(this.form.controls.right.value! + this.form.controls.addToRightTank.value!, 1)
+        const calculatedTankCapacity = this.round(this.form.controls.right.value! + Number(this.form.controls.addToRightTank.value!), 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.right.setErrors({ invalid: true })
         }
@@ -162,7 +166,7 @@ export class FuelLogFormComponent {
             return
         }
 
-        const calculatedTankCapacity = this.round(this.form.controls.left.value! + this.form.controls.addToLeftTank.value!, 1)
+        const calculatedTankCapacity = this.round(this.form.controls.left.value! + Number(this.form.controls.addToLeftTank.value!), 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.addToLeftTank.setErrors({ invalid: true })
         }
@@ -178,7 +182,7 @@ export class FuelLogFormComponent {
             return
         }
 
-        const calculatedTankCapacity = this.round(this.form.controls.right.value! + this.form.controls.addToRightTank.value!, 1)
+        const calculatedTankCapacity = this.round(this.form.controls.right.value! + Number(this.form.controls.addToRightTank.value!), 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.addToRightTank.setErrors({ invalid: true })
         }
@@ -215,14 +219,13 @@ export class FuelLogFormComponent {
         if (priceType == PriceTypeOptionEnum.PER_LITRE) {
             this.pricePerLitre = price!
         } else {
-            const addToLeftTank = this.form.controls.addToLeftTank.value
-            const addToRightTank = this.form.controls.addToRightTank.value
+            const addToLeftTank = Number(this.form.controls.addToLeftTank.value)
+            const addToRightTank = Number(this.form.controls.addToRightTank.value)
             this.pricePerLitre = this.round(price! / ((addToLeftTank! + addToRightTank!) * 3.78), 2)
         }
     }
 
     private round(value: number, precision: number): number {
-        console.log('value', value)
         if (value.toLocaleString() == '-' || value.toLocaleString().endsWith('-')) {
             return 0
         } else {
@@ -234,8 +237,7 @@ export class FuelLogFormComponent {
         // if addToLeftTanks & addToRightTank are negative then the priceType and price
         // controls wont appear and by disabling them the Required validtor wont be in effect
         // and allow the form to be valid
-        console.log('this.form.controls.addToLeftTank.value!', this.form.controls.addToLeftTank.value!, 'this.form.controls.addToRightTank.value!', this.form.controls.addToRightTank.value!)
-        if (this.form.controls.addToLeftTank.value! < 0 && this.form.controls.addToRightTank.value! < 0) {
+        if (Number(this.form.controls.addToLeftTank.value!) < 0 && Number(this.form.controls.addToRightTank.value!) < 0) {
             this.form.controls.priceType.disable()
             this.form.controls.price.disable()
             return true
@@ -246,24 +248,52 @@ export class FuelLogFormComponent {
         }
     }
 
-    validateChangeToTank(control: FormControl, minValue: number, maxValue: number, maxFractionDigits: number) {
+    validateChangeToTank(control: FormControl, tankSideEnum: TankSideEnum) {
+
+        const minValue: number = this.maintenanceMode ? -1 * this.acParameters.eachTankCapacity : 0
+        const maxValue: number = 24
+        const maxFractionDigits: number = 1
+
         control.valueChanges.subscribe(value => {
-            console.log('Validating', this.getControlName(this.form, control), ' value ', value);
+            const controlName = this.getControlName(this.form, control)
+            console.log('Validating', controlName, ' value ', value);
+
+            if (control.dirty) {
+                // turn off Top up checkbox
+                this.form.controls.topUp.setValue(false)
+            }
+
             if (!value || (typeof value === 'string' && value.trim() === '')) {
                 console.log('required')
                 control.setErrors({ required: true });
-            } else if (value < minValue || value > maxValue) {
+                return
+            }
+
+            // change value type from string to number
+            value = Number(value)
+            if (value < minValue || value > maxValue) {
                 console.log('minMaxError')
                 control.setErrors({ minMaxError: true });
-            } else {
-                const fractionPart = value.toString().split('.')[1];
-                if (fractionPart && fractionPart.length > maxFractionDigits) {
-                    console.log('maxFractionDigitsError')
-                    control.setErrors({ maxFractionDigitsError: true });
-                } else {
-                    control.setErrors(null);
-                }
+                return
             }
+
+            const fractionPart = value.toString().split('.')[1];
+            if (fractionPart && fractionPart.length > maxFractionDigits) {
+                console.log('maxFractionDigitsError')
+                control.setErrors({ maxFractionDigitsError: true });
+                return
+            }
+
+            const inTank = (tankSideEnum === TankSideEnum.LEFT) ? this.form.controls.left.value : this.form.controls.right.value
+            const calculatedTankCapacity = this.round(inTank! + value, 1)
+            if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
+                control.setErrors({ invalid: true })
+                return
+            }
+
+            this.calculatePricePerLitre()
+
+            control.setErrors(null);
         })
     }
 

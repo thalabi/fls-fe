@@ -84,7 +84,7 @@
                     (onInput)="onInputAddToLeftTank()" [min]="maintenanceMode ? (-1*acParameters.eachTankCapacity) : 0"
                     mode="decimal" [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}" /> -->
                 <input type="text" pInputText formControlName="addToLeftTank" inputmode="numeric" pKeyFilter="num"
-                    pSize="small" style="width: 3rem" />
+                    pSize="small" style="width: 4rem" />
             </div>
             <div class="col-8">
                 <p-inputnumber inputId="addToRightTank" formControlName="addToRightTank" size="small"
@@ -93,7 +93,7 @@
             </div>
 
             <ng-container
-                *ngIf="(form?.controls?.addToLeftTank?.value ?? 0) >= 0 && (form?.controls?.addToRightTank?.value ?? 0) >= 0 ">
+                *ngIf="(form?.controls?.addToLeftTank?.value ?? 0) >= 0 || (form?.controls?.addToRightTank?.value ?? 0) >= 0 ">
                 <!-- line 6 -->
                 <!-- priceType -->
                 <div class="col-2">
