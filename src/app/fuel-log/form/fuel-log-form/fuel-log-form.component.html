@@ -38,12 +38,12 @@
                 <div class="col-2">
                     <p-inputnumber inputId="left" formControlName="left" size="small" (onInput)="onInputLeft()"
                         [min]="0" mode="decimal" [maxFractionDigits]="1" [maxlength]="4"
-                        [inputStyle]="{'width':'3rem'}" />
+                        [inputStyle]="{'width':'3.5rem'}" />
                 </div>
                 <div class="col-8">
                     <p-inputnumber inputId="right" formControlName="right" size="small" (onInput)="onInputRight()"
                         [min]="0" mode="decimal" [maxFractionDigits]="1" [maxlength]="4"
-                        [inputStyle]="{'width':'3rem'}" />
+                        [inputStyle]="{'width':'3.5rem'}" />
                 </div>
             </ng-container>
             <ng-template #displayInTank>
@@ -84,12 +84,14 @@
                     (onInput)="onInputAddToLeftTank()" [min]="maintenanceMode ? (-1*acParameters.eachTankCapacity) : 0"
                     mode="decimal" [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}" /> -->
                 <input type="text" pInputText formControlName="addToLeftTank" inputmode="numeric" pKeyFilter="num"
-                    pSize="small" style="width: 4rem" />
+                    pSize="small" style="width: 3.5rem" />
             </div>
             <div class="col-8">
-                <p-inputnumber inputId="addToRightTank" formControlName="addToRightTank" size="small"
+                <!-- <p-inputnumber inputId="addToRightTank" formControlName="addToRightTank" size="small"
                     (onInput)="onInputAddToRightTank()" [min]="maintenanceMode ? (-1*acParameters.eachTankCapacity) : 0"
-                    mode="decimal" [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}" />
+                    mode="decimal" [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}" /> -->
+                <input type="text" pInputText formControlName="addToRightTank" inputmode="numeric" pKeyFilter="num"
+                    pSize="small" style="width: 3.5rem" />
             </div>
 
             <ng-container

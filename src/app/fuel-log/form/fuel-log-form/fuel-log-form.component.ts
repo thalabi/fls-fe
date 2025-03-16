@@ -35,6 +35,7 @@ export class FuelLogFormComponent {
         this.fuelLog = value
 
         this.validateChangeToTank(this.form.controls.addToLeftTank, TankSideEnum.LEFT)
+        this.validateChangeToTank(this.form.controls.addToRightTank, TankSideEnum.RIGHT)
         this.fillInFormWithValues()
         this.formReady = true
     }
@@ -86,7 +87,6 @@ export class FuelLogFormComponent {
     });
 
     constructor() {
-        // this.validateChangeToTank(this.form.controls.addToLeftTank)
     }
 
     private fillInFormWithValues() {
@@ -158,38 +158,38 @@ export class FuelLogFormComponent {
 
         this.calculatePricePerLitre()
     }
-    onInputAddToLeftTank() {
-        // turn off Top up checkbox
-        this.form.controls.topUp.setValue(false)
+    // onInputAddToLeftTank() {
+    //     // turn off Top up checkbox
+    //     this.form.controls.topUp.setValue(false)
 
-        if (this.checkAndDisablePriceTypeAndPrice()) {
-            return
-        }
+    //     if (this.checkAndDisablePriceTypeAndPrice()) {
+    //         return
+    //     }
 
-        const calculatedTankCapacity = this.round(this.form.controls.left.value! + Number(this.form.controls.addToLeftTank.value!), 1)
-        if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
-            this.form.controls.addToLeftTank.setErrors({ invalid: true })
-        }
-        this.form.controls.left.setErrors(null)
+    //     const calculatedTankCapacity = this.round(this.form.controls.left.value! + Number(this.form.controls.addToLeftTank.value!), 1)
+    //     if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
+    //         this.form.controls.addToLeftTank.setErrors({ invalid: true })
+    //     }
+    //     this.form.controls.left.setErrors(null)
 
-        this.calculatePricePerLitre()
-    }
-    onInputAddToRightTank() {
-        // turn off Top up checkbox
-        this.form.controls.topUp.setValue(false)
+    //     this.calculatePricePerLitre()
+    // }
+    // onInputAddToRightTank() {
+    //     // turn off Top up checkbox
+    //     this.form.controls.topUp.setValue(false)
 
-        if (this.checkAndDisablePriceTypeAndPrice()) {
-            return
-        }
+    //     if (this.checkAndDisablePriceTypeAndPrice()) {
+    //         return
+    //     }
 
-        const calculatedTankCapacity = this.round(this.form.controls.right.value! + Number(this.form.controls.addToRightTank.value!), 1)
-        if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
-            this.form.controls.addToRightTank.setErrors({ invalid: true })
-        }
-        this.form.controls.right.setErrors(null)
+    //     const calculatedTankCapacity = this.round(this.form.controls.right.value! + Number(this.form.controls.addToRightTank.value!), 1)
+    //     if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
+    //         this.form.controls.addToRightTank.setErrors({ invalid: true })
+    //     }
+    //     this.form.controls.right.setErrors(null)
 
-        this.calculatePricePerLitre()
-    }
+    //     this.calculatePricePerLitre()
+    // }
     onInputPrice() {
         this.calculatePricePerLitre()
     }
