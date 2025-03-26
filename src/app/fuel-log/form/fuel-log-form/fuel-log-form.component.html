@@ -1,7 +1,7 @@
 <ng-template [ngIf]="formReady">
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
-        <div class="grid" style="width: 30em;">
+        <div class="grid" style="width: 25em;">
 
             <!-- line 1 -->
             <!-- date-->
@@ -9,12 +9,22 @@
                 <label for="date">Date</label>
             </div>
             <div class="col-10">
-                <p-datepicker formControlName="date" [iconDisplay]="'input'" [showIcon]="true" [showButtonBar]="true"
-                    [dateFormat]="'yy-mm-dd'" size="small" [inputStyle]="{'width':'8rem'}"
-                    ngClass="date.invalid && && date.touched ? ng-invalid" />
+                <p-datepicker inputId="date" formControlName="date" [iconDisplay]="'input'" [showIcon]="true"
+                    [showButtonBar]="true" [showTime]="true" hourFormat="12" [dateFormat]="'yy-mm-dd'" size="small"
+                    [inputStyle]="{'width':'12rem'}" ngClass="date.invalid && && date.touched ? ng-invalid" />
             </div>
 
             <!-- line 2 -->
+            <div class="col-2">
+                <label for="transactionType">Trans</label>
+            </div>
+            <div class="col-10">
+                <p-select id="transactionType" [options]="transactionTypeOptions" formControlName="transactionType"
+                    size="small">
+                </p-select>
+            </div>
+
+            <!-- line 3 -->
             <div class="col-2">
                 <label>
                 </label>
@@ -30,7 +40,7 @@
                 </label>
             </div>
 
-            <!-- line 3 -->
+            <!-- line 4 -->
             <div class="col-2">
                 <span>In tank</span>
             </div>
@@ -55,7 +65,7 @@
                 </div>
             </ng-template>
 
-            <!-- line 4 -->
+            <!-- line 5 -->
             <!-- topUp -->
             <ng-container *ngIf="!maintenanceMode">
                 <div class="col-2">
@@ -69,7 +79,7 @@
                 </div>
             </ng-container>
 
-            <!-- line 5 -->
+            <!-- line 6 -->
             <!-- addToLeftTank & addToRightTank -->
             <div class="col-2">
                 <ng-container *ngIf="maintenanceMode; else refuelMode">
@@ -80,23 +90,17 @@
                 </ng-template>
             </div>
             <div class="col-2">
-                <!-- <p-inputnumber inputId="addToLeftTank" formControlName="addToLeftTank" size="small"
-                    (onInput)="onInputAddToLeftTank()" [min]="maintenanceMode ? (-1*acParameters.eachTankCapacity) : 0"
-                    mode="decimal" [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}" /> -->
                 <input type="text" pInputText formControlName="addToLeftTank" inputmode="numeric" pKeyFilter="num"
                     pSize="small" style="width: 3.5rem" />
             </div>
             <div class="col-8">
-                <!-- <p-inputnumber inputId="addToRightTank" formControlName="addToRightTank" size="small"
-                    (onInput)="onInputAddToRightTank()" [min]="maintenanceMode ? (-1*acParameters.eachTankCapacity) : 0"
-                    mode="decimal" [maxFractionDigits]="1" [maxlength]="4" [inputStyle]="{'width':'3rem'}" /> -->
                 <input type="text" pInputText formControlName="addToRightTank" inputmode="numeric" pKeyFilter="num"
                     pSize="small" style="width: 3.5rem" />
             </div>
 
             <ng-container
                 *ngIf="(form?.controls?.addToLeftTank?.value ?? 0) >= 0 || (form?.controls?.addToRightTank?.value ?? 0) >= 0 ">
-                <!-- line 6 -->
+                <!-- line 7 -->
                 <!-- priceType -->
                 <div class="col-2">
                     <label for="priceType">Price type</label>
@@ -107,14 +111,14 @@
                     </p-select>
                 </div>
 
-                <!-- line 7 -->
+                <!-- line 8 -->
                 <!-- price -->
                 <div class="col-2">
                     <label for="price">Price</label>
                 </div>
                 <div class="col-2">
                     <p-inputnumber inputId="price" formControlName="price" size="small" (onInput)="onInputPrice()"
-                        [min]="0" mode="decimal" [maxFractionDigits]="2" [maxlength]="6"
+                        [min]="0" mode="decimal" [maxFractionDigits]="2" [maxlength]="5"
                         [inputStyle]="{'width':'5rem'}" />
                 </div>
                 <!-- pricePerLitre -->
@@ -125,28 +129,30 @@
                         *ngIf="form.controls.priceType.value == 'Total' && !form.controls.addToLeftTank.invalid && !form.controls.addToRightTank.invalid  && !form.controls.price.invalid">({{pricePerLitre
                         | number: '1.0-2' }}/litre)</span>
                 </div>
+                <!-- line 9 -->
+                <!-- airport -->
+                <div class="col-2">
+                    <label for="airport">Airport</label>
+                </div>
+                <div class="col-10">
+                    <input type="text" pInputText inputId="airport" formControlName="airport" pSize="small"
+                        (input)="toUpperCase()" size="small" maxlength="4"
+                        style="text-transform:uppercase; width: 5rem" />
+                </div>
+                <!-- line 10 -->
+                <!-- fbo -->
+                <div class="col-2">
+                    <label for="fbo">FBO</label>
+                </div>
+                <div class="col-10">
+                    <input type="text" pInputText inputId="airport" formControlName="fbo" pSize="small"
+                        maxlength="256" />
+                </div>
             </ng-container>
 
-            <!-- line 8 -->
-            <!-- airport -->
-            <div class="col-2">
-                <label for="airport">Airport</label>
-            </div>
-            <div class="col-10">
-                <input type="text" pInputText inputId="airport" formControlName="airport" pSize="small"
-                    (input)="toUpperCase()" size="small" maxlength="4" style="text-transform:uppercase; width: 5rem" />
-            </div>
 
-            <!-- line 9 -->
-            <!-- fbo -->
-            <div class="col-2">
-                <label for="fbo">FBO</label>
-            </div>
-            <div class="col-10">
-                <input type="text" pInputText inputId="airport" formControlName="fbo" pSize="small" maxlength="256" />
-            </div>
 
-            <!-- line 10 -->
+            <!-- line 11 -->
             <!-- comment -->
             <div class="col-2">
                 <label for="comment">Comment</label>
@@ -158,6 +164,20 @@
 
             <!-- <p-footer> -->
             <div class="formgroup-inline">
+                <!-- <ul>
+                    <li>date {{form.controls.date.valid}}</li>
+                    <li>transactionType {{form.controls.transactionType.valid}}</li>
+                    <li>left {{form.controls.left.valid}}</li>
+                    <li>right {{form.controls.right.valid}}</li>
+                    <li>topUp {{form.controls.topUp.valid}}</li>
+                    <li>addToLeftTank {{form.controls.addToLeftTank.valid}}</li>
+                    <li>addToRightTank {{form.controls.addToRightTank.valid}}</li>
+                    <li>priceType {{form.controls.priceType.valid}}</li>
+                    <li>price {{form.controls.price.valid}}</li>
+                    <li>airport {{form.controls.airport.valid}}</li>
+                    <li>fbo {{form.controls.fbo.valid}}</li>
+                    <li>comment {{form.controls.comment.valid}}</li>
+                </ul> -->
                 <div class="field">
                     <button pButton type="submit" label="Submit" [disabled]="form.invalid" icon="pi pi-check"></button>
                 </div>

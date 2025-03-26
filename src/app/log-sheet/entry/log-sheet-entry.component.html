@@ -1,3 +1,6 @@
+<div style="text-align: center; margin-bottom: 0.7rem;">
+    <span style="font-weight: bold; font-size: larger;">Log sheet</span>
+</div>
 <div>
     <form [formGroup]="timesForm" (ngSubmit)="onSubmitTimesForm()" novalidate>
 
@@ -7,23 +10,24 @@
                 <label for="flightDate">Flight date</label>
             </div>
             <div class="col-10">
-                <p-datepicker formControlName="flightDate" [iconDisplay]="'input'" [showIcon]="true"
-                    [showButtonBar]="true" [dateFormat]="'yy-mm-dd'" size="small" [inputStyle]="{'width':'8rem'}"
+                <p-datepicker inputId="flightDate" formControlName="flightDate" [iconDisplay]="'input'"
+                    [showIcon]="true" [showButtonBar]="true" [showTime]="true" [dateFormat]="'yy-mm-dd'"
+                    [hourFormat]="'12'" size="small" [inputStyle]="{'width':'12rem'}"
                     ngClass="flightDate.invalid && && flightDate.touched ? ng-invalid" />
             </div>
 
             <!-- line 2 -->
-            <!-- from -->
+            <!-- from/to -->
             <div class="col-2">
                 <label for="from">From/To</label>
             </div>
             <div class="col-2">
                 <input type="text" pInputText inputId="from" formControlName="from" pSize="small" size="small"
-                    maxlength="4" style="text-transform:uppercase; width: 3.5rem;" />
+                    maxlength="4" style="text-transform:uppercase; width: 4rem;" />
             </div>
             <div class="col-2">
                 <input type="text" pInputText inputId="to" formControlName="to" pSize="small" size="small" maxlength="4"
-                    style="text-transform:uppercase; width: 3.5rem;" />
+                    style="text-transform:uppercase; width: 4rem;" />
             </div>
             <div class="col-6">
             </div>
@@ -34,8 +38,9 @@
                 <label for="startupTime">Startup</label>
             </div>
             <div class="col-4">
-                <p-datepicker formControlName="startupTime" [timeOnly]="true" [iconDisplay]="'input'" [showIcon]="true"
-                    hourFormat="12" size="small" ngClass="startupTime.invalid && && startupTime.touched ? ng-invalid">
+                <p-datepicker inputId="startupTime" formControlName="startupTime" [timeOnly]="true"
+                    [iconDisplay]="'input'" [showIcon]="true" hourFormat="12" size="small"
+                    ngClass="startupTime.invalid && && startupTime.touched ? ng-invalid">
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>
@@ -53,8 +58,9 @@
                 <label for="takeoffTime">Takeoff</label>
             </div>
             <div class="col-4">
-                <p-datepicker formControlName="takeoffTime" [timeOnly]="true" [iconDisplay]="'input'" [showIcon]="true"
-                    hourFormat="12" size="small" ngClass="takeoffTime.invalid && && takeoffTime.touched ? ng-invalid">
+                <p-datepicker inputId="takeoffTime" formControlName="takeoffTime" [timeOnly]="true"
+                    [iconDisplay]="'input'" [showIcon]="true" hourFormat="12" size="small"
+                    ngClass="takeoffTime.invalid && && takeoffTime.touched ? ng-invalid">
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>
@@ -72,8 +78,9 @@
                 <label for="landingTime">Landing</label>
             </div>
             <div class="col-4">
-                <p-datepicker formControlName="landingTime" [timeOnly]="true" [iconDisplay]="'input'" [showIcon]="true"
-                    hourFormat="12" size="small" ngClass="landingTime.invalid && && landingTime.touched ? ng-invalid">
+                <p-datepicker inputId="landingTime" formControlName="landingTime" [timeOnly]="true"
+                    [iconDisplay]="'input'" [showIcon]="true" hourFormat="12" size="small"
+                    ngClass="landingTime.invalid && && landingTime.touched ? ng-invalid">
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>
@@ -91,8 +98,9 @@
                 <label for="shutdownTime">Shutdown</label>
             </div>
             <div class="col-4">
-                <p-datepicker formControlName="shutdownTime" [timeOnly]="true" [iconDisplay]="'input'" [showIcon]="true"
-                    hourFormat="12" size="small" ngClass="shutdownTime.invalid && && shutdownTime.touched ? ng-invalid">
+                <p-datepicker inputId="shutdownTime" formControlName="shutdownTime" [timeOnly]="true"
+                    [iconDisplay]="'input'" [showIcon]="true" hourFormat="12" size="small"
+                    ngClass="shutdownTime.invalid && && shutdownTime.touched ? ng-invalid">
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>

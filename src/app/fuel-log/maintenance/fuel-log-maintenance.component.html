@@ -2,13 +2,16 @@
     [totalRecords]="page.totalElements" [loading]="loadingStatus" selectionMode="single" [(selection)]="selectedFuelLog"
     (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)" [loading]="loadingStatus" [lazy]="true"
     (onLazyLoad)="onLazyLoad($event)" dataKey="_links.self.href" size="small">
-    <!-- <ng-template pTemplate="caption">
-    Show <p-selectButton id="logicallyDeletedOptions" [options]="logicallyDeletedOptions"
-        [(ngModel)]="logicallyDeletedOption" (onChange)="onChangeLogicallyDeleted($event)"></p-selectButton>
-</ng-template> -->
-    <ng-template pTemplate="header">
+
+    <ng-template #caption>
+        <div style="text-align: center;">
+            <span style="font-weight: bold; font-size: larger;">Fuel log</span>
+        </div>
+    </ng-template>
+    <ng-template #header>
         <tr>
             <th>Date</th>
+            <th>Trans</th>
             <th>Left tank</th>
             <th>Right tank</th>
             <th>Left tank change</th>
@@ -19,10 +22,11 @@
             <th>Comment</th>
         </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-fuelLog>
+    <ng-template #body let-fuelLog>
         <!-- <tr [pSelectableRow]="fuelLog.pricePerLitre ? fuelLog : ''"> -->
         <tr [pSelectableRow]="fuelLog">
             <td>{{fuelLog.date | date: 'yy/M/d h:mm a'}}</td>
+            <td>{{fuelLog.transactionType}}</td>
             <td>{{fuelLog.left}}</td>
             <td>{{fuelLog.right}}</td>
             <td>{{fuelLog.changeInLeft}}</td>
@@ -33,7 +37,7 @@
             <td>{{fuelLog.comment}}</td>
         </tr>
     </ng-template>
-    <ng-template pTemplate="summary">
+    <ng-template #summary>
         <div>
             <button type="button" pButton icon="pi pi-plus" (click)="showDialog(crudEnum.ADD)" label="Add"></button>
             <button type="button" pButton icon="pi pi-pencil" style="margin-left:0.5rem;"
@@ -48,6 +52,9 @@
 
 <p-dialog header="Fuel log - {{crudMode}}" [(visible)]="displayDialog" [responsive]="true" showEffect="fade"
     [modal]="true" (onHide)="onChildFormCancel()">
+
+    <p-messages></p-messages>
+    <app-backend-stacktrace-display></app-backend-stacktrace-display>
 
     <app-fuel-log-form [fuelLog]="fuelLogToForm" [acParameters]="acParameters"
         (formSubmitted)="onChildFormSubmit($event)" (formCancelled)="onChildFormCancel()" [maintenanceMode]="true"

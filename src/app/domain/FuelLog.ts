@@ -1,7 +1,16 @@
+export enum FuelTransactionTypeEnum {
+    REFUEL = 'Refuel', FLIGHT = 'Flight'
+}
+export function getFuelTransactionTypeEnum(value: string): FuelTransactionTypeEnum | undefined {
+    return (Object.keys(FuelTransactionTypeEnum) as Array<keyof typeof FuelTransactionTypeEnum>)
+        .find((key) => FuelTransactionTypeEnum[key] === value) as FuelTransactionTypeEnum | undefined;
+}
+
 export interface FuelLog {
     id: number;
     registration: string;
     date: Date;
+    transactionType: FuelTransactionTypeEnum;
     left: number;
     right: number;
     changeInLeft: number;

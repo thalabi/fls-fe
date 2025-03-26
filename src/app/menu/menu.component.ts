@@ -25,7 +25,7 @@ export class MenuComponent implements OnInit {
         console.log('menu component')
         const userMenuItems = [
             {
-                label: 'Log Sheet', routerLink: ['/log-sheet']
+                label: 'Flight Log Sheet', routerLink: ['/log-sheet']
             },
             {
                 label: 'Refuel', routerLink: ['/refuel']
@@ -33,8 +33,12 @@ export class MenuComponent implements OnInit {
             {
                 label: 'Maintenance',
                 items: [
-                    { label: 'Fuel Log Maintenance', routerLink: ['/fuel-log'] },
-                    { label: 'A/C Parameters', routerLink: ['/ac-parameters'] }
+                    { label: 'A/C Parameters', routerLink: ['/ac-parameters'] },
+                    { label: 'Fuel Log Maintenance', routerLink: ['/fuel-log-maintenance'] },
+                    { label: 'Flight Log Sheet Maintenance', routerLink: ['/log-sheet-maintenance'] },
+                    { label: 'Journy Log Maintenance', routerLink: ['/journey-log-maintenance'] },
+                    { label: 'Engine Log Maintenance', routerLink: ['/engine-log-maintenance'] },
+
                 ]
             },
             // {

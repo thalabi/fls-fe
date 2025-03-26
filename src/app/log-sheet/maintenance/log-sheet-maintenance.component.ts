@@ -1,49 +1,45 @@
-import { Component, OnInit } from '@angular/core';
-import { ReactiveFormsModule, } from '@angular/forms';
-import { MessageService } from 'primeng/api';
-import { RestService } from '../../service/rest.service';
-import { SessionService } from '../../service/session.service';
-import { HttpErrorResponse } from '@angular/common/http';
-import { HalResponseLinks } from '../../response/hal/hal-response-links'
-import { HalResponsePage } from '../../response/hal/hal-response-page';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { CrudEnum } from '../../crud-enum';
-import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { SelectModule } from 'primeng/select';
-import { MessagesModule } from 'primeng/messages';
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
-import { CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { FuelLogResponse } from '../../response/FuelLogResponse';
-import { FuelLog } from '../../domain/FuelLog';
-import { FuelLogFormComponent } from '../form/fuel-log-form/fuel-log-form.component';
-import { AcParameters } from '../../domain/AcParameters';
-import { AcParametersResponse } from '../../response/AcParametersResponse';
-import { BackendStacktraceDisplayComponent } from "../../backend-stacktrace-display/backend-stacktrace-display.component";
-import { filter, Subscription, take } from 'rxjs';
+import { RestService } from '../../service/rest.service';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { CrudEnum } from '../../crud-enum';
+import { HalResponseLinks } from '../../response/hal/hal-response-links';
+import { HalResponsePage } from '../../response/hal/hal-response-page';
+import { LogSheet } from '../../domain/LogSheet';
+import { SessionService } from '../../service/session.service';
+import { LogSheetResponse } from '../../response/LogSheetResponse';
+import { HttpErrorResponse } from '@angular/common/http';
+import { DialogModule } from 'primeng/dialog';
+import { LogSheetRequest } from '../../request/log-sheet-request';
+import { BackendStacktraceDisplayComponent } from '../../backend-stacktrace-display/backend-stacktrace-display.component';
+import { MessagesModule } from 'primeng/messages';
+import { CheckboxModule } from 'primeng/checkbox';
+import { filter, take } from 'rxjs';
 
 @Component({
-    selector: 'app-fuel-log',
-    imports: [CommonModule, ReactiveFormsModule, TableModule, ButtonModule, DialogModule, SelectModule, MessagesModule, DatePickerModule, CheckboxModule, InputNumberModule, InputTextModule, FuelLogFormComponent, BackendStacktraceDisplayComponent],
-    templateUrl: './fuel-log-maintenance.component.html',
-    styleUrl: './fuel-log-maintenance.component.css'
+    selector: 'app-log-sheet-maintenance',
+    imports: [CommonModule, ReactiveFormsModule, TableModule, DatePickerModule, ButtonModule, DialogModule, InputNumberModule, InputTextModule, MessagesModule, BackendStacktraceDisplayComponent, CheckboxModule],
+    templateUrl: './log-sheet-maintenance.component.html',
+    styleUrl: './log-sheet-maintenance.component.css'
 })
-
-export class FuelLogMaintenaceComponent implements OnInit {
+export class LogSheetMaintenanceComponent implements OnInit {
 
     readonly AC_REGISTRATION: string = 'C-GQGD'
-    readonly TABLE_NAME: string = 'fuel_log'
+    readonly TABLE_NAME: string = 'log_sheet'
 
     page: HalResponsePage = {} as HalResponsePage;
     links: HalResponseLinks = {} as HalResponseLinks;
     readonly ROWS_PER_PAGE: number = 10; // default rows per page
     firstRowOfTable!: number; // triggers a page change, zero based. 0 -> first page, 1 -> second page, ...
     pageNumber: number = 0;
-    fuelLogArray!: Array<FuelLog>;
-    selectedFuelLog!: FuelLog
+    logSheetArray!: Array<LogSheet>;
+    selectedLogSheet!: LogSheet
     crudMode!: CrudEnum;
     crudEnum = CrudEnum; // Used in html to refere to enum
     modifyAndDeleteButtonsDisable: boolean = true;
@@ -51,43 +47,31 @@ export class FuelLogMaintenaceComponent implements OnInit {
     loadingStatus!: boolean;
     savedTableLazyLoadEvent!: TableLazyLoadEvent
 
-    acParameters!: AcParameters
-
-    fuelLog: FuelLog = {} as FuelLog
-    fuelLogToForm!: FuelLog
-    displayOnly!: boolean
-
-    // disableParentMessages: boolean = false;
+    form = new FormGroup({
+        date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+        from: new FormControl<string>('', Validators.required),
+        to: new FormControl<string>('', Validators.required),
+        airtime: new FormControl<number | null>(null, Validators.required),
+        flightTime: new FormControl<number | null>(null, Validators.required),
+        updateJourneyLog: new FormControl<boolean>(true, Validators.required),
+        updateEngineLog: new FormControl<boolean>(true, Validators.required),
+    });
 
     constructor(
-        private restService: RestService,
         private messageService: MessageService,
+        private restService: RestService,
         private sessionService: SessionService
     ) { }
 
-    ngOnInit(): void {
+    ngOnInit() {
         this.messageService.clear()
-        this.getAcParameters()
-        // this.sessionService.disableParentMessages$.subscribe(data => {
-        //     this.disableParentMessages = data
-        //     console.log('consuming disableParentMessages, disableParentMessages', this.disableParentMessages)
-        // })
-
-    }
-    private getAcParameters() {
-        this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1).subscribe((acParametersResponse: AcParametersResponse) => {
-            console.log('acParametersResponse', acParametersResponse);
-            const acParametersArray = acParametersResponse._embedded.simpleModels || new Array<AcParameters>
-            this.acParameters = acParametersArray[0]
-        })
+        this.sessionService.setDisableParentMessages(false)
     }
     onLazyLoad(lazyLoadEvent: TableLazyLoadEvent) {
         this.savedTableLazyLoadEvent = lazyLoadEvent;
         this.fetchPage(lazyLoadEvent)
     }
-    //
-    // TODO, to add filter by price and airport 
-    //
+
     fetchPage(tableLazyLoadEvent: TableLazyLoadEvent) {
         console.log(tableLazyLoadEvent)
         this.loadingStatus = true
@@ -121,13 +105,13 @@ export class FuelLogMaintenaceComponent implements OnInit {
         this.restService.getTableData(this.TABLE_NAME, `registration|equals|${this.AC_REGISTRATION}` + searchCriteria, pageNumber, pageSize, ['date'])
             .subscribe(
                 {
-                    next: (fuelLogResponse: FuelLogResponse) => {
-                        console.log('fuelLogResponse', fuelLogResponse);
-                        this.fuelLogArray = fuelLogResponse._embedded.simpleModels || new Array<FuelLog>
+                    next: (logSheetResponse: LogSheetResponse) => {
+                        console.log('logSheetResponse', logSheetResponse);
+                        this.logSheetArray = logSheetResponse._embedded.simpleModels || new Array<LogSheet>
 
-                        this.page = fuelLogResponse.page;
+                        this.page = logSheetResponse.page;
                         this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
-                        this.links = fuelLogResponse._links;
+                        this.links = logSheetResponse._links;
                     },
                     complete: () => {
                         console.log('this.restService.getTableData completed')
@@ -144,7 +128,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
     onRowSelect(event: any) {
         console.log(event);
         console.log('onRowSelect()')
-        if (! /* not */ this.selectedFuelLog) {
+        if (! /* not */ this.selectedLogSheet) {
             this.modifyAndDeleteButtonsDisable = true
             return
         }
@@ -154,45 +138,76 @@ export class FuelLogMaintenaceComponent implements OnInit {
     onRowUnselect(event: any) {
         console.log(event);
         this.modifyAndDeleteButtonsDisable = true;
-        this.selectedFuelLog = {} as FuelLog
-        this.fuelLogToForm = {} as FuelLog
+        this.selectedLogSheet = {} as LogSheet
     }
     showDialog(crudMode: CrudEnum) {
         this.displayDialog = true;
         this.sessionService.setDisableParentMessages(true)
-        this.messageService.clear()
         this.crudMode = crudMode;
         console.log('this.crudMode', this.crudMode);
+        this.form.reset()
         switch (this.crudMode) {
             case CrudEnum.ADD:
-                this.fuelLog = {} as FuelLog
-                this.fuelLog.date = new Date()
-                this.fuelLog.registration = this.AC_REGISTRATION
-                this.fuelLogToForm = this.fuelLog // will trigger a change detection and populate the form
-                this.displayOnly = false
+                this.form.controls.date.setValue(new Date())
+                this.form.controls.updateJourneyLog.setValue(true)
+                this.form.controls.updateEngineLog.setValue(true)
+                this.form.enable()
                 break;
             case CrudEnum.UPDATE:
-                console.log('this.selectedFuelLog', this.selectedFuelLog)
-                this.fuelLogToForm = this.selectedFuelLog // will trigger a change detection and populate the form
-                console.log('this.fuelLogToForm', this.fuelLogToForm)
-                this.displayOnly = false
+                console.log('this.selectedLogSheet', this.selectedLogSheet)
+                this.selectedLogSheet.date
+                this.selectedLogSheet.from
+                this.selectedLogSheet.airtime
+                this.selectedLogSheet.flightTime
+                this.form.setValue({
+                    date: new Date(this.selectedLogSheet.date),
+                    from: this.selectedLogSheet.from,
+                    to: this.selectedLogSheet.to,
+                    airtime: this.selectedLogSheet.airtime,
+                    flightTime: this.selectedLogSheet.flightTime,
+                    updateJourneyLog: true,
+                    updateEngineLog: true
+                })
+                this.form.enable()
                 break;
             case CrudEnum.DELETE:
-                // this.fillInFormWithValues();
-                //this.form.disable();
-                this.displayOnly = true
-                this.fuelLogToForm = this.selectedFuelLog // will trigger a change detection and populate the form
+                this.form.setValue({
+                    date: new Date(this.selectedLogSheet.date),
+                    from: this.selectedLogSheet.from,
+                    to: this.selectedLogSheet.to,
+                    airtime: this.selectedLogSheet.airtime,
+                    flightTime: this.selectedLogSheet.flightTime,
+                    updateJourneyLog: true,
+                    updateEngineLog: true
+                })
+                this.form.disable()
+                this.form.controls.updateJourneyLog.enable()
+                this.form.controls.updateEngineLog.enable()
                 break;
             default:
                 console.error('this.crudMode is invalid. this.crudMode: ' + this.crudMode);
         }
     }
+    onCancel() {
+        this.afterCrud()
+    }
+    onSubmit() {
+        console.log('this.form', this.form)
+        const logSheetRequest: LogSheetRequest = {} as LogSheetRequest
 
-    onChildFormSubmit(fuelLog: FuelLog) {
-        console.log('fuelLog', fuelLog)
+        console.log('logSheetRequest', logSheetRequest)
+
         switch (this.crudMode) {
             case CrudEnum.ADD:
-                this.restService.addFuelLog(fuelLog)
+                logSheetRequest.registration = this.AC_REGISTRATION
+                logSheetRequest.date = this.form.controls.date.value
+                logSheetRequest.from = this.form.controls.from.value!.toUpperCase()
+                logSheetRequest.to = this.form.controls.to.value!.toUpperCase()
+                logSheetRequest.airtime = this.form.controls.airtime.value!
+                logSheetRequest.flightTime = this.form.controls.flightTime.value!
+                // logSheetRequest.updateJourneyLog = this.form.controls.updateJourneyLog.value!
+                // logSheetRequest.updateEngineLog = this.form.controls.updateEngineLog.value!
+                this.restService.addLogSheet(logSheetRequest)
                     .subscribe(
                         {
                             next: (response: any) => {
@@ -218,7 +233,16 @@ export class FuelLogMaintenaceComponent implements OnInit {
                         });
                 break
             case CrudEnum.UPDATE:
-                this.restService.updateFuelLog(fuelLog)
+                logSheetRequest.id = this.selectedLogSheet.id
+                logSheetRequest.registration = this.AC_REGISTRATION
+                logSheetRequest.date = this.form.controls.date.value
+                logSheetRequest.from = this.form.controls.from.value!.toUpperCase()
+                logSheetRequest.to = this.form.controls.to.value!.toUpperCase()
+                logSheetRequest.airtime = this.form.controls.airtime.value!
+                logSheetRequest.flightTime = this.form.controls.flightTime.value!
+                // logSheetRequest.updateJourneyLog = this.form.controls.updateJourneyLog.value!
+                // logSheetRequest.updateEngineLog = this.form.controls.updateEngineLog.value!
+                this.restService.updateLogSheet(logSheetRequest)
                     .subscribe(
                         {
                             next: (response: any) => {
@@ -227,24 +251,16 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             complete: () => {
                                 console.log('http request completed')
                                 this.afterCrud()
-                                // let disableParentMessagesSubscription: Subscription
-                                // disableParentMessagesSubscription = this.sessionService.disableParentMessages$.subscribe(disableParentMessages => {
-                                //     console.log('ADD disableParentMessages', disableParentMessages)
-                                //     if (!disableParentMessages) {
-                                //         this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
-                                //         disableParentMessagesSubscription.unsubscribe()
-                                //     }
-                                // })
                                 // this.sessionService.disableParentMessages$
                                 //     .pipe(
                                 //         filter(disableParentMessages => !disableParentMessages), // Only emit when it's false
-                                //         //take(1) // Unsubscribe automatically after the first `false`
+                                //         take(1) // Unsubscribe automatically after the first `false`
                                 //     )
-                                //     .subscribe((disableParentMessages) => {
-                                //         console.log('UPDATE adding to messages, disableParentMessages', disableParentMessages)
+                                //     .subscribe(() => {
                                 //         this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated successfully' });
                                 //     });
                                 this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated successfully' });
+
                             },
                             error: (httpErrorResponse: HttpErrorResponse) => {
                                 console.log('httpErrorResponse', httpErrorResponse)
@@ -252,7 +268,10 @@ export class FuelLogMaintenaceComponent implements OnInit {
                         });
                 break;
             case CrudEnum.DELETE:
-                this.restService.deleteFuelLog(fuelLog.id)
+                logSheetRequest.id = this.selectedLogSheet.id
+                // logSheetRequest.updateJourneyLog = this.form.controls.updateJourneyLog.value!
+                // logSheetRequest.updateEngineLog = this.form.controls.updateEngineLog.value!
+                this.restService.deleteLogSheet(logSheetRequest)
                     .subscribe(
                         {
                             next: (response: any) => {
@@ -270,6 +289,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
                                 //         this.messageService.add({ severity: 'info', summary: '200', detail: 'Deleted successfully' });
                                 //     });
                                 this.messageService.add({ severity: 'info', summary: '200', detail: 'Deleted successfully' });
+
                             },
                             error: (httpErrorResponse: HttpErrorResponse) => {
                                 console.log('httpErrorResponse', httpErrorResponse)
@@ -281,21 +301,70 @@ export class FuelLogMaintenaceComponent implements OnInit {
         }
     }
     private afterCrud() {
-        this.displayDialog = false;
+        this.displayDialog = false
         this.sessionService.setDisableParentMessages(false)
         this.modifyAndDeleteButtonsDisable = true;
         this.onLazyLoad(this.savedTableLazyLoadEvent);
-        this.selectedFuelLog = {} as FuelLog
-        this.fuelLogToForm = {} as FuelLog
+        this.form.reset()
+        this.selectedLogSheet = {} as LogSheet
+
     }
 
-    onChildFormCancel() {
-        this.displayDialog = false;
-        this.sessionService.setDisableParentMessages(false)
-        this.modifyAndDeleteButtonsDisable = true
-        this.selectedFuelLog = {} as FuelLog
-        this.fuelLogToForm = {} as FuelLog
+    /*
+
+    FlightLogHelper.copyFromForm(this.flightLogForm, this.crudFlightLog);
+    console.log('this.crudFlightLog: ', this.crudFlightLog);
+    switch (this.crudMode) {
+        case CrudEnum.ADD:
+            this.clearTimePortionOfDates(this.crudFlightLog);
+            this.flightLogService.addFlightLog(this.crudFlightLog).subscribe({
+                next: savedFlightLog => {
+                    console.log('savedFlightLog', savedFlightLog);
+                },
+                // error: error => {
+                //     console.error('flightLogService.saveFlightLog() returned error: ', error);
+                //     //this.messageService.error(error);
+                // },
+                complete: () => {
+                    this.afterCrud();
+                }
+            });
+            break;
+        case CrudEnum.UPDATE:
+            this.clearTimePortionOfDates(this.crudFlightLog);
+            this.flightLogService.updateFlightLog(this.crudFlightLog).subscribe({
+                next: savedFlightLog => {
+                    console.log('updatedFlightLog', savedFlightLog);
+                },
+                // error: error => {
+                //     console.error('flightLogService.updateFlightLog() returned error: ', error);
+                //     //this.messageService.error(error);
+                // },
+                complete: () => {
+                    this.afterCrud();
+                }
+            });
+            break;
+        case CrudEnum.DELETE:
+            console.log('this.crudFlightLog: ', this.crudFlightLog);
+            this.flightLogService.deleteFlightLog(this.crudFlightLog).subscribe({
+                next: savedFlightLog => {
+                    console.log('deleted flightLog', this.crudFlightLog);
+                },
+                // error: error => {
+                //     console.error('flightLogService.saveFlightLog() returned error: ', error);
+                //     //this.messageService.error(error);
+                // },
+                complete: () => {
+                    this.afterCrud();
+                }
+            });
+            break;
+        default:
+            console.error('this.crudMode is invalid. this.crudMode: ' + this.crudMode);
     }
+
+*/
+
 
 }
-

@@ -6,19 +6,25 @@ import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { RestService } from '../service/rest.service';
-import { AcParameters } from '../domain/AcParameters';
-import { AcParametersResponse } from '../response/AcParametersResponse';
+import { RestService } from '../../service/rest.service';
+import { AcParameters } from '../../domain/AcParameters';
+import { AcParametersResponse } from '../../response/AcParametersResponse';
 import { forkJoin } from 'rxjs';
-import { FuelLog } from '../domain/FuelLog';
-import { FuelLogResponse } from '../response/FuelLogResponse';
-import { LogSheetRequest } from '../request/log-sheet-request';
+import { FuelLog } from '../../domain/FuelLog';
+import { FuelLogResponse } from '../../response/FuelLogResponse';
+import { LogSheetRequest } from '../../request/log-sheet-request';
+import { LogSheetAndFuelLogRequest } from '../../request/log-sheet-and-fuel-log-request'
+import { SessionService } from '../../service/session.service';
+import { TsnVResponse } from '../../response/TsnVResponse';
+import { TsnV } from '../../domain/TsnV';
+import { TsmohVResponse } from '../../response/TsmohVResponse';
+import { TsmohV } from '../../domain/TsmohV';
 
 @Component({
     selector: 'app-log-sheet',
     imports: [CommonModule, ReactiveFormsModule, DatePickerModule, ButtonModule, InputNumberModule, InputTextModule],
-    templateUrl: './log-sheet.component.html',
-    styleUrl: './log-sheet.component.css'
+    templateUrl: './log-sheet-entry.component.html',
+    styleUrl: './log-sheet-entry.component.css'
 })
 export class LogSheetComponent implements OnInit {
 
@@ -46,6 +52,8 @@ export class LogSheetComponent implements OnInit {
     bothTanksUsed!: number | null
 
     acParameters!: AcParameters
+    tsnV!: TsnV
+    tsmohV!: TsmohV
     fuelLog!: FuelLog
 
     readonly oneDayMinutes: number = 24 * 60;
@@ -71,15 +79,19 @@ export class LogSheetComponent implements OnInit {
     leftTankUsed!: number;
     rightTankUsed!: number;
 
-    constructor(private messageService: MessageService, private restService: RestService) { }
+    constructor(
+        private restService: RestService,
+        private messageService: MessageService,
+        private sessionService: SessionService
+    ) { }
 
     ngOnInit() {
         this.messageService.clear()
         this.initTimesForm()
         this.initFuelForm()
 
-        // this.getAcParameters()
         this.getFuelBeforeFlight()
+        this.sessionService.setDisableParentMessages(false)
     }
 
     private initTimesForm() {
@@ -126,8 +138,8 @@ export class LogSheetComponent implements OnInit {
         console.log('flightTimeMinutes', flightTimeMinutes)
         console.log('flightTime', this.flightTime)
 
-        this.tsn = this.acParameters.initialTsn + this.airtime
-        this.tsmoh = this.acParameters.initialTsmoh + this.airtime
+        this.tsn = this.tsnV.tsn + this.airtime
+        this.tsmoh = this.tsmohV.tsmoh + this.airtime
 
         this.timesCaculated = true
     }
@@ -208,14 +220,26 @@ export class LogSheetComponent implements OnInit {
         forkJoin({
 
             acParametersResponse: this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1),
+            tsnVResponse: this.restService.getTableData('tsn_v', `registration|equals|${this.AC_REGISTRATION}`, 0, 1),
+            tsmohVResponse: this.restService.getTableData('tsmoh_v', `registration|equals|${this.AC_REGISTRATION}`, 0, 1),
 
             fuelLogResponse: this.restService.getLastFuelLog(this.AC_REGISTRATION)
 
-        }).subscribe(((result: { acParametersResponse: AcParametersResponse; fuelLogResponse: FuelLogResponse }) => {
+        }).subscribe(((result: { acParametersResponse: AcParametersResponse; tsnVResponse: TsnVResponse; tsmohVResponse: TsmohVResponse; fuelLogResponse: FuelLogResponse }) => {
 
             console.log('acParametersResponse', result.acParametersResponse);
             const acParametersArray = result.acParametersResponse._embedded.simpleModels || new Array<AcParameters>
             this.acParameters = acParametersArray[0]
+
+            console.log('tsnVResponse', result.tsnVResponse);
+            const tsnVArray = result.tsnVResponse._embedded.simpleModels || new Array<TsnV>
+            this.tsnV = tsnVArray[0]
+            this.tsn = this.tsnV.tsn
+
+            console.log('tsmohVResponse', result.tsmohVResponse);
+            const tsmohVArray = result.tsmohVResponse._embedded.simpleModels || new Array<TsmohV>
+            this.tsmohV = tsmohVArray[0]
+            this.tsmoh = this.tsmohV.tsmoh
 
             console.log('fuelLogResponse', result.fuelLogResponse);
             const fuelLogs = result.fuelLogResponse._embedded.fuelLogs || new Array<FuelLog>
@@ -240,7 +264,7 @@ export class LogSheetComponent implements OnInit {
     }
 
     onSave() {
-        const logSheetRequest: LogSheetRequest = {
+        const logSheetAndFuelLogRequest: LogSheetAndFuelLogRequest = {
             registration: this.AC_REGISTRATION,
             date: this.timesForm.controls.flightDate.value,
             from: this.timesForm.controls.from.value!.toUpperCase(),
@@ -248,9 +272,9 @@ export class LogSheetComponent implements OnInit {
             airtime: this.airtime,
             flightTime: this.flightTime,
             leftTankUsed: this.leftTankUsed,
-            rightTankUsed: this.rightTankUsed
+            rightTankUsed: this.rightTankUsed,
         }
-        this.restService.addLogSheet(logSheetRequest).subscribe(() => {
+        this.restService.addLogSheetAndFuelLog(logSheetAndFuelLogRequest).subscribe(() => {
             this.messageService.add({ severity: 'info', summary: '200', detail: 'Saved sucessfully' });
             this.onResetTimesForm()
             this.onResetFuelForm()

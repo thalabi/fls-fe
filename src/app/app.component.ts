@@ -14,7 +14,7 @@ import { DEFAULT_INTERRUPTSOURCES, Idle } from '@ng-idle/core';
 
 @Component({
     selector: 'app-root',
-    imports: [NgIf, MessagesModule, BackendStacktraceDisplayComponent, MenuComponent, RouterOutlet, PopoverModule, SharedModule],
+    imports: [MessagesModule, BackendStacktraceDisplayComponent, MenuComponent, RouterOutlet, PopoverModule, SharedModule],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css'
 })

@@ -3,12 +3,12 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule, AbstractContro
 import { ButtonModule } from 'primeng/button';
 import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
-import { InputNumberModule } from 'primeng/inputnumber';
+import { InputNumberInputEvent, InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { KeyFilterModule } from 'primeng/keyfilter'
 import { SelectModule } from 'primeng/select';
 import { CommonModule } from '@angular/common';
-import { FuelLog } from '../../../domain/FuelLog';
+import { FuelLog, FuelTransactionTypeEnum, getFuelTransactionTypeEnum } from '../../../domain/FuelLog';
 import { AcParameters } from '../../../domain/AcParameters';
 
 export enum PriceTypeOptionEnum {
@@ -71,9 +71,12 @@ export class FuelLogFormComponent {
     priceTypeOptions: Array<PriceTypeOptionEnum> = [PriceTypeOptionEnum.PER_LITRE, PriceTypeOptionEnum.TOTAL]
     pricePerLitre!: number
 
+    transactionTypeOptions: Array<FuelTransactionTypeEnum> = [FuelTransactionTypeEnum.FLIGHT, FuelTransactionTypeEnum.REFUEL]
+
     formReady: boolean = false
     form = new FormGroup({
         date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+        transactionType: new FormControl<FuelTransactionTypeEnum>(FuelTransactionTypeEnum.REFUEL, { nonNullable: true, validators: Validators.required }),
         left: new FormControl<number>(0),
         right: new FormControl<number>(0),
         topUp: new FormControl<boolean>(false, { nonNullable: true, validators: Validators.required }),
@@ -108,10 +111,14 @@ export class FuelLogFormComponent {
 
         console.log('this.form.value', this.form.value)
     }
-
+    // private getFuelTransactionTypeEnum(value: string): FuelTransactionTypeEnum | undefined {
+    //     return (Object.keys(FuelTransactionTypeEnum) as Array<keyof typeof FuelTransactionTypeEnum>)
+    //         .find((key) => FuelTransactionTypeEnum[key] === value) as FuelTransactionTypeEnum | undefined;
+    // }
     private fillFuelLogWithValues() {
         console.log('this.form.value', this.form.value)
         this.fuelLog.date = new Date(this.form.controls.date.value)
+        this.fuelLog.transactionType = getFuelTransactionTypeEnum(this.form.controls.transactionType.value)!
         this.fuelLog.left = this.form.controls.left.value!
         this.fuelLog.right = this.form.controls.right.value!
         this.fuelLog.changeInLeft = Number(this.form.controls.addToLeftTank.value!)
@@ -144,6 +151,8 @@ export class FuelLogFormComponent {
         const calculatedTankCapacity = this.round(this.form.controls.left.value! + Number(this.form.controls.addToLeftTank.value!), 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.left.setErrors({ invalid: true })
+        } else {
+            this.form.controls.left.setErrors(null)
         }
         this.form.controls.addToLeftTank.setErrors(null)
 
@@ -153,6 +162,8 @@ export class FuelLogFormComponent {
         const calculatedTankCapacity = this.round(this.form.controls.right.value! + Number(this.form.controls.addToRightTank.value!), 1)
         if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
             this.form.controls.right.setErrors({ invalid: true })
+        } else {
+            this.form.controls.right.setErrors(null)
         }
         this.form.controls.addToRightTank.setErrors(null)
 
@@ -191,6 +202,10 @@ export class FuelLogFormComponent {
     //     this.calculatePricePerLitre()
     // }
     onInputPrice() {
+        const priceControl = this.form.controls.price;
+        if (priceControl.value && Number(priceControl.value) > 99.99) {
+            priceControl.setErrors({ invalid: true })
+        }
         this.calculatePricePerLitre()
     }
     onChangePriceType() {
@@ -213,7 +228,6 @@ export class FuelLogFormComponent {
     }
 
     private calculatePricePerLitre() {
-        console.log('this.pricePerLitre', this.pricePerLitre)
         const priceType = this.form.controls.priceType.value
         const price = this.form.controls.price.value
         if (priceType == PriceTypeOptionEnum.PER_LITRE) {
@@ -234,12 +248,15 @@ export class FuelLogFormComponent {
     }
 
     private checkAndDisablePriceTypeAndPrice() {
+        console.log('checkAndDisablePriceTypeAndPrice()')
         // if addToLeftTanks & addToRightTank are negative then the priceType and price
         // controls wont appear and by disabling them the Required validtor wont be in effect
         // and allow the form to be valid
         if (Number(this.form.controls.addToLeftTank.value!) < 0 && Number(this.form.controls.addToRightTank.value!) < 0) {
             this.form.controls.priceType.disable()
             this.form.controls.price.disable()
+            this.form.controls.price.clearValidators()
+            this.form.controls.airport.clearValidators()
             return true
         } else {
             this.form.controls.priceType.enable()
@@ -288,6 +305,11 @@ export class FuelLogFormComponent {
             const calculatedTankCapacity = this.round(inTank! + value, 1)
             if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
                 control.setErrors({ invalid: true })
+                if (tankSideEnum === TankSideEnum.LEFT) {
+                    this.form.controls.left.setErrors(null)
+                } else {
+                    this.form.controls.right.setErrors(null)
+                }
                 return
             }
 

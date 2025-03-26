@@ -1,4 +1,4 @@
-export interface LogSheetRequest {
+export interface LogSheetAndFuelLogRequest {
     id?: number
     registration: string
     date: Date
@@ -8,6 +8,4 @@ export interface LogSheetRequest {
     flightTime: number
     leftTankUsed: number
     rightTankUsed: number
-    // updateJourneyLog: boolean // updated journey_log table
-    // updateEngineLog: boolean // updated engine_log table
 }

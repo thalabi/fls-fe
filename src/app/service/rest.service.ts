@@ -6,6 +6,10 @@ import { IGenericEntity } from '../domain/i-gerneric-entity';
 import { FuelLog } from '../domain/FuelLog';
 import { AcParameters } from '../domain/AcParameters';
 import { LogSheetRequest } from '../request/log-sheet-request';
+import { LogSheet } from '../domain/LogSheet';
+import { LogSheetAndFuelLogRequest } from '../request/log-sheet-and-fuel-log-request';
+import { JourneyLogRequest } from '../request/journey-log-request';
+import { EngineLogRequest } from '../request/engine-log-request';
 
 @Injectable({
     providedIn: 'root'
@@ -55,8 +59,26 @@ export class RestService {
         return this.httpClient.delete<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs/${id}`);
     }
 
+    addLogSheetAndFuelLog(logSheetAndFuelLogRequest: LogSheetAndFuelLogRequest): Observable<HttpResponse<any>> {
+        return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/logSheetController/addLogSheetAndFuelLog`, logSheetAndFuelLogRequest);
+    }
+
+
     addLogSheet(logSheetRequest: LogSheetRequest): Observable<HttpResponse<any>> {
         return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/logSheetController/addLogSheet`, logSheetRequest);
+    }
+    updateLogSheet(logSheetRequest: LogSheetRequest): Observable<HttpResponse<any>> {
+        return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/logSheetController/updateLogSheet`, logSheetRequest);
+    }
+    deleteLogSheet(logSheetRequest: LogSheetRequest): Observable<HttpResponse<any>> {
+        return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/logSheetController/deleteLogSheet`, logSheetRequest);
+    }
+
+    updateJourneyLog(journeyLogRequest: JourneyLogRequest): Observable<HttpResponse<any>> {
+        return this.httpClient.patch<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/journeyLogs/${journeyLogRequest.id}`, journeyLogRequest);
+    }
+    updateEngineLog(engineLogRequest: EngineLogRequest): Observable<HttpResponse<any>> {
+        return this.httpClient.patch<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/engineLogs/${engineLogRequest.id}`, engineLogRequest);
     }
 
     public static toCamelCase(tableName: string): string {

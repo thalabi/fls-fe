@@ -1,0 +1,144 @@
+<p-table [value]="logSheetArray" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [rows]="ROWS_PER_PAGE"
+    [totalRecords]="page.totalElements" [loading]="loadingStatus" selectionMode="single"
+    [(selection)]="selectedLogSheet" (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)"
+    [loading]="loadingStatus" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" dataKey="id" size="small">
+
+    <ng-template #caption>
+        <div style="text-align: center;">
+            <span style="font-weight: bold; font-size: larger;">Log sheet</span>
+        </div>
+    </ng-template>
+    <ng-template #header>
+        <tr>
+            <th>Date</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Airtime</th>
+            <th>Flight time</th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-logSheet>
+        <tr [pSelectableRow]="logSheet">
+            <td>{{logSheet.date | date: 'yy/M/d h:mm a'}}</td>
+            <td>{{logSheet.from}}</td>
+            <td>{{logSheet.to}}</td>
+            <td>{{logSheet.airtime}}</td>
+            <td>{{logSheet.flightTime}}</td>
+        </tr>
+    </ng-template>
+    <ng-template #summary>
+        <div>
+            <button type="button" pButton icon="pi pi-plus" (click)="showDialog(crudEnum.ADD)" label="Add"></button>
+            <button type="button" pButton icon="pi pi-pencil" style="margin-left:0.5rem;"
+                (click)="showDialog(crudEnum.UPDATE)" label="Modify"
+                [disabled]="modifyAndDeleteButtonsDisable"></button>
+            <button type="button" pButton icon="pi pi-minus" style="margin-left:0.5rem;"
+                (click)="showDialog(crudEnum.DELETE)" label="Delete"
+                [disabled]="modifyAndDeleteButtonsDisable"></button>
+        </div>
+    </ng-template>
+
+</p-table>
+
+<p-dialog header="Log sheet - {{crudMode}}" [(visible)]="displayDialog" [responsive]="true" showEffect="fade"
+    [modal]="true" (onHide)="onCancel()" #dialog>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+        <p-messages></p-messages>
+        <app-backend-stacktrace-display></app-backend-stacktrace-display>
+
+        <div class="grid" style="width: 25em;">
+
+            <!-- line 1 -->
+            <!-- date-->
+            <div class="col-2">
+                <label for="date">Date</label>
+            </div>
+            <div class="col-10">
+                <p-datepicker inputId="date" formControlName="date" [iconDisplay]="'input'" [showIcon]="true"
+                    [showButtonBar]="true" [showTime]="true" hourFormat="12" [dateFormat]="'yy-mm-dd'" size="small"
+                    [appendTo]="dialog" [inputStyle]="{'width':'12rem'}"
+                    ngClass="date.invalid && && date.touched ? ng-invalid" />
+            </div>
+
+            <!-- line 2 -->
+            <!-- from -->
+            <div class="col-2">
+                <label for="from">From</label>
+            </div>
+            <div class="col-2">
+                <input type="text" pInputText inputId="from" formControlName="from" pSize="small" size="small"
+                    maxlength="4" style="text-transform:uppercase; width: 4rem;" />
+            </div>
+            <div class="col-8">
+            </div>
+
+            <!-- line 3 -->
+            <!-- to -->
+            <div class="col-2">
+                <label for="to">To</label>
+            </div>
+            <div class="col-2">
+                <input type="text" pInputText inputId="to" formControlName="to" pSize="small" size="small" maxlength="4"
+                    style="text-transform:uppercase; width: 4rem;" />
+            </div>
+            <div class="col-8">
+            </div>
+
+            <!-- line 4 -->
+            <!-- airtime -->
+            <div class="col-2">
+                <label for="airtime">Airtime</label>
+            </div>
+            <div class="col-10">
+                <!-- <input type="text" pInputText inputId="airtime" formControlName="airtime" pSize="small" size="small"
+                    maxlength="3" style="width: 3rem;" /> -->
+                <p-inputnumber inputId="airtime" formControlName="airtime" size="small" [min]="0" mode="decimal"
+                    [maxFractionDigits]="1" [maxlength]="3" [inputStyle]="{'width':'3rem'}" />
+            </div>
+
+            <!-- line 5 -->
+            <!-- flightTime -->
+            <div class="col-2">
+                <label for="flightTime">Flight time</label>
+            </div>
+            <div class="col-10">
+                <!-- <input type="text" pInputText inputId="flightTime" formControlName="flightTime" pSize="small"
+                    size="small" maxlength="3" style="width: 3rem;" /> -->
+                <p-inputnumber inputId="flightTime" formControlName="flightTime" size="small" [min]="0" mode="decimal"
+                    [maxFractionDigits]="1" [maxlength]="3" [inputStyle]="{'width':'3rem'}" />
+            </div>
+
+            <!-- line 6 -->
+            <!-- updateJourneyLog & updateEngineLog -->
+            <!-- <div class="col-2" [ngSwitch]="crudMode">
+                <span *ngSwitchCase="'Add'">Add</span>
+                <span *ngSwitchCase="'Update'">Update</span>
+                <span *ngSwitchCase="'Delete'">Delete</span>
+            </div>
+            <div class="col-4">
+                <p-checkbox formControlName="updateJourneyLog" inputId="updateJouneyLog" binary="true" />
+                <label for="updateJouneyLog" class="ml-2">Journey log</label>
+            </div>
+            <div class="col-6">
+                <p-checkbox formControlName="updateEngineLog" inputId="updateEngineLog" binary="true" />
+                <label for="updateEngineLog" class="ml-2">Engine log</label>
+            </div> -->
+
+            <!-- <p-footer> -->
+            <div class="formgroup-inline">
+                <div class="field">
+                    <button pButton type="submit" label="Submit" [disabled]="form.invalid" icon="pi pi-check"></button>
+                </div>
+                <div class="field">
+                    <button pButton type="reset" label="Cancel" (click)="onCancel()"></button>
+                </div>
+            </div>
+            <!-- </p-footer> -->
+
+
+        </div>
+    </form>
+
+</p-dialog>
