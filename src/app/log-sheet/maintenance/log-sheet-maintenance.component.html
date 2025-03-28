@@ -19,12 +19,15 @@
     </ng-template>
     <ng-template #body let-logSheet>
         <tr [pSelectableRow]="logSheet">
-            <td>{{logSheet.date | date: 'yy/M/d h:mm a'}}</td>
+            <td [pTooltip]="dateTooltip">{{logSheet.date | date: 'yy/M/d'}}</td>
             <td>{{logSheet.from}}</td>
             <td>{{logSheet.to}}</td>
             <td>{{logSheet.airtime}}</td>
             <td>{{logSheet.flightTime}}</td>
         </tr>
+        <ng-template #dateTooltip>
+            <span>{{logSheet.date | date: 'h:mm a'}}</span>
+        </ng-template>
     </ng-template>
     <ng-template #summary>
         <div>

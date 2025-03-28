@@ -17,7 +17,7 @@
     </ng-template>
     <ng-template #body let-engineLog let-editing="editing" let-rowIndex="rowIndex">
         <tr [pSelectableRow]=" engineLog">
-            <td>{{engineLog.date | date: 'yy/M/d h:mm a'}}</td>
+            <td [pTooltip]="dateTooltip">{{engineLog.date | date: 'yy/M/d'}}</td>
             <td>{{engineLog.airtime}}</td>
             <!-- <td>{{engineLog.comment}}</td> -->
             <td [pEditableColumn]="engineLog.comment" pEditableColumnField="comment"
@@ -32,6 +32,9 @@
                 </p-cellEditor>
             </td>
         </tr>
+        <ng-template #dateTooltip>
+            <span>{{engineLog.date | date: 'h:mm a'}}</span>
+        </ng-template>
     </ng-template>
 </p-table>
 <!-- <pre>{{engineLogArray|json}}</pre> -->

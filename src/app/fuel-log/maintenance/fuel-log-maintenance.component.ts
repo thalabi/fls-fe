@@ -24,10 +24,11 @@ import { AcParameters } from '../../domain/AcParameters';
 import { AcParametersResponse } from '../../response/AcParametersResponse';
 import { BackendStacktraceDisplayComponent } from "../../backend-stacktrace-display/backend-stacktrace-display.component";
 import { filter, Subscription, take } from 'rxjs';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-fuel-log',
-    imports: [CommonModule, ReactiveFormsModule, TableModule, ButtonModule, DialogModule, SelectModule, MessagesModule, DatePickerModule, CheckboxModule, InputNumberModule, InputTextModule, FuelLogFormComponent, BackendStacktraceDisplayComponent],
+    imports: [CommonModule, ReactiveFormsModule, TableModule, ButtonModule, DialogModule, SelectModule, MessagesModule, DatePickerModule, CheckboxModule, InputNumberModule, InputTextModule, FuelLogFormComponent, BackendStacktraceDisplayComponent, TooltipModule],
     templateUrl: './fuel-log-maintenance.component.html',
     styleUrl: './fuel-log-maintenance.component.css'
 })

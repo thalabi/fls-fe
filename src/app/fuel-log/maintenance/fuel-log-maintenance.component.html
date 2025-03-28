@@ -25,7 +25,7 @@
     <ng-template #body let-fuelLog>
         <!-- <tr [pSelectableRow]="fuelLog.pricePerLitre ? fuelLog : ''"> -->
         <tr [pSelectableRow]="fuelLog">
-            <td>{{fuelLog.date | date: 'yy/M/d h:mm a'}}</td>
+            <td [pTooltip]="dateTooltip">{{fuelLog.date | date: 'yy/M/d'}}</td>
             <td>{{fuelLog.transactionType}}</td>
             <td>{{fuelLog.left}}</td>
             <td>{{fuelLog.right}}</td>
@@ -36,6 +36,9 @@
             <td>{{fuelLog.fbo}}</td>
             <td>{{fuelLog.comment}}</td>
         </tr>
+        <ng-template #dateTooltip>
+            <span>{{fuelLog.date | date: 'h:mm a'}}</span>
+        </ng-template>
     </ng-template>
     <ng-template #summary>
         <div>

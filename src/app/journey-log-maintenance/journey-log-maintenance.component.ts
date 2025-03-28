@@ -12,10 +12,11 @@ import { JourneyLog } from '../domain/JourneyLog';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { JourneyLogRequest } from '../request/journey-log-request';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-journey-log-maintenance',
-    imports: [CommonModule, TableModule, FormsModule],
+    imports: [CommonModule, TableModule, FormsModule, TooltipModule],
     templateUrl: './journey-log-maintenance.component.html',
     styleUrl: './journey-log-maintenance.component.css'
 })

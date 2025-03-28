@@ -12,10 +12,11 @@ import { RestService } from '../service/rest.service';
 import { SessionService } from '../service/session.service';
 import { EngineLogRequest } from '../request/engine-log-request';
 import { EngineLogResponse } from '../response/EngineLogResponse';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-engine-log-maintenance',
-    imports: [CommonModule, TableModule, FormsModule],
+    imports: [CommonModule, TableModule, FormsModule, TooltipModule],
     templateUrl: './engine-log-maintenance.component.html',
     styleUrl: './engine-log-maintenance.component.css'
 })

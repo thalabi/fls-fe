@@ -19,7 +19,7 @@
     </ng-template>
     <ng-template #body let-journeyLog let-editing="editing" let-rowIndex="rowIndex">
         <tr [pSelectableRow]=" journeyLog">
-            <td>{{journeyLog.date | date: 'yy/M/d h:mm a'}}</td>
+            <td [pTooltip]="dateTooltip">{{journeyLog.date | date: 'yy/M/d'}}</td>
             <td>{{journeyLog.from}}</td>
             <td>{{journeyLog.to}}</td>
             <td>{{journeyLog.airtime}}</td>
@@ -36,6 +36,9 @@
                 </p-cellEditor>
             </td>
         </tr>
+        <ng-template #dateTooltip>
+            <span>{{journeyLog.date | date: 'h:mm a'}}</span>
+        </ng-template>
     </ng-template>
 </p-table>
 <!-- <pre>{{journeyLogArray|json}}</pre> -->

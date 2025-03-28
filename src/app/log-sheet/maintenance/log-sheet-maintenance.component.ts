@@ -21,10 +21,11 @@ import { BackendStacktraceDisplayComponent } from '../../backend-stacktrace-disp
 import { MessagesModule } from 'primeng/messages';
 import { CheckboxModule } from 'primeng/checkbox';
 import { filter, take } from 'rxjs';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-log-sheet-maintenance',
-    imports: [CommonModule, ReactiveFormsModule, TableModule, DatePickerModule, ButtonModule, DialogModule, InputNumberModule, InputTextModule, MessagesModule, BackendStacktraceDisplayComponent, CheckboxModule],
+    imports: [CommonModule, ReactiveFormsModule, TableModule, DatePickerModule, ButtonModule, DialogModule, InputNumberModule, InputTextModule, MessagesModule, BackendStacktraceDisplayComponent, CheckboxModule, TooltipModule],
     templateUrl: './log-sheet-maintenance.component.html',
     styleUrl: './log-sheet-maintenance.component.css'
 })
