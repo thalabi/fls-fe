@@ -26,15 +26,15 @@
         <!-- <tr [pSelectableRow]="fuelLog.pricePerLitre ? fuelLog : ''"> -->
         <tr [pSelectableRow]="fuelLog">
             <td [pTooltip]="dateTooltip">{{fuelLog.date | date: 'yy/M/d'}}</td>
-            <td>{{fuelLog.transactionType}}</td>
+            <td>{{fuelLog.transactionType == 'REFUEL' ? 'Refuel' : 'Flight'}}</td>
             <td>{{fuelLog.left}}</td>
             <td>{{fuelLog.right}}</td>
             <td>{{fuelLog.changeInLeft}}</td>
             <td>{{fuelLog.changeInRight}}</td>
-            <td>{{fuelLog.pricePerLitre}}</td>
-            <td>{{fuelLog.airport}}</td>
-            <td>{{fuelLog.fbo}}</td>
-            <td>{{fuelLog.comment}}</td>
+            <td>{{fuelLog.fuelPrice?.pricePerLitre}}</td>
+            <td>{{fuelLog.fuelPrice?.airport}}</td>
+            <td>{{fuelLog.fuelPrice?.fbo}}</td>
+            <td>{{fuelLog.fuelPrice?.comment}}</td>
         </tr>
         <ng-template #dateTooltip>
             <span>{{fuelLog.date | date: 'h:mm a'}}</span>
@@ -61,6 +61,6 @@
 
     <app-fuel-log-form [fuelLog]="fuelLogToForm" [acParameters]="acParameters"
         (formSubmitted)="onChildFormSubmit($event)" (formCancelled)="onChildFormCancel()" [maintenanceMode]="true"
-        [displayOnly]="displayOnly"></app-fuel-log-form>
+        [displayOnly]="displayOnly" (deleteFuelPrice)="onDeleteFuelPrice($event)"></app-fuel-log-form>
 
 </p-dialog>

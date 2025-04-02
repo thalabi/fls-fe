@@ -10,6 +10,7 @@ import { LogSheet } from '../domain/LogSheet';
 import { LogSheetAndFuelLogRequest } from '../request/log-sheet-and-fuel-log-request';
 import { JourneyLogRequest } from '../request/journey-log-request';
 import { EngineLogRequest } from '../request/engine-log-request';
+import { FuelLogRequest } from '../request/fuel-log-request';
 
 @Injectable({
     providedIn: 'root'
@@ -46,17 +47,20 @@ export class RestService {
         return this.httpClient.put<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/acParameterses/${acParameters.id}`, acParameters);
     }
 
+    // getLastFuelLog(registration: string): Observable<any> {
+    //     return this.httpClient.get(`${this.serviceUrl}/protected/data-rest/fuelLogs/search/findTopByRegistrationOrderByDateDesc?registration=${registration}`);
+    // }
     getLastFuelLog(registration: string): Observable<any> {
-        return this.httpClient.get(`${this.serviceUrl}/protected/data-rest/fuelLogs/search/findTopByRegistrationOrderByDateDesc?registration=${registration}`);
+        return this.httpClient.get(`${this.serviceUrl}/protected/fuelLogController/getLastFuelLog?registration=${registration}`);
     }
-    addFuelLog(fuelLog: FuelLog): Observable<HttpResponse<any>> {
-        return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs`, fuelLog);
+    addFuelLog(fuelLogRequest: FuelLogRequest): Observable<HttpResponse<any>> {
+        return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/fuelLogController/addFuelLog`, fuelLogRequest);
     }
     updateFuelLog(fuelLog: FuelLog): Observable<HttpResponse<any>> {
         return this.httpClient.put<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs/${fuelLog.id}`, fuelLog);
     }
-    deleteFuelLog(id: number): Observable<HttpResponse<any>> {
-        return this.httpClient.delete<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs/${id}`);
+    deleteFuelLog(fuelLogRequest: FuelLogRequest): Observable<HttpResponse<any>> {
+        return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/fuelLogController/deleteFuelLog`, fuelLogRequest);
     }
 
     addLogSheetAndFuelLog(logSheetAndFuelLogRequest: LogSheetAndFuelLogRequest): Observable<HttpResponse<any>> {

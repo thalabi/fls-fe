@@ -13,6 +13,8 @@
             <th>Date</th>
             <th>From</th>
             <th>To</th>
+            <th>Takeoff</th>
+            <th>Landing</th>
             <th>Airtime</th>
             <th>Comment</th>
         </tr>
@@ -22,13 +24,15 @@
             <td [pTooltip]="dateTooltip">{{journeyLog.date | date: 'yy/M/d'}}</td>
             <td>{{journeyLog.from}}</td>
             <td>{{journeyLog.to}}</td>
+            <td>{{journeyLog.takeoffTime}}</td>
+            <td>{{journeyLog.landingTime}}</td>
             <td>{{journeyLog.airtime}}</td>
             <!-- <td>{{journeyLog.comment}}</td> -->
             <td [pEditableColumn]="journeyLog.comment" pEditableColumnField="comment"
-                [pEditableColumnRowIndex]="rowIndex">
+                [pEditableColumnRowIndex]="rowIndex" style="background-color: snow;">
                 <p-cellEditor>
                     <ng-template #input>
-                        <input pInputText type="text" [(ngModel)]="journeyLog.comment" />
+                        <input pInputText type=" text" [(ngModel)]="journeyLog.comment" />
                     </ng-template>
                     <ng-template #output>
                         {{ journeyLog.comment }}

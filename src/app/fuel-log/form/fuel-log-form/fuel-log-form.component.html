@@ -20,7 +20,7 @@
             </div>
             <div class="col-10">
                 <p-select id="transactionType" [options]="transactionTypeOptions" formControlName="transactionType"
-                    size="small">
+                    size="small" (onChange)="onChangeTransactionType($event)">
                 </p-select>
             </div>
 
@@ -98,8 +98,7 @@
                     pSize="small" style="width: 3.5rem" />
             </div>
 
-            <ng-container
-                *ngIf="(form?.controls?.addToLeftTank?.value ?? 0) >= 0 || (form?.controls?.addToRightTank?.value ?? 0) >= 0 ">
+            <ng-container *ngIf="form?.controls?.transactionType?.value == fuelTransactionTypeEnum.Refuel">
                 <!-- line 7 -->
                 <!-- priceType -->
                 <div class="col-2">
@@ -148,19 +147,32 @@
                     <input type="text" pInputText inputId="airport" formControlName="fbo" pSize="small"
                         maxlength="256" />
                 </div>
+                <!-- line 11 -->
+                <!-- comment -->
+                <div class="col-2">
+                    <label for="comment">Comment</label>
+                </div>
+                <div class="col-10">
+                    <input type="text" pInputText inputId="comment" formControlName="comment" pSize="small"
+                        maxlength="4000" />
+                </div>
+
+                <ng-container
+                    *ngIf="form.controls.transactionType.value == fuelTransactionTypeEnum.Refuel && displayOnly">
+                    <div class="col-2">
+                    </div>
+                    <div class="col-10">
+                        <label for="deleteFuelPrice">
+                            Delete fuel price record
+                        </label>
+                        <p-checkbox formControlName="deleteFuelPrice" inputId="deleteFuelPrice" binary="true"
+                            (onChange)="onChangeDeleteFuelPrice($event)" />
+                    </div>
+                </ng-container>
             </ng-container>
 
 
 
-            <!-- line 11 -->
-            <!-- comment -->
-            <div class="col-2">
-                <label for="comment">Comment</label>
-            </div>
-            <div class="col-10">
-                <input type="text" pInputText inputId="comment" formControlName="comment" pSize="small"
-                    maxlength="4000" />
-            </div>
 
             <!-- <p-footer> -->
             <div class="formgroup-inline">

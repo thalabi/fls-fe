@@ -1,11 +1,8 @@
-export enum FuelTransactionTypeEnum {
-    REFUEL = 'Refuel', FLIGHT = 'Flight'
-}
-export function getFuelTransactionTypeEnum(value: string): FuelTransactionTypeEnum | undefined {
-    return (Object.keys(FuelTransactionTypeEnum) as Array<keyof typeof FuelTransactionTypeEnum>)
-        .find((key) => FuelTransactionTypeEnum[key] === value) as FuelTransactionTypeEnum | undefined;
-}
+import { FuelPrice } from "./FuelPrice";
 
+export enum FuelTransactionTypeEnum {
+    Refuel = 'REFUEL', Flight = 'FLIGHT'
+}
 export interface FuelLog {
     id: number;
     registration: string;
@@ -15,10 +12,9 @@ export interface FuelLog {
     right: number;
     changeInLeft: number;
     changeInRight: number;
-    pricePerLitre: number | null;
-    airport: string | null;
-    fbo: string | null;
-    comment: string | null;
+
+    fuelPrice: FuelPrice;
+
     version: number; // result returned by custom queries use this field
     rowVersion: number; // result returned by JPA Data Rest uses this field
     _links: {

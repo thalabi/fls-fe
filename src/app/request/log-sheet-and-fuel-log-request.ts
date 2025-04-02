@@ -4,6 +4,8 @@ export interface LogSheetAndFuelLogRequest {
     date: Date
     from: string
     to: string
+    takeoffTime: Date
+    landingTime: Date
     airtime: number
     flightTime: number
     leftTankUsed: number

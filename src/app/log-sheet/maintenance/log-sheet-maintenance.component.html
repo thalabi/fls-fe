@@ -13,6 +13,8 @@
             <th>Date</th>
             <th>From</th>
             <th>To</th>
+            <th>Takeoff</th>
+            <th>Landing</th>
             <th>Airtime</th>
             <th>Flight time</th>
         </tr>
@@ -22,6 +24,8 @@
             <td [pTooltip]="dateTooltip">{{logSheet.date | date: 'yy/M/d'}}</td>
             <td>{{logSheet.from}}</td>
             <td>{{logSheet.to}}</td>
+            <td>{{logSheet.takeoffTime}}</td>
+            <td>{{logSheet.landingTime}}</td>
             <td>{{logSheet.airtime}}</td>
             <td>{{logSheet.flightTime}}</td>
         </tr>

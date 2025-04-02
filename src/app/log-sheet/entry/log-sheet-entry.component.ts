@@ -223,9 +223,9 @@ export class LogSheetComponent implements OnInit {
             tsnVResponse: this.restService.getTableData('tsn_v', `registration|equals|${this.AC_REGISTRATION}`, 0, 1),
             tsmohVResponse: this.restService.getTableData('tsmoh_v', `registration|equals|${this.AC_REGISTRATION}`, 0, 1),
 
-            fuelLogResponse: this.restService.getLastFuelLog(this.AC_REGISTRATION)
+            fuelLog: this.restService.getLastFuelLog(this.AC_REGISTRATION)
 
-        }).subscribe(((result: { acParametersResponse: AcParametersResponse; tsnVResponse: TsnVResponse; tsmohVResponse: TsmohVResponse; fuelLogResponse: FuelLogResponse }) => {
+        }).subscribe(((result: { acParametersResponse: AcParametersResponse; tsnVResponse: TsnVResponse; tsmohVResponse: TsmohVResponse; fuelLog: FuelLog }) => {
 
             console.log('acParametersResponse', result.acParametersResponse);
             const acParametersArray = result.acParametersResponse._embedded.simpleModels || new Array<AcParameters>
@@ -241,10 +241,10 @@ export class LogSheetComponent implements OnInit {
             this.tsmohV = tsmohVArray[0]
             this.tsmoh = this.tsmohV.tsmoh
 
-            console.log('fuelLogResponse', result.fuelLogResponse);
-            const fuelLogs = result.fuelLogResponse._embedded.fuelLogs || new Array<FuelLog>
-            this.leftTankBefore = fuelLogs[0].left + fuelLogs[0].changeInLeft
-            this.rightTankBefore = fuelLogs[0].right + fuelLogs[0].changeInRight
+            console.log('fuelLog', result.fuelLog);
+            const fuelLog = result.fuelLog || {} as FuelLog
+            this.leftTankBefore = fuelLog.left + fuelLog.changeInLeft
+            this.rightTankBefore = fuelLog.right + fuelLog.changeInRight
             this.bothTanksBefore = this.leftTankBefore + this.rightTankBefore
             this.timeRemainingInTanksBefore = this.toFuelTime(this.bothTanksBefore)
 
@@ -268,7 +268,9 @@ export class LogSheetComponent implements OnInit {
             registration: this.AC_REGISTRATION,
             date: this.timesForm.controls.flightDate.value,
             from: this.timesForm.controls.from.value!.toUpperCase(),
-            to: this.timesForm.controls.from.value!.toUpperCase(),
+            to: this.timesForm.controls.to.value!.toUpperCase(),
+            takeoffTime: this.timesForm.controls.takeoffTime.value,
+            landingTime: this.timesForm.controls.landingTime.value,
             airtime: this.airtime,
             flightTime: this.flightTime,
             leftTankUsed: this.leftTankUsed,

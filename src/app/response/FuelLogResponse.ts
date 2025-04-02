@@ -4,8 +4,8 @@ import { HalResponsePage } from "../response/hal/hal-response-page";
 
 export interface FuelLogResponse {
     _embedded:
-    | { fuelLogs: Array<FuelLog>; simpleModels?: never } // produced by HATEOS
-    | { simpleModels: Array<FuelLog>; fuelLogs?: never }; // produced by GenericEntityController
+    | { fuelLogs: Array<FuelLog>; fuelLogModels?: never } // produced by HATEOS
+    | { fuelLogModels: Array<FuelLog>; fuelLogs?: never }; // produced by GenericEntityController
 
     _links: HalResponseLinks;
     page: HalResponsePage;

@@ -5,7 +5,7 @@
 
     <ng-template #caption>
         <div style="text-align: center;">
-            <span style="font-weight: bold; font-size: larger;">Journey log</span>
+            <span style="font-weight: bold; font-size: larger;">Engine log</span>
         </div>
     </ng-template>
     <ng-template #header>
@@ -21,7 +21,7 @@
             <td>{{engineLog.airtime}}</td>
             <!-- <td>{{engineLog.comment}}</td> -->
             <td [pEditableColumn]="engineLog.comment" pEditableColumnField="comment"
-                [pEditableColumnRowIndex]="rowIndex">
+                [pEditableColumnRowIndex]="rowIndex" style="background-color: snow;">
                 <p-cellEditor>
                     <ng-template #input>
                         <input pInputText type="text" [(ngModel)]="engineLog.comment" />

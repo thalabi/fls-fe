@@ -6,10 +6,11 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberInputEvent, InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { KeyFilterModule } from 'primeng/keyfilter'
-import { SelectModule } from 'primeng/select';
+import { SelectChangeEvent, SelectModule } from 'primeng/select';
 import { CommonModule } from '@angular/common';
-import { FuelLog, FuelTransactionTypeEnum, getFuelTransactionTypeEnum } from '../../../domain/FuelLog';
+import { FuelLog, FuelTransactionTypeEnum } from '../../../domain/FuelLog';
 import { AcParameters } from '../../../domain/AcParameters';
+import { FuelPrice } from '../../../domain/FuelPrice';
 
 export enum PriceTypeOptionEnum {
     PER_LITRE = 'Per litre', TOTAL = 'Total'
@@ -60,23 +61,28 @@ export class FuelLogFormComponent {
         if (value) {
             console.log('disable: true')
             this.form.disable()
+            this.form.controls.deleteFuelPrice.enable()
         } else {
             console.log('disable: false')
             this.form.enable()
         }
+        this.displayOnly = value
     }
+    @Output() deleteFuelPrice = new EventEmitter<boolean>();
     @Output() formSubmitted = new EventEmitter<FuelLog>();
     @Output() formCancelled = new EventEmitter();
 
     priceTypeOptions: Array<PriceTypeOptionEnum> = [PriceTypeOptionEnum.PER_LITRE, PriceTypeOptionEnum.TOTAL]
     pricePerLitre!: number
 
-    transactionTypeOptions: Array<FuelTransactionTypeEnum> = [FuelTransactionTypeEnum.FLIGHT, FuelTransactionTypeEnum.REFUEL]
+    transactionTypeOptions: Array<{ label: string, value: FuelTransactionTypeEnum }> = [{ label: 'Flight', value: FuelTransactionTypeEnum.Flight }, { label: 'Refuel', value: FuelTransactionTypeEnum.Refuel }]
+
+    fuelTransactionTypeEnum = FuelTransactionTypeEnum; // Expose the enum to the template
 
     formReady: boolean = false
     form = new FormGroup({
         date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
-        transactionType: new FormControl<FuelTransactionTypeEnum>(FuelTransactionTypeEnum.REFUEL, { nonNullable: true, validators: Validators.required }),
+        transactionType: new FormControl<FuelTransactionTypeEnum>(FuelTransactionTypeEnum.Refuel, { nonNullable: true, validators: Validators.required }),
         left: new FormControl<number>(0),
         right: new FormControl<number>(0),
         topUp: new FormControl<boolean>(false, { nonNullable: true, validators: Validators.required }),
@@ -87,6 +93,7 @@ export class FuelLogFormComponent {
         airport: new FormControl<string>('', Validators.required),
         fbo: new FormControl<string>(''),
         comment: new FormControl<string>(''),
+        deleteFuelPrice: new FormControl<boolean>(false)
     });
 
     constructor() {
@@ -96,16 +103,20 @@ export class FuelLogFormComponent {
         console.log('this.fuelLog', this.fuelLog)
         this.form.reset()
         this.form.controls.date.setValue(this.fuelLog.date !== undefined ? new Date(this.fuelLog.date) : new Date())
+        this.form.controls.transactionType.setValue(this.fuelLog.transactionType)
         this.form.controls.left.setValue(this.fuelLog.left)
         this.form.controls.right.setValue(this.fuelLog.right)
         this.form.controls.topUp.setValue(false)
         this.form.controls.addToLeftTank.setValue(this.fuelLog.changeInLeft)
         this.form.controls.addToRightTank.setValue(this.fuelLog.changeInRight)
         this.form.controls.priceType.setValue(PriceTypeOptionEnum.PER_LITRE)
-        this.form.controls.price.setValue(this.fuelLog.pricePerLitre)
-        this.form.controls.airport.setValue(this.fuelLog.airport)
-        this.form.controls.fbo.setValue(this.fuelLog.fbo)
-        this.form.controls.comment.setValue(this.fuelLog.comment)
+        this.form.controls.price.setValue(this.fuelLog.fuelPrice?.pricePerLitre)
+        this.form.controls.airport.setValue(this.fuelLog.fuelPrice?.airport)
+        this.form.controls.fbo.setValue(this.fuelLog.fuelPrice?.fbo)
+        this.form.controls.comment.setValue(this.fuelLog.fuelPrice?.comment)
+
+        this.form.controls.deleteFuelPrice.setValue(false)
+        this.deleteFuelPrice.emit(false)
 
         this.checkAndDisablePriceTypeAndPrice()
 
@@ -118,22 +129,38 @@ export class FuelLogFormComponent {
     private fillFuelLogWithValues() {
         console.log('this.form.value', this.form.value)
         this.fuelLog.date = new Date(this.form.controls.date.value)
-        this.fuelLog.transactionType = getFuelTransactionTypeEnum(this.form.controls.transactionType.value)!
+        // this.fuelLog.transactionType = getFuelTransactionTypeEnum(this.form.controls.transactionType.value)! as FuelTransactionTypeEnum
+        this.fuelLog.transactionType = this.form.controls.transactionType.value
         this.fuelLog.left = this.form.controls.left.value!
         this.fuelLog.right = this.form.controls.right.value!
         this.fuelLog.changeInLeft = Number(this.form.controls.addToLeftTank.value!)
         this.fuelLog.changeInRight = Number(this.form.controls.addToRightTank.value!)
-        if (Number(this.form.controls.addToLeftTank.value!) >= 0 || Number(this.form.controls.addToRightTank.value!) >= 0) {
+        // if (Number(this.form.controls.addToLeftTank.value!) >= 0 || Number(this.form.controls.addToRightTank.value!) >= 0) {
+        this.fuelLog.fuelPrice = {} as FuelPrice
+        if (this.form.controls.transactionType.value === FuelTransactionTypeEnum.Refuel) {
             if (this.pricePerLitre === undefined) {
                 this.calculatePricePerLitre()
             }
-            this.fuelLog.pricePerLitre = this.pricePerLitre
-        } else {
-            this.fuelLog.pricePerLitre = null
+            this.fuelLog.fuelPrice.pricePerLitre = this.pricePerLitre
+            this.fuelLog.fuelPrice.airport = this.form.controls.airport.value!
+            this.fuelLog.fuelPrice.fbo = this.form.controls.fbo.value!
+            this.fuelLog.fuelPrice.comment = this.form.controls.comment.value!
         }
-        this.fuelLog.airport = this.form.controls.airport.value!
-        this.fuelLog.fbo = this.form.controls.fbo.value!
-        this.fuelLog.comment = this.form.controls.comment.value!
+
+    }
+    onChangeTransactionType(event: SelectChangeEvent) {
+        console.log('event', event)
+        console.log('event.value', event.value)
+        // if (getFuelTransactionTypeEnum(event.value) === FuelTransactionTypeEnum.Flight) {
+        if (event.value === FuelTransactionTypeEnum.Flight) {
+            this.form.controls.priceType.disable()
+            this.form.controls.price.disable()
+            this.form.controls.airport.disable()
+        } else {
+            this.form.controls.priceType.enable()
+            this.form.controls.price.enable()
+            this.form.controls.airport.enable()
+        }
     }
     onChangeTopUp(event: CheckboxChangeEvent) {
         console.log('onChangeTopUp(), event', event)
@@ -210,6 +237,11 @@ export class FuelLogFormComponent {
     }
     onChangePriceType() {
         this.calculatePricePerLitre()
+    }
+
+    onChangeDeleteFuelPrice(event: CheckboxChangeEvent) {
+        console.log('event', event)
+        this.deleteFuelPrice.emit(this.form.controls.deleteFuelPrice.value!)
     }
 
     onSubmit() {

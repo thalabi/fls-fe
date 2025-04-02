@@ -1,20 +1,17 @@
-export interface JourneyLog {
+export interface FuelPrice {
     id: number;
-    registration: string;
+    airport: string;
+    fbo: string | null;
     date: Date;
-    from: string;
-    to: string;
-    takeoffTime: Date;
-    landingTime: Date;
-    airtime: number;
-    comment: string;
+    pricePerLitre: number | null;
+    comment: string | null;
     version: number; // result returned by custom queries use this field
     rowVersion: number; // result returned by JPA Data Rest uses this field
     _links: {
         self: {
             href: URL
         },
-        journeyLog: {
+        fuelPrice: {
             href: URL
         }
     };

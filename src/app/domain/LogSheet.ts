@@ -4,6 +4,8 @@ export interface LogSheet {
     date: Date;
     from: string;
     to: string;
+    takeoffTime: Date;
+    landingTime: Date;
     airtime: number;
     flightTime: number;
     version: number; // result returned by custom queries use this field

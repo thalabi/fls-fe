@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { RestService } from '../../service/rest.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FuelLog, FuelTransactionTypeEnum, getFuelTransactionTypeEnum } from '../../domain/FuelLog';
+import { FuelLog } from '../../domain/FuelLog';
 import { FuelLogResponse } from '../../response/FuelLogResponse';
 import { AcParameters } from '../../domain/AcParameters';
 import { AcParametersResponse } from '../../response/AcParametersResponse';
 import { FuelLogFormComponent } from '../form/fuel-log-form/fuel-log-form.component';
 import { forkJoin } from 'rxjs';
+import { FuelLogRequest } from '../../request/fuel-log-request';
 
 @Component({
     selector: 'app-refuel',
@@ -34,36 +35,52 @@ export class RefuelComponent implements OnInit {
 
             acParametersResponse: this.restService.getTableData('ac_parameters', `registration|equals|${this.AC_REGISTRATION}`, 0, 1),
 
-            fuelLogResponse: this.restService.getLastFuelLog(this.AC_REGISTRATION)
+            fuelLog: this.restService.getLastFuelLog(this.AC_REGISTRATION)
 
-        }).subscribe(((result: { acParametersResponse: AcParametersResponse; fuelLogResponse: FuelLogResponse }) => {
+        }).subscribe(((result: { acParametersResponse: AcParametersResponse; fuelLog: FuelLog }) => {
 
             console.log('acParametersResponse', result.acParametersResponse);
             const acParametersArray = result.acParametersResponse._embedded.simpleModels || new Array<AcParameters>
             this.acParameters = acParametersArray[0]
 
-            console.log('fuelLogResponse', result.fuelLogResponse);
-            const fuelLogs = result.fuelLogResponse._embedded.fuelLogs || new Array<FuelLog>
+            console.log('result.fuelLog', result.fuelLog);
+            const fuelLog = result.fuelLog || {} as FuelLog
             let inLeftTank = 0
             let inRightTank = 0
-            if (fuelLogs.length !== 0) {
-                inLeftTank = fuelLogs[0].left + fuelLogs[0].changeInLeft
-                inRightTank = fuelLogs[0].right + fuelLogs[0].changeInRight;
-            }
+            inLeftTank = fuelLog.left + fuelLog.changeInLeft
+            inRightTank = fuelLog.right + fuelLog.changeInRight;
             this.fuelLog.date = new Date()
             this.fuelLog.registration = this.AC_REGISTRATION
             this.fuelLog.left = inLeftTank
             this.fuelLog.right = inRightTank
-            console.log('fuelLog', this.fuelLog)
+            //this.fuelLog.fuelPrice = fuelLog.fuelPrice
+            console.log('this.fuelLog', this.fuelLog)
 
             this.fuelLogToForm = this.fuelLog // will trigger a change detection and populate the form
         }));
     }
 
+    private fuelLogToFuelLogRequest(fuelLog: FuelLog): FuelLogRequest {
+        const fuelLogRequest: FuelLogRequest = {
+            registration: fuelLog.registration,
+            date: fuelLog.date,
+            transactionType: fuelLog.transactionType,
+            left: fuelLog.left,
+            right: fuelLog.right,
+            changeInLeft: fuelLog.changeInLeft,
+            changeInRight: fuelLog.changeInRight,
+            pricePerLitre: fuelLog.fuelPrice.pricePerLitre,
+            airport: fuelLog.fuelPrice.airport,
+            fbo: fuelLog.fuelPrice.fbo,
+            comment: fuelLog.fuelPrice.comment
+        }
+        return fuelLogRequest
+    }
+
     onChildFormSubmit(fuelLog: FuelLog) {
-        fuelLog.transactionType = getFuelTransactionTypeEnum(FuelTransactionTypeEnum.REFUEL)!
+        //fuelLog.transactionType = getFuelTransactionTypeEnum(FuelTransactionTypeEnum.REFUEL)!
         console.log('fuelLog', fuelLog)
-        this.restService.addFuelLog(fuelLog)
+        this.restService.addFuelLog(this.fuelLogToFuelLogRequest(fuelLog))
             .subscribe(
                 {
                     next: (response: any) => {

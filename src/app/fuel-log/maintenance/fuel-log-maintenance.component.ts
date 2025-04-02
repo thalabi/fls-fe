@@ -25,6 +25,7 @@ import { AcParametersResponse } from '../../response/AcParametersResponse';
 import { BackendStacktraceDisplayComponent } from "../../backend-stacktrace-display/backend-stacktrace-display.component";
 import { filter, Subscription, take } from 'rxjs';
 import { TooltipModule } from 'primeng/tooltip';
+import { FuelLogRequest } from '../../request/fuel-log-request';
 
 @Component({
     selector: 'app-fuel-log',
@@ -57,6 +58,8 @@ export class FuelLogMaintenaceComponent implements OnInit {
     fuelLog: FuelLog = {} as FuelLog
     fuelLogToForm!: FuelLog
     displayOnly!: boolean
+
+    deleteFuelPrice!: boolean
 
     // disableParentMessages: boolean = false;
 
@@ -124,7 +127,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
                 {
                     next: (fuelLogResponse: FuelLogResponse) => {
                         console.log('fuelLogResponse', fuelLogResponse);
-                        this.fuelLogArray = fuelLogResponse._embedded.simpleModels || new Array<FuelLog>
+                        this.fuelLogArray = fuelLogResponse._embedded.fuelLogModels || new Array<FuelLog>
 
                         this.page = fuelLogResponse.page;
                         this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
@@ -189,11 +192,37 @@ export class FuelLogMaintenaceComponent implements OnInit {
         }
     }
 
+    private fuelLogToFuelLogRequest(fuelLog: FuelLog): FuelLogRequest {
+        const fuelLogRequest: FuelLogRequest = {
+            registration: fuelLog.registration,
+            date: fuelLog.date,
+            transactionType: fuelLog.transactionType,
+            left: fuelLog.left,
+            right: fuelLog.right,
+            changeInLeft: fuelLog.changeInLeft,
+            changeInRight: fuelLog.changeInRight,
+            pricePerLitre: fuelLog.fuelPrice.pricePerLitre,
+            airport: fuelLog.fuelPrice.airport,
+            fbo: fuelLog.fuelPrice.fbo,
+            comment: fuelLog.fuelPrice.comment,
+            deleteFuelPrice: this.deleteFuelPrice
+        }
+        console.log('fuelLogRequest', fuelLogRequest)
+        return fuelLogRequest
+    }
+
+    onDeleteFuelPrice(event: boolean) {
+        this.deleteFuelPrice = event
+        console.log('this.deleteFuelPrice', this.deleteFuelPrice)
+    }
+
     onChildFormSubmit(fuelLog: FuelLog) {
         console.log('fuelLog', fuelLog)
+        console.log('deleteFuelPrice: this.deleteFuelPrice', this.deleteFuelPrice)
+        const fuelLogRequest = {} as FuelLogRequest
         switch (this.crudMode) {
             case CrudEnum.ADD:
-                this.restService.addFuelLog(fuelLog)
+                this.restService.addFuelLog(this.fuelLogToFuelLogRequest(fuelLog))
                     .subscribe(
                         {
                             next: (response: any) => {
@@ -202,14 +231,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             complete: () => {
                                 console.log('http request completed')
                                 this.afterCrud()
-                                // this.sessionService.disableParentMessages$
-                                //     .pipe(
-                                //         filter(disableParentMessages => !disableParentMessages), // Only emit when it's false
-                                //         take(1) // Unsubscribe automatically after the first `false`
-                                //     )
-                                //     .subscribe(() => {
-                                //         this.messageService.add({ severity: 'info', summary: '200', detail: 'Added successfully' });
-                                //     });
                                 this.messageService.add({ severity: 'info', summary: '200', detail: 'Added successfully' });
 
                             },
@@ -228,23 +249,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             complete: () => {
                                 console.log('http request completed')
                                 this.afterCrud()
-                                // let disableParentMessagesSubscription: Subscription
-                                // disableParentMessagesSubscription = this.sessionService.disableParentMessages$.subscribe(disableParentMessages => {
-                                //     console.log('ADD disableParentMessages', disableParentMessages)
-                                //     if (!disableParentMessages) {
-                                //         this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated sucessfully' });
-                                //         disableParentMessagesSubscription.unsubscribe()
-                                //     }
-                                // })
-                                // this.sessionService.disableParentMessages$
-                                //     .pipe(
-                                //         filter(disableParentMessages => !disableParentMessages), // Only emit when it's false
-                                //         //take(1) // Unsubscribe automatically after the first `false`
-                                //     )
-                                //     .subscribe((disableParentMessages) => {
-                                //         console.log('UPDATE adding to messages, disableParentMessages', disableParentMessages)
-                                //         this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated successfully' });
-                                //     });
                                 this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated successfully' });
                             },
                             error: (httpErrorResponse: HttpErrorResponse) => {
@@ -253,7 +257,9 @@ export class FuelLogMaintenaceComponent implements OnInit {
                         });
                 break;
             case CrudEnum.DELETE:
-                this.restService.deleteFuelLog(fuelLog.id)
+                fuelLogRequest.id = fuelLog.id
+                fuelLogRequest.deleteFuelPrice = this.deleteFuelPrice
+                this.restService.deleteFuelLog(fuelLogRequest)
                     .subscribe(
                         {
                             next: (response: any) => {
@@ -262,14 +268,6 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             complete: () => {
                                 console.log('http request completed')
                                 this.afterCrud()
-                                // this.sessionService.disableParentMessages$
-                                //     .pipe(
-                                //         filter(disableParentMessages => !disableParentMessages), // Only emit when it's false
-                                //         take(1) // Unsubscribe automatically after the first `false`
-                                //     )
-                                //     .subscribe(() => {
-                                //         this.messageService.add({ severity: 'info', summary: '200', detail: 'Deleted successfully' });
-                                //     });
                                 this.messageService.add({ severity: 'info', summary: '200', detail: 'Deleted successfully' });
                             },
                             error: (httpErrorResponse: HttpErrorResponse) => {
