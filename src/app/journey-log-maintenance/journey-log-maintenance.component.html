@@ -24,8 +24,8 @@
             <td [pTooltip]="dateTooltip">{{journeyLog.date | date: 'yy/M/d'}}</td>
             <td>{{journeyLog.from}}</td>
             <td>{{journeyLog.to}}</td>
-            <td>{{journeyLog.takeoffTime}}</td>
-            <td>{{journeyLog.landingTime}}</td>
+            <td>{{journeyLog.takeoffTime | date: 'yy/M/d h:mm a'}}</td>
+            <td>{{journeyLog.landingTime | date: 'yy/M/d h:mm a'}}</td>
             <td>{{journeyLog.airtime}}</td>
             <!-- <td>{{journeyLog.comment}}</td> -->
             <td [pEditableColumn]="journeyLog.comment" pEditableColumnField="comment"

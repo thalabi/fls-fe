@@ -11,8 +11,6 @@ import { AcParameters } from '../../domain/AcParameters';
 import { AcParametersResponse } from '../../response/AcParametersResponse';
 import { forkJoin } from 'rxjs';
 import { FuelLog } from '../../domain/FuelLog';
-import { FuelLogResponse } from '../../response/FuelLogResponse';
-import { LogSheetRequest } from '../../request/log-sheet-request';
 import { LogSheetAndFuelLogRequest } from '../../request/log-sheet-and-fuel-log-request'
 import { SessionService } from '../../service/session.service';
 import { TsnVResponse } from '../../response/TsnVResponse';

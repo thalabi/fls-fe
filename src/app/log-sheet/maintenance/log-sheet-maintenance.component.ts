@@ -52,10 +52,12 @@ export class LogSheetMaintenanceComponent implements OnInit {
         date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
         from: new FormControl<string>('', Validators.required),
         to: new FormControl<string>('', Validators.required),
+        takeoffTime: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
+        landingTime: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
         airtime: new FormControl<number | null>(null, Validators.required),
         flightTime: new FormControl<number | null>(null, Validators.required),
-        updateJourneyLog: new FormControl<boolean>(true, Validators.required),
-        updateEngineLog: new FormControl<boolean>(true, Validators.required),
+        // updateJourneyLog: new FormControl<boolean>(true, Validators.required),
+        // updateEngineLog: new FormControl<boolean>(true, Validators.required),
     });
 
     constructor(
@@ -150,24 +152,22 @@ export class LogSheetMaintenanceComponent implements OnInit {
         switch (this.crudMode) {
             case CrudEnum.ADD:
                 this.form.controls.date.setValue(new Date())
-                this.form.controls.updateJourneyLog.setValue(true)
-                this.form.controls.updateEngineLog.setValue(true)
+                // this.form.controls.updateJourneyLog.setValue(true)
+                // this.form.controls.updateEngineLog.setValue(true)
                 this.form.enable()
                 break;
             case CrudEnum.UPDATE:
                 console.log('this.selectedLogSheet', this.selectedLogSheet)
-                this.selectedLogSheet.date
-                this.selectedLogSheet.from
-                this.selectedLogSheet.airtime
-                this.selectedLogSheet.flightTime
                 this.form.setValue({
                     date: new Date(this.selectedLogSheet.date),
                     from: this.selectedLogSheet.from,
                     to: this.selectedLogSheet.to,
+                    takeoffTime: new Date(this.selectedLogSheet.takeoffTime),
+                    landingTime: new Date(this.selectedLogSheet.landingTime),
                     airtime: this.selectedLogSheet.airtime,
                     flightTime: this.selectedLogSheet.flightTime,
-                    updateJourneyLog: true,
-                    updateEngineLog: true
+                    // updateJourneyLog: true,
+                    // updateEngineLog: true
                 })
                 this.form.enable()
                 break;
@@ -176,14 +176,16 @@ export class LogSheetMaintenanceComponent implements OnInit {
                     date: new Date(this.selectedLogSheet.date),
                     from: this.selectedLogSheet.from,
                     to: this.selectedLogSheet.to,
+                    takeoffTime: new Date(this.selectedLogSheet.takeoffTime),
+                    landingTime: new Date(this.selectedLogSheet.landingTime),
                     airtime: this.selectedLogSheet.airtime,
                     flightTime: this.selectedLogSheet.flightTime,
-                    updateJourneyLog: true,
-                    updateEngineLog: true
+                    // updateJourneyLog: true,
+                    // updateEngineLog: true
                 })
                 this.form.disable()
-                this.form.controls.updateJourneyLog.enable()
-                this.form.controls.updateEngineLog.enable()
+                // this.form.controls.updateJourneyLog.enable()
+                // this.form.controls.updateEngineLog.enable()
                 break;
             default:
                 console.error('this.crudMode is invalid. this.crudMode: ' + this.crudMode);
@@ -204,6 +206,8 @@ export class LogSheetMaintenanceComponent implements OnInit {
                 logSheetRequest.date = this.form.controls.date.value
                 logSheetRequest.from = this.form.controls.from.value!.toUpperCase()
                 logSheetRequest.to = this.form.controls.to.value!.toUpperCase()
+                logSheetRequest.takeoffTime = this.form.controls.takeoffTime.value
+                logSheetRequest.landingTime = this.form.controls.landingTime.value
                 logSheetRequest.airtime = this.form.controls.airtime.value!
                 logSheetRequest.flightTime = this.form.controls.flightTime.value!
                 // logSheetRequest.updateJourneyLog = this.form.controls.updateJourneyLog.value!
@@ -239,6 +243,8 @@ export class LogSheetMaintenanceComponent implements OnInit {
                 logSheetRequest.date = this.form.controls.date.value
                 logSheetRequest.from = this.form.controls.from.value!.toUpperCase()
                 logSheetRequest.to = this.form.controls.to.value!.toUpperCase()
+                logSheetRequest.takeoffTime = this.form.controls.takeoffTime.value
+                logSheetRequest.landingTime = this.form.controls.landingTime.value
                 logSheetRequest.airtime = this.form.controls.airtime.value!
                 logSheetRequest.flightTime = this.form.controls.flightTime.value!
                 // logSheetRequest.updateJourneyLog = this.form.controls.updateJourneyLog.value!

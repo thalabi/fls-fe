@@ -24,8 +24,8 @@
             <td [pTooltip]="dateTooltip">{{logSheet.date | date: 'yy/M/d'}}</td>
             <td>{{logSheet.from}}</td>
             <td>{{logSheet.to}}</td>
-            <td>{{logSheet.takeoffTime}}</td>
-            <td>{{logSheet.landingTime}}</td>
+            <td>{{logSheet.takeoffTime | date: 'yy/M/d h:mm a'}}</td>
+            <td>{{logSheet.landingTime | date: 'yy/M/d h:mm a'}}</td>
             <td>{{logSheet.airtime}}</td>
             <td>{{logSheet.flightTime}}</td>
         </tr>
@@ -94,6 +94,30 @@
             </div>
 
             <!-- line 4 -->
+            <!-- date-->
+            <div class="col-2">
+                <label for="takeoffTime">Takeoff</label>
+            </div>
+            <div class="col-10">
+                <p-datepicker inputId="takeoffTime" formControlName="takeoffTime" [iconDisplay]="'input'"
+                    [showIcon]="true" [showButtonBar]="true" [showTime]="true" hourFormat="12" [dateFormat]="'yy-mm-dd'"
+                    size="small" [appendTo]="dialog" [inputStyle]="{'width':'12rem'}"
+                    ngClass="takeoffTime.invalid && && takeoffTime.touched ? ng-invalid" />
+            </div>
+
+            <!-- line 5 -->
+            <!-- date-->
+            <div class="col-2">
+                <label for="landingTime">Landing</label>
+            </div>
+            <div class="col-10">
+                <p-datepicker inputId="landingTime" formControlName="landingTime" [iconDisplay]="'input'"
+                    [showIcon]="true" [showButtonBar]="true" [showTime]="true" hourFormat="12" [dateFormat]="'yy-mm-dd'"
+                    size="small" [appendTo]="dialog" [inputStyle]="{'width':'12rem'}"
+                    ngClass="landingTime.invalid && && landingTime.touched ? ng-invalid" />
+            </div>
+
+            <!-- line 6 -->
             <!-- airtime -->
             <div class="col-2">
                 <label for="airtime">Airtime</label>
@@ -105,7 +129,7 @@
                     [maxFractionDigits]="1" [maxlength]="3" [inputStyle]="{'width':'3rem'}" />
             </div>
 
-            <!-- line 5 -->
+            <!-- line 7 -->
             <!-- flightTime -->
             <div class="col-2">
                 <label for="flightTime">Flight time</label>
@@ -116,22 +140,6 @@
                 <p-inputnumber inputId="flightTime" formControlName="flightTime" size="small" [min]="0" mode="decimal"
                     [maxFractionDigits]="1" [maxlength]="3" [inputStyle]="{'width':'3rem'}" />
             </div>
-
-            <!-- line 6 -->
-            <!-- updateJourneyLog & updateEngineLog -->
-            <!-- <div class="col-2" [ngSwitch]="crudMode">
-                <span *ngSwitchCase="'Add'">Add</span>
-                <span *ngSwitchCase="'Update'">Update</span>
-                <span *ngSwitchCase="'Delete'">Delete</span>
-            </div>
-            <div class="col-4">
-                <p-checkbox formControlName="updateJourneyLog" inputId="updateJouneyLog" binary="true" />
-                <label for="updateJouneyLog" class="ml-2">Journey log</label>
-            </div>
-            <div class="col-6">
-                <p-checkbox formControlName="updateEngineLog" inputId="updateEngineLog" binary="true" />
-                <label for="updateEngineLog" class="ml-2">Engine log</label>
-            </div> -->
 
             <!-- <p-footer> -->
             <div class="formgroup-inline">
