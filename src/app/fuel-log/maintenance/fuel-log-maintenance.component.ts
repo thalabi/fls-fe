@@ -194,6 +194,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
 
     private fuelLogToFuelLogRequest(fuelLog: FuelLog): FuelLogRequest {
         const fuelLogRequest: FuelLogRequest = {
+            id: fuelLog.id,
             registration: fuelLog.registration,
             date: fuelLog.date,
             transactionType: fuelLog.transactionType,
@@ -240,7 +241,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
                         });
                 break
             case CrudEnum.UPDATE:
-                this.restService.updateFuelLog(fuelLog)
+                this.restService.updateFuelLog(this.fuelLogToFuelLogRequest(fuelLog))
                     .subscribe(
                         {
                             next: (response: any) => {

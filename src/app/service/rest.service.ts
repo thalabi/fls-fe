@@ -56,8 +56,8 @@ export class RestService {
     addFuelLog(fuelLogRequest: FuelLogRequest): Observable<HttpResponse<any>> {
         return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/fuelLogController/addFuelLog`, fuelLogRequest);
     }
-    updateFuelLog(fuelLog: FuelLog): Observable<HttpResponse<any>> {
-        return this.httpClient.put<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelLogs/${fuelLog.id}`, fuelLog);
+    updateFuelLog(fuelLogRequest: FuelLogRequest): Observable<HttpResponse<any>> {
+        return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/fuelLogController/updateFuelLog`, fuelLogRequest);
     }
     deleteFuelLog(fuelLogRequest: FuelLogRequest): Observable<HttpResponse<any>> {
         return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/fuelLogController/deleteFuelLog`, fuelLogRequest);
