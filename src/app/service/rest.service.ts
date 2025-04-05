@@ -11,6 +11,7 @@ import { LogSheetAndFuelLogRequest } from '../request/log-sheet-and-fuel-log-req
 import { JourneyLogRequest } from '../request/journey-log-request';
 import { EngineLogRequest } from '../request/engine-log-request';
 import { FuelLogRequest } from '../request/fuel-log-request';
+import { FuelPriceRequest } from '../request/fuel-price-request';
 
 @Injectable({
     providedIn: 'root'
@@ -78,6 +79,9 @@ export class RestService {
         return this.httpClient.post<HttpResponse<any>>(`${this.serviceUrl}/protected/logSheetController/deleteLogSheet`, logSheetRequest);
     }
 
+    updateFuelPrice(fuelPriceRequest: FuelPriceRequest): Observable<HttpResponse<any>> {
+        return this.httpClient.patch<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/fuelPrices/${fuelPriceRequest.id}`, fuelPriceRequest);
+    }
     updateJourneyLog(journeyLogRequest: JourneyLogRequest): Observable<HttpResponse<any>> {
         return this.httpClient.patch<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/journeyLogs/${journeyLogRequest.id}`, journeyLogRequest);
     }

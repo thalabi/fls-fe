@@ -14,15 +14,17 @@
                     [inputStyle]="{'width':'12rem'}" ngClass="date.invalid && && date.touched ? ng-invalid" />
             </div>
 
-            <!-- line 2 -->
-            <div class="col-2">
-                <label for="transactionType">Trans</label>
-            </div>
-            <div class="col-10">
-                <p-select id="transactionType" [options]="transactionTypeOptions" formControlName="transactionType"
-                    size="small" (onChange)="onChangeTransactionType($event)">
-                </p-select>
-            </div>
+            <ng-container *ngIf="maintenanceMode">
+                <!-- line 2 -->
+                <div class="col-2">
+                    <label for="transactionType">Trans</label>
+                </div>
+                <div class="col-10">
+                    <p-select id="transactionType" [options]="transactionTypeOptions" formControlName="transactionType"
+                        size="small" (onChange)="onChangeTransactionType($event)">
+                    </p-select>
+                </div>
+            </ng-container>
 
             <!-- line 3 -->
             <div class="col-2">
@@ -176,20 +178,24 @@
 
             <!-- <p-footer> -->
             <div class="formgroup-inline">
-                <!-- <ul>
-                    <li>date {{form.controls.date.valid}}</li>
-                    <li>transactionType {{form.controls.transactionType.valid}}</li>
-                    <li>left {{form.controls.left.valid}}</li>
-                    <li>right {{form.controls.right.valid}}</li>
-                    <li>topUp {{form.controls.topUp.valid}}</li>
-                    <li>addToLeftTank {{form.controls.addToLeftTank.valid}}</li>
-                    <li>addToRightTank {{form.controls.addToRightTank.valid}}</li>
-                    <li>priceType {{form.controls.priceType.valid}}</li>
-                    <li>price {{form.controls.price.valid}}</li>
-                    <li>airport {{form.controls.airport.valid}}</li>
-                    <li>fbo {{form.controls.fbo.valid}}</li>
-                    <li>comment {{form.controls.comment.valid}}</li>
-                </ul> -->
+                <ul>
+                    <li>date valid: {{form.controls.date.valid}} disabled: {{form.controls.date.disabled}}</li>
+                    <li>transactionType valid: {{form.controls.transactionType.valid}} disabled:
+                        {{form.controls.transactionType.disabled}}</li>
+                    <li>left valid: {{form.controls.left.valid}} disabled: {{form.controls.left.disabled}}</li>
+                    <li>right valid: {{form.controls.right.valid}} disabled: {{form.controls.right.disabled}}</li>
+                    <li>topUp valid: {{form.controls.topUp.valid}} disabled: {{form.controls.topUp.disabled}}</li>
+                    <li>addToLeftTank valid: {{form.controls.addToLeftTank.valid}} disabled:
+                        {{form.controls.addToLeftTank.disabled}}</li>
+                    <li>addToRightTank valid: {{form.controls.addToRightTank.valid}} disabled:
+                        {{form.controls.addToRightTank.disabled}}</li>
+                    <li>priceType valid: {{form.controls.priceType.valid}} disabled:
+                        {{form.controls.priceType.disabled}}</li>
+                    <li>price valid: {{form.controls.price.valid}} disabled: {{form.controls.price.disabled}}</li>
+                    <li>airport valid: {{form.controls.airport.valid}} disabled: {{form.controls.airport.disabled}}</li>
+                    <li>fbo valid: {{form.controls.fbo.valid}} disabled: {{form.controls.fbo.disabled}}</li>
+                    <li>comment valid: {{form.controls.comment.valid}} disabled: {{form.controls.comment.disabled}}</li>
+                </ul>
                 <div class="field">
                     <button pButton type="submit" label="Submit" [disabled]="form.invalid" icon="pi pi-check"></button>
                 </div>

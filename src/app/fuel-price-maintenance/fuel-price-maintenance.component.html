@@ -1,0 +1,43 @@
+<p-table [value]="fuelPriceArray" (onEditComplete)="onCommentEditComplete($event)" [paginator]="true"
+    [rowsPerPageOptions]="[10,20,30]" [rows]="ROWS_PER_PAGE" [totalRecords]="page.totalElements"
+    [loading]="loadingStatus" selectionMode="single" [loading]="loadingStatus" [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)" dataKey="id" size="small">
+
+    <ng-template #caption>
+        <div style="text-align: center;">
+            <span style="font-weight: bold; font-size: larger;">Fuel Price</span>
+        </div>
+    </ng-template>
+    <ng-template #header>
+        <tr>
+            <th>Airport</th>
+            <th>FBO</th>
+            <th>Date</th>
+            <th>Price</th>
+            <th>Comment</th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-fuelPrice let-editing="editing" let-rowIndex="rowIndex">
+        <tr [pSelectableRow]=" fuelPrice">
+            <td>{{fuelPrice.airport}}</td>
+            <td>{{fuelPrice.fbo}}</td>
+            <td [pTooltip]="dateTooltip">{{fuelPrice.date | date: 'yy/M/d'}}</td>
+            <td>{{fuelPrice.pricePerLitre}}</td>
+            <!-- <td>{{fuelPrice.comment}}</td> -->
+            <td [pEditableColumn]="fuelPrice.comment" pEditableColumnField="comment"
+                [pEditableColumnRowIndex]="rowIndex" style="background-color: snow;">
+                <p-cellEditor>
+                    <ng-template #input>
+                        <input pInputText type=" text" [(ngModel)]="fuelPrice.comment" />
+                    </ng-template>
+                    <ng-template #output>
+                        {{ fuelPrice.comment }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+        </tr>
+        <ng-template #dateTooltip>
+            <span>{{fuelPrice.date | date: 'h:mm a'}}</span>
+        </ng-template>
+    </ng-template>
+</p-table>

@@ -50,9 +50,19 @@ export class FuelLogFormComponent {
         this.acParameters = value
     }
 
-    @Input() maintenanceMode: boolean = false // allows all fields to be editable and will not show top ip checkbox
+    maintenanceMode: boolean = false // allows all fields to be editable and will not show top ip checkbox
+    @Input("maintenanceMode") set inputMaintenanceMode(value: boolean) {
+        console.log('@Input() set inputMaintenanceMode(value: boolean) value: ', value)
+        if (value === undefined) return
+        if (value) {
+            this.form.controls.transactionType.enable();
+        } else {
+            this.form.controls.transactionType.disable();
+        }
+        this.maintenanceMode = value
+    }
 
-    displayOnly!: boolean
+    displayOnly!: boolean // for delete operation
     @Input("displayOnly") set inputDisplayOnly(value: boolean) {
         console.log('@Input() set inputDisplayOnly(value: boolean) value: ', value)
         if (value === undefined) return
@@ -82,7 +92,7 @@ export class FuelLogFormComponent {
     formReady: boolean = false
     form = new FormGroup({
         date: new FormControl<Date>(new Date(), { nonNullable: true, validators: Validators.required }),
-        transactionType: new FormControl<FuelTransactionTypeEnum>(FuelTransactionTypeEnum.Refuel, { nonNullable: true, validators: Validators.required }),
+        transactionType: new FormControl<FuelTransactionTypeEnum>({ value: FuelTransactionTypeEnum.Refuel, disabled: true }, { nonNullable: true, validators: Validators.required }),
         left: new FormControl<number>(0),
         right: new FormControl<number>(0),
         topUp: new FormControl<boolean>(false, { nonNullable: true, validators: Validators.required }),

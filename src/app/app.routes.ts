@@ -10,6 +10,7 @@ import { Httpstatus404Component } from './httpstatus404/httpstatus404.component'
 import { FuelLogMaintenaceComponent } from './fuel-log/maintenance/fuel-log-maintenance.component'
 import { JourneyLogMaintenanceComponent } from './journey-log-maintenance/journey-log-maintenance.component'
 import { EngineLogMaintenanceComponent } from './engine-log-maintenance/engine-log-maintenance.component'
+import { FuelPriceMaintenanceComponent } from './fuel-price-maintenance/fuel-price-maintenance.component'
 
 export const routes: Routes = [
     { path: 'welcome', component: WelcomeComponent },
@@ -18,6 +19,7 @@ export const routes: Routes = [
     { path: 'refuel', component: RefuelComponent, canActivate: [AuthGuard] },
     { path: 'ac-parameters', component: AcParametersComponent, canActivate: [AuthGuard] },
     { path: 'fuel-log-maintenance', component: FuelLogMaintenaceComponent, canActivate: [AuthGuard] },
+    { path: 'fuel-price-maintenance', component: FuelPriceMaintenanceComponent, canActivate: [AuthGuard] },
     { path: 'log-sheet-maintenance', component: LogSheetMaintenanceComponent, canActivate: [AuthGuard] },
     { path: 'journey-log-maintenance', component: JourneyLogMaintenanceComponent, canActivate: [AuthGuard] },
     { path: 'engine-log-maintenance', component: EngineLogMaintenanceComponent, canActivate: [AuthGuard] },
