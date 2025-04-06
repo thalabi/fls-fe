@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { RestService } from '../../service/rest.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FuelLog } from '../../domain/FuelLog';
+import { FuelLog, FuelTransactionTypeEnum } from '../../domain/FuelLog';
 import { FuelLogResponse } from '../../response/FuelLogResponse';
 import { AcParameters } from '../../domain/AcParameters';
 import { AcParametersResponse } from '../../response/AcParametersResponse';
@@ -45,14 +45,17 @@ export class RefuelComponent implements OnInit {
 
             console.log('result.fuelLog', result.fuelLog);
             const fuelLog = result.fuelLog || {} as FuelLog
-            let inLeftTank = 0
-            let inRightTank = 0
-            inLeftTank = fuelLog.left + fuelLog.changeInLeft
-            inRightTank = fuelLog.right + fuelLog.changeInRight;
+            // let inLeftTank = 0
+            // let inRightTank = 0
+            // inLeftTank = fuelLog.left + fuelLog.changeInLeft
+            // inRightTank = fuelLog.right + fuelLog.changeInRight
             this.fuelLog.date = new Date()
+            this.fuelLog.transactionType = FuelTransactionTypeEnum.Refuel
             this.fuelLog.registration = this.AC_REGISTRATION
-            this.fuelLog.left = inLeftTank
-            this.fuelLog.right = inRightTank
+            // this.fuelLog.left = inLeftTank
+            // this.fuelLog.right = inRightTank
+            this.fuelLog.left = fuelLog.left + fuelLog.changeInLeft
+            this.fuelLog.right = fuelLog.right + fuelLog.changeInRight
             //this.fuelLog.fuelPrice = fuelLog.fuelPrice
             console.log('this.fuelLog', this.fuelLog)
 
