@@ -9,6 +9,7 @@ import { AcParametersResponse } from '../../response/AcParametersResponse';
 import { FuelLogFormComponent } from '../form/fuel-log-form/fuel-log-form.component';
 import { forkJoin } from 'rxjs';
 import { FuelLogRequest } from '../../request/fuel-log-request';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-refuel',
@@ -27,7 +28,7 @@ export class RefuelComponent implements OnInit {
     fuelLog: FuelLog = {} as FuelLog
     fuelLogToForm!: FuelLog
 
-    constructor(private messageService: MessageService, private restService: RestService,) { }
+    constructor(private messageService: MessageService, private restService: RestService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
     ngOnInit(): void {
         this.messageService.clear()
@@ -45,20 +46,14 @@ export class RefuelComponent implements OnInit {
 
             console.log('result.fuelLog', result.fuelLog);
             const fuelLog = result.fuelLog || {} as FuelLog
-            // let inLeftTank = 0
-            // let inRightTank = 0
-            // inLeftTank = fuelLog.left + fuelLog.changeInLeft
-            // inRightTank = fuelLog.right + fuelLog.changeInRight
             this.fuelLog.date = new Date()
             this.fuelLog.transactionType = FuelTransactionTypeEnum.Refuel
             this.fuelLog.registration = this.AC_REGISTRATION
-            // this.fuelLog.left = inLeftTank
-            // this.fuelLog.right = inRightTank
             this.fuelLog.left = fuelLog.left + fuelLog.changeInLeft
             this.fuelLog.right = fuelLog.right + fuelLog.changeInRight
-            //this.fuelLog.fuelPrice = fuelLog.fuelPrice
             console.log('this.fuelLog', this.fuelLog)
 
+            this.fuelLogToForm = {} as FuelLog
             this.fuelLogToForm = this.fuelLog // will trigger a change detection and populate the form
         }));
     }
@@ -81,7 +76,6 @@ export class RefuelComponent implements OnInit {
     }
 
     onChildFormSubmit(fuelLog: FuelLog) {
-        //fuelLog.transactionType = getFuelTransactionTypeEnum(FuelTransactionTypeEnum.REFUEL)!
         console.log('fuelLog', fuelLog)
         this.restService.addFuelLog(this.fuelLogToFuelLogRequest(fuelLog))
             .subscribe(
@@ -91,8 +85,8 @@ export class RefuelComponent implements OnInit {
                     },
                     complete: () => {
                         console.log('http request completed')
-                        this.messageService.add({ severity: 'info', summary: '200', detail: 'Added sucessfully' });
-
+                        // this.messageService.add({ severity: 'info', summary: '200', detail: 'Added sucessfully' });
+                        this.router.navigate(['fuel-log-maintenance'])
                     },
                     error: (httpErrorResponse: HttpErrorResponse) => {
                         console.log('httpErrorResponse', httpErrorResponse)
@@ -101,9 +95,14 @@ export class RefuelComponent implements OnInit {
 
     }
 
+    onChildFormCancel() {
+        const currentPath = this.router.url;
+        console.log('this.activatedRoute', this.activatedRoute)
+        this.router.navigateByUrl('/', {
+            skipLocationChange: true,
 
-    onCancel() {
-
+        }).then(() => {
+            this.router.navigateByUrl(currentPath)
+        })
     }
-
 }

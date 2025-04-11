@@ -1,7 +1,7 @@
 <p-table [value]="engineLogArray" (onEditComplete)="onCommentEditComplete($event)" [paginator]="true"
     [rowsPerPageOptions]="[10,20,30]" [rows]="ROWS_PER_PAGE" [totalRecords]="page.totalElements"
-    [loading]="loadingStatus" selectionMode="single" [loading]="loadingStatus" [lazy]="true"
-    (onLazyLoad)="onLazyLoad($event)" dataKey="id" size="small">
+    [loading]="loadingStatus" [loading]="loadingStatus" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" dataKey="id"
+    size="small">
 
     <ng-template #caption>
         <div style="text-align: center;">

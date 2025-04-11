@@ -232,8 +232,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             complete: () => {
                                 console.log('http request completed')
                                 this.afterCrud()
-                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Added successfully' });
-
+                                // this.messageService.add({ severity: 'info', summary: '200', detail: 'Added successfully' });
                             },
                             error: (httpErrorResponse: HttpErrorResponse) => {
                                 console.log('httpErrorResponse', httpErrorResponse)
@@ -250,7 +249,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             complete: () => {
                                 console.log('http request completed')
                                 this.afterCrud()
-                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated successfully' });
+                                // this.messageService.add({ severity: 'info', summary: '200', detail: 'Updated successfully' });
                             },
                             error: (httpErrorResponse: HttpErrorResponse) => {
                                 console.log('httpErrorResponse', httpErrorResponse)
@@ -269,7 +268,7 @@ export class FuelLogMaintenaceComponent implements OnInit {
                             complete: () => {
                                 console.log('http request completed')
                                 this.afterCrud()
-                                this.messageService.add({ severity: 'info', summary: '200', detail: 'Deleted successfully' });
+                                // this.messageService.add({ severity: 'info', summary: '200', detail: 'Deleted successfully' });
                             },
                             error: (httpErrorResponse: HttpErrorResponse) => {
                                 console.log('httpErrorResponse', httpErrorResponse)

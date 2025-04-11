@@ -119,7 +119,8 @@
                 </div>
                 <div class="col-2">
                     <p-inputnumber inputId="price" formControlName="price" size="small" (onInput)="onInputPrice()"
-                        [min]="0" mode="decimal" [maxFractionDigits]="2" [maxlength]="5"
+                        [min]="0" mode="decimal" [maxFractionDigits]="2"
+                        [maxlength]="form.controls.priceType.value == 'Total' ? 7 : 5"
                         [inputStyle]="{'width':'5rem'}" />
                 </div>
                 <!-- pricePerLitre -->
@@ -178,7 +179,7 @@
 
             <!-- <p-footer> -->
             <div class="formgroup-inline">
-                <ul>
+                <!-- <ul>
                     <li>date valid: {{form.controls.date.valid}} disabled: {{form.controls.date.disabled}}</li>
                     <li>transactionType: {{form.controls.transactionType.value}} valid:
                         {{form.controls.transactionType.valid}} disabled:
@@ -196,7 +197,7 @@
                     <li>airport valid: {{form.controls.airport.valid}} disabled: {{form.controls.airport.disabled}}</li>
                     <li>fbo valid: {{form.controls.fbo.valid}} disabled: {{form.controls.fbo.disabled}}</li>
                     <li>comment valid: {{form.controls.comment.valid}} disabled: {{form.controls.comment.disabled}}</li>
-                </ul>
+                </ul> -->
                 <div class="field">
                     <button pButton type="submit" label="Submit" [disabled]="form.invalid" icon="pi pi-check"></button>
                 </div>

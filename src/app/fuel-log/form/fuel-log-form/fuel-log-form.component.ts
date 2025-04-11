@@ -132,10 +132,6 @@ export class FuelLogFormComponent {
 
         console.log('this.form.value', this.form.value)
     }
-    // private getFuelTransactionTypeEnum(value: string): FuelTransactionTypeEnum | undefined {
-    //     return (Object.keys(FuelTransactionTypeEnum) as Array<keyof typeof FuelTransactionTypeEnum>)
-    //         .find((key) => FuelTransactionTypeEnum[key] === value) as FuelTransactionTypeEnum | undefined;
-    // }
     private fillFuelLogWithValues() {
         console.log('this.form.value', this.form.value)
         this.fuelLog.date = new Date(this.form.controls.date.value)
@@ -148,7 +144,7 @@ export class FuelLogFormComponent {
         // if (Number(this.form.controls.addToLeftTank.value!) >= 0 || Number(this.form.controls.addToRightTank.value!) >= 0) {
         this.fuelLog.fuelPrice = {} as FuelPrice
         if (this.form.controls.transactionType.value === FuelTransactionTypeEnum.Refuel) {
-            if (this.pricePerLitre === undefined) {
+            if (! /* not */ this.pricePerLitre) {
                 this.calculatePricePerLitre()
             }
             this.fuelLog.fuelPrice.pricePerLitre = this.pricePerLitre
@@ -179,9 +175,13 @@ export class FuelLogFormComponent {
             this.form.controls.addToLeftTank.setValue(this.round(addToLeftTank, 1))
             const addToRightTank = this.acParameters.eachTankCapacity - this.form.controls.right.value!
             this.form.controls.addToRightTank.setValue(this.round(addToRightTank, 1))
+            this.form.controls.addToLeftTank.disable()
+            this.form.controls.addToRightTank.disable()
         } else {
             this.form.controls.addToLeftTank.reset()
             this.form.controls.addToRightTank.reset()
+            this.form.controls.addToLeftTank.enable()
+            this.form.controls.addToRightTank.enable()
         }
     }
     onInputLeft() {
@@ -206,49 +206,33 @@ export class FuelLogFormComponent {
 
         this.calculatePricePerLitre()
     }
-    // onInputAddToLeftTank() {
-    //     // turn off Top up checkbox
-    //     this.form.controls.topUp.setValue(false)
-
-    //     if (this.checkAndDisablePriceTypeAndPrice()) {
-    //         return
-    //     }
-
-    //     const calculatedTankCapacity = this.round(this.form.controls.left.value! + Number(this.form.controls.addToLeftTank.value!), 1)
-    //     if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
-    //         this.form.controls.addToLeftTank.setErrors({ invalid: true })
-    //     }
-    //     this.form.controls.left.setErrors(null)
-
-    //     this.calculatePricePerLitre()
-    // }
-    // onInputAddToRightTank() {
-    //     // turn off Top up checkbox
-    //     this.form.controls.topUp.setValue(false)
-
-    //     if (this.checkAndDisablePriceTypeAndPrice()) {
-    //         return
-    //     }
-
-    //     const calculatedTankCapacity = this.round(this.form.controls.right.value! + Number(this.form.controls.addToRightTank.value!), 1)
-    //     if (calculatedTankCapacity > this.acParameters.eachTankCapacity) {
-    //         this.form.controls.addToRightTank.setErrors({ invalid: true })
-    //     }
-    //     this.form.controls.right.setErrors(null)
-
-    //     this.calculatePricePerLitre()
-    // }
+    onChangePriceType() {
+        this.validatePrice()
+    }
     onInputPrice() {
+        this.validatePrice()
+    }
+    private validatePrice() {
         const priceControl = this.form.controls.price;
-        if (priceControl.value && Number(priceControl.value) > 99.99) {
-            priceControl.setErrors({ invalid: true })
+        console.log('priceControl.value', priceControl.value)
+        console.log('this.form.controls.priceType.value', this.form.controls.priceType.value)
+        if (this.form.controls.priceType.value === PriceTypeOptionEnum.PER_LITRE) {
+            console.log('PER_LITRE')
+            if (priceControl.value && Number(priceControl.value) > 99.99) {
+                console.log('setErrors invalid')
+                priceControl.setErrors({ invalid: true })
+            }
+        } else {
+            console.log('TOTAL')
+            if (priceControl.value && Number(priceControl.value) > 9999.99) {
+                console.log('setErrors invalid')
+                priceControl.setErrors({ invalid: true })
+            }
+
         }
         this.calculatePricePerLitre()
-    }
-    onChangePriceType() {
-        this.calculatePricePerLitre()
-    }
 
+    }
     onChangeDeleteFuelPrice(event: CheckboxChangeEvent) {
         console.log('event', event)
         this.deleteFuelPrice.emit(this.form.controls.deleteFuelPrice.value!)
@@ -272,6 +256,7 @@ export class FuelLogFormComponent {
     private calculatePricePerLitre() {
         const priceType = this.form.controls.priceType.value
         const price = this.form.controls.price.value
+        console.log('priceType', priceType, 'price', price)
         if (priceType == PriceTypeOptionEnum.PER_LITRE) {
             this.pricePerLitre = price!
         } else {
@@ -279,6 +264,7 @@ export class FuelLogFormComponent {
             const addToRightTank = Number(this.form.controls.addToRightTank.value)
             this.pricePerLitre = this.round(price! / ((addToLeftTank! + addToRightTank!) * 3.78), 2)
         }
+        console.log('this.pricePerLitre', this.pricePerLitre)
     }
 
     private round(value: number, precision: number): number {
