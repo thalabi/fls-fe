@@ -9,9 +9,10 @@
                 <label for="date">Date</label>
             </div>
             <div class="col-10">
-                <p-datepicker inputId="date" formControlName="date" [iconDisplay]="'input'" [showIcon]="true"
-                    [showButtonBar]="true" [showTime]="true" hourFormat="12" [dateFormat]="'yy-mm-dd'" size="small"
-                    [inputStyle]="{'width':'12rem'}" ngClass="date.invalid && && date.touched ? ng-invalid" />
+                <p-datepicker inputId="date" formControlName="date" appendTo="body" [iconDisplay]="'input'"
+                    [showIcon]="true" [showButtonBar]="true" [showTime]="true" hourFormat="12" [dateFormat]="'yy-mm-dd'"
+                    size="small" [inputStyle]="{'width':'12rem'}"
+                    ngClass="date.invalid && && date.touched ? ng-invalid" />
             </div>
 
             <ng-container *ngIf="maintenanceMode">

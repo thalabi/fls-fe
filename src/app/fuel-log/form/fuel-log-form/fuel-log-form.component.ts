@@ -113,7 +113,7 @@ export class FuelLogFormComponent {
         console.log('this.fuelLog', this.fuelLog)
         this.form.reset()
         this.form.controls.date.setValue(this.fuelLog.date !== undefined ? new Date(this.fuelLog.date) : new Date())
-        this.form.controls.transactionType.setValue(this.fuelLog.transactionType)
+        this.form.controls.transactionType.setValue(this.fuelLog.transactionType ? this.fuelLog.transactionType : FuelTransactionTypeEnum.Flight)
         this.form.controls.left.setValue(this.fuelLog.left)
         this.form.controls.right.setValue(this.fuelLog.right)
         this.form.controls.topUp.setValue(false)
