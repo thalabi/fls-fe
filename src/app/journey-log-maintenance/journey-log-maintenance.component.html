@@ -1,4 +1,4 @@
-<p-table [value]="journeyLogArray" (onEditComplete)="onCommentEditComplete($event)" [paginator]="true"
+<p-table [value]="journeyLogVArray" (onEditComplete)="onCommentEditComplete($event)" [paginator]="true"
     [rowsPerPageOptions]="[10,20,30]" [rows]="ROWS_PER_PAGE" [totalRecords]="page.totalElements"
     [loading]="loadingStatus" [loading]="loadingStatus" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" dataKey="id"
     size="small">
@@ -16,18 +16,19 @@
             <th>Takeoff</th>
             <th>Landing</th>
             <th>Airtime</th>
-            <th>Comment</th>
+            <th>TSN</th>
+            <th>Comment <small>(editable)</small></th>
         </tr>
     </ng-template>
     <ng-template #body let-journeyLog let-editing="editing" let-rowIndex="rowIndex">
-        <tr [pSelectableRow]=" journeyLog">
+        <tr [pSelectableRow]="journeyLog">
             <td [pTooltip]="dateTooltip">{{journeyLog.date | date: 'yy/M/d'}}</td>
             <td>{{journeyLog.from}}</td>
             <td>{{journeyLog.to}}</td>
             <td>{{journeyLog.takeoffTime | date: 'yy/M/d h:mm a'}}</td>
             <td>{{journeyLog.landingTime | date: 'yy/M/d h:mm a'}}</td>
             <td>{{journeyLog.airtime}}</td>
-            <!-- <td>{{journeyLog.comment}}</td> -->
+            <td>{{journeyLog.tsn}}</td>
             <td [pEditableColumn]="journeyLog.comment" pEditableColumnField="comment"
                 [pEditableColumnRowIndex]="rowIndex" style="background-color: snow;">
                 <p-cellEditor>
@@ -35,7 +36,7 @@
                         <input pInputText type=" text" [(ngModel)]="journeyLog.comment" />
                     </ng-template>
                     <ng-template #output>
-                        {{ journeyLog.comment }}
+                        <span class="pi pi-pencil">{{ journeyLog.comment }}</span>
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -45,4 +46,3 @@
         </ng-template>
     </ng-template>
 </p-table>
-<!-- <pre>{{journeyLogArray|json}}</pre> -->

@@ -11,8 +11,9 @@ import { MessageService } from 'primeng/api';
 import { RestService } from '../service/rest.service';
 import { SessionService } from '../service/session.service';
 import { EngineLogRequest } from '../request/engine-log-request';
-import { EngineLogResponse } from '../response/EngineLogResponse';
+import { EngineLogVResponse } from '../response/EngineLogVResponse';
 import { TooltipModule } from 'primeng/tooltip';
+import { EngineLogV } from '../domain/EngineLogV';
 
 @Component({
     selector: 'app-engine-log-maintenance',
@@ -23,15 +24,15 @@ import { TooltipModule } from 'primeng/tooltip';
 export class EngineLogMaintenanceComponent {
 
     readonly AC_REGISTRATION: string = 'C-GQGD'
-    readonly TABLE_NAME: string = 'engine_log'
+    readonly VIEW_NAME: string = 'engine_log_v'
 
     page: HalResponsePage = {} as HalResponsePage;
     links: HalResponseLinks = {} as HalResponseLinks;
     readonly ROWS_PER_PAGE: number = 10; // default rows per page
     firstRowOfTable!: number; // triggers a page change, zero based. 0 -> first page, 1 -> second page, ...
     pageNumber: number = 0;
-    engineLogArray!: Array<EngineLog>;
-    selectedEngineLog!: EngineLog
+    engineLogVArray!: Array<EngineLogV>;
+    selectedEngineLog!: EngineLogV
     crudMode!: CrudEnum;
     crudEnum = CrudEnum; // Used in html to refere to enum
     modifyAndDeleteButtonsDisable: boolean = true;
@@ -82,14 +83,14 @@ export class EngineLogMaintenanceComponent {
             }
             console.log('searchCriteria', searchCriteria)
         }
-        const entityNameResource = RestService.toPlural(RestService.toCamelCase(this.TABLE_NAME))
+        const entityNameResource = RestService.toPlural(RestService.toCamelCase(this.VIEW_NAME))
         console.log('entityNameResource 2', entityNameResource)
-        this.restService.getTableData(this.TABLE_NAME, `registration|equals|${this.AC_REGISTRATION}` + searchCriteria, pageNumber, pageSize, ['date'])
+        this.restService.getTableData(this.VIEW_NAME, `registration|equals|${this.AC_REGISTRATION}` + searchCriteria, pageNumber, pageSize, ['date'])
             .subscribe(
                 {
-                    next: (engineLogResponse: EngineLogResponse) => {
+                    next: (engineLogResponse: EngineLogVResponse) => {
                         console.log('engineLogResponse', engineLogResponse);
-                        this.engineLogArray = engineLogResponse._embedded.simpleModels || new Array<EngineLog>
+                        this.engineLogVArray = engineLogResponse._embedded.simpleModels || new Array<EngineLogV>
 
                         this.page = engineLogResponse.page;
                         this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
@@ -111,12 +112,12 @@ export class EngineLogMaintenanceComponent {
     onCommentEditComplete(event: TableEditCompleteEvent) {
         console.log('event', event)
         console.log('event.index', event.index)
-        console.log('will need to update', this.engineLogArray[event.index!])
-        const engineLog: EngineLog = this.engineLogArray[event.index!]
+        console.log('will need to update', this.engineLogVArray[event.index!])
+        const engineLogV: EngineLogV = this.engineLogVArray[event.index!]
 
         const engineLogRequest: EngineLogRequest = {
-            id: engineLog.id,
-            comment: engineLog.comment
+            id: engineLogV.id,
+            comment: engineLogV.comment
         }
         this.restService.updateEngineLog(engineLogRequest)
             .subscribe(

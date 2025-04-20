@@ -1,4 +1,4 @@
-<p-table [value]="engineLogArray" (onEditComplete)="onCommentEditComplete($event)" [paginator]="true"
+<p-table [value]="engineLogVArray" (onEditComplete)="onCommentEditComplete($event)" [paginator]="true"
     [rowsPerPageOptions]="[10,20,30]" [rows]="ROWS_PER_PAGE" [totalRecords]="page.totalElements"
     [loading]="loadingStatus" [loading]="loadingStatus" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" dataKey="id"
     size="small">
@@ -12,22 +12,23 @@
         <tr>
             <th>Date</th>
             <th>Airtime</th>
-            <th>Comment</th>
+            <th>TSMOH</th>
+            <th>Comment <small>(editable)</small></th>
         </tr>
     </ng-template>
     <ng-template #body let-engineLog let-editing="editing" let-rowIndex="rowIndex">
-        <tr [pSelectableRow]=" engineLog">
+        <tr [pSelectableRow]="engineLog">
             <td [pTooltip]="dateTooltip">{{engineLog.date | date: 'yy/M/d'}}</td>
             <td>{{engineLog.airtime}}</td>
-            <!-- <td>{{engineLog.comment}}</td> -->
+            <td>{{engineLog.tsmoh}}</td>
             <td [pEditableColumn]="engineLog.comment" pEditableColumnField="comment"
-                [pEditableColumnRowIndex]="rowIndex" style="background-color: snow;">
+                [pEditableColumnRowIndex]="rowIndex">
                 <p-cellEditor>
                     <ng-template #input>
                         <input pInputText type="text" [(ngModel)]="engineLog.comment" />
                     </ng-template>
                     <ng-template #output>
-                        {{ engineLog.comment }}
+                        <span class="pi pi-pencil">{{ engineLog.comment }}</span>
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -37,4 +38,3 @@
         </ng-template>
     </ng-template>
 </p-table>
-<!-- <pre>{{engineLogArray|json}}</pre> -->

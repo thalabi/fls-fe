@@ -4,11 +4,11 @@ import { RestService } from '../service/rest.service';
 import { SessionService } from '../service/session.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TableEditCompleteEvent, TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { JourneyLogResponse } from '../response/JourneyLogResponse';
+import { JourneyLogVResponse } from '../response/JourneyLogVResponse';
 import { CrudEnum } from '../crud-enum';
 import { HalResponseLinks } from '../response/hal/hal-response-links';
 import { HalResponsePage } from '../response/hal/hal-response-page';
-import { JourneyLog } from '../domain/JourneyLog';
+import { JourneyLogV } from '../domain/JourneyLogV';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { JourneyLogRequest } from '../request/journey-log-request';
@@ -23,15 +23,14 @@ import { TooltipModule } from 'primeng/tooltip';
 export class JourneyLogMaintenanceComponent implements OnInit {
 
     readonly AC_REGISTRATION: string = 'C-GQGD'
-    readonly TABLE_NAME: string = 'journey_log'
+    readonly VIEW_NAME: string = 'journey_log_v'
 
     page: HalResponsePage = {} as HalResponsePage;
     links: HalResponseLinks = {} as HalResponseLinks;
     readonly ROWS_PER_PAGE: number = 10; // default rows per page
     firstRowOfTable!: number; // triggers a page change, zero based. 0 -> first page, 1 -> second page, ...
     pageNumber: number = 0;
-    journeyLogArray!: Array<JourneyLog>;
-    selectedJourneyLog!: JourneyLog
+    journeyLogVArray!: Array<JourneyLogV>;
     crudMode!: CrudEnum;
     crudEnum = CrudEnum; // Used in html to refere to enum
     modifyAndDeleteButtonsDisable: boolean = true;
@@ -82,14 +81,14 @@ export class JourneyLogMaintenanceComponent implements OnInit {
             }
             console.log('searchCriteria', searchCriteria)
         }
-        const entityNameResource = RestService.toPlural(RestService.toCamelCase(this.TABLE_NAME))
+        const entityNameResource = RestService.toPlural(RestService.toCamelCase(this.VIEW_NAME))
         console.log('entityNameResource 2', entityNameResource)
-        this.restService.getTableData(this.TABLE_NAME, `registration|equals|${this.AC_REGISTRATION}` + searchCriteria, pageNumber, pageSize, ['date'])
+        this.restService.getTableData(this.VIEW_NAME, `registration|equals|${this.AC_REGISTRATION}` + searchCriteria, pageNumber, pageSize, ['date'])
             .subscribe(
                 {
-                    next: (journeyLogResponse: JourneyLogResponse) => {
+                    next: (journeyLogResponse: JourneyLogVResponse) => {
                         console.log('journeyLogResponse', journeyLogResponse);
-                        this.journeyLogArray = journeyLogResponse._embedded.simpleModels || new Array<JourneyLog>
+                        this.journeyLogVArray = journeyLogResponse._embedded.simpleModels || new Array<JourneyLogV>
 
                         this.page = journeyLogResponse.page;
                         this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
@@ -111,12 +110,12 @@ export class JourneyLogMaintenanceComponent implements OnInit {
     onCommentEditComplete(event: TableEditCompleteEvent) {
         console.log('event', event)
         console.log('event.index', event.index)
-        console.log('will need to update', this.journeyLogArray[event.index!])
-        const journeyLog: JourneyLog = this.journeyLogArray[event.index!]
+        console.log('will need to update', this.journeyLogVArray[event.index!])
+        const journeyLogV: JourneyLogV = this.journeyLogVArray[event.index!]
 
         const journeyLogRequest: JourneyLogRequest = {
-            id: journeyLog.id,
-            comment: journeyLog.comment
+            id: journeyLogV.id,
+            comment: journeyLogV.comment
         }
         this.restService.updateJourneyLog(journeyLogRequest)
             .subscribe(

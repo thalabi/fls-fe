@@ -1,12 +1,9 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { catchError, map, Observable, throwError } from 'rxjs';
-import { IGenericEntity } from '../domain/i-gerneric-entity';
-import { FuelLog } from '../domain/FuelLog';
+import { Observable } from 'rxjs';
 import { AcParameters } from '../domain/AcParameters';
 import { LogSheetRequest } from '../request/log-sheet-request';
-import { LogSheet } from '../domain/LogSheet';
 import { LogSheetAndFuelLogRequest } from '../request/log-sheet-and-fuel-log-request';
 import { JourneyLogRequest } from '../request/journey-log-request';
 import { EngineLogRequest } from '../request/engine-log-request';
