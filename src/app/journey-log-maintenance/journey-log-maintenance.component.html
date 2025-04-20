@@ -13,8 +13,8 @@
             <th>Date</th>
             <th>From</th>
             <th>To</th>
-            <th>Takeoff</th>
-            <th>Landing</th>
+            <th>Takeoff (UTC)</th>
+            <th>Landing (UTC)</th>
             <th>Airtime</th>
             <th>TSN</th>
             <th>Comment <small>(editable)</small></th>
@@ -25,8 +25,8 @@
             <td [pTooltip]="dateTooltip">{{journeyLog.date | date: 'yy/M/d'}}</td>
             <td>{{journeyLog.from}}</td>
             <td>{{journeyLog.to}}</td>
-            <td>{{journeyLog.takeoffTime | date: 'yy/M/d h:mm a'}}</td>
-            <td>{{journeyLog.landingTime | date: 'yy/M/d h:mm a'}}</td>
+            <td>{{journeyLog.takeoffTime | date: 'yy/M/d h:mm a':"+0000"}}</td>
+            <td>{{journeyLog.landingTime | date: 'yy/M/d h:mm a':"+0000"}}</td>
             <td>{{journeyLog.airtime}}</td>
             <td>{{journeyLog.tsn}}</td>
             <td [pEditableColumn]="journeyLog.comment" pEditableColumnField="comment"

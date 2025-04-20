@@ -88,13 +88,13 @@ export class EngineLogMaintenanceComponent {
         this.restService.getTableData(this.VIEW_NAME, `registration|equals|${this.AC_REGISTRATION}` + searchCriteria, pageNumber, pageSize, ['date'])
             .subscribe(
                 {
-                    next: (engineLogResponse: EngineLogVResponse) => {
-                        console.log('engineLogResponse', engineLogResponse);
-                        this.engineLogVArray = engineLogResponse._embedded.simpleModels || new Array<EngineLogV>
+                    next: (engineLogVResponse: EngineLogVResponse) => {
+                        console.log('engineLogVResponse', engineLogVResponse);
+                        this.engineLogVArray = engineLogVResponse._embedded.simpleModels || new Array<EngineLogV>
 
-                        this.page = engineLogResponse.page;
+                        this.page = engineLogVResponse.page;
                         this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
-                        this.links = engineLogResponse._links;
+                        this.links = engineLogVResponse._links;
                     },
                     complete: () => {
                         console.log('this.restService.getTableData completed')

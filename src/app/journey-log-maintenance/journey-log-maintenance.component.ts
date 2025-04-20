@@ -86,13 +86,13 @@ export class JourneyLogMaintenanceComponent implements OnInit {
         this.restService.getTableData(this.VIEW_NAME, `registration|equals|${this.AC_REGISTRATION}` + searchCriteria, pageNumber, pageSize, ['date'])
             .subscribe(
                 {
-                    next: (journeyLogResponse: JourneyLogVResponse) => {
-                        console.log('journeyLogResponse', journeyLogResponse);
-                        this.journeyLogVArray = journeyLogResponse._embedded.simpleModels || new Array<JourneyLogV>
+                    next: (journeyLogVResponse: JourneyLogVResponse) => {
+                        console.log('journeyLogVResponse', journeyLogVResponse);
+                        this.journeyLogVArray = journeyLogVResponse._embedded.simpleModels || new Array<JourneyLogV>
 
-                        this.page = journeyLogResponse.page;
+                        this.page = journeyLogVResponse.page;
                         this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
-                        this.links = journeyLogResponse._links;
+                        this.links = journeyLogVResponse._links;
                     },
                     complete: () => {
                         console.log('this.restService.getTableData completed')
