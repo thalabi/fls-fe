@@ -28,9 +28,9 @@
             <td [pTooltip]="dateTooltip">{{fuelLog.date | date: 'yy/M/d'}}</td>
             <td>{{fuelLog.transactionType == 'REFUEL' ? 'Refuel' : 'Flight'}}</td>
             <td [width]="10">{{fuelLog.left}}/{{fuelLog.changeInLeft}}</td>
-            <td>{{fuelLog.left + fuelLog.changeInLeft}}</td>
+            <td>{{fuelLog.left + fuelLog.changeInLeft | number: '1.0-1'}}</td>
             <td [width]="10">{{fuelLog.right}}/{{fuelLog.changeInRight}}</td>
-            <td>{{fuelLog.right + fuelLog.changeInRight}}</td>
+            <td>{{fuelLog.right + fuelLog.changeInRight | number: '1.0-1'}}</td>
             <td>{{fuelLog.fuelPrice?.pricePerLitre}}</td>
             <td>{{fuelLog.fuelPrice?.airport}}</td>
             <td>{{fuelLog.fuelPrice?.fbo}}</td>
