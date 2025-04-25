@@ -12,10 +12,10 @@
         <tr>
             <th>Date</th>
             <th>Trans</th>
-            <th>Left tank</th>
-            <th>Right tank</th>
-            <th>Left tank change</th>
-            <th>Right tank change</th>
+            <th [width]="10">Left<br>Initial/Change</th>
+            <th>Left<br>Remain</th>
+            <th [width]="10">Right<br>Initial/Change</th>
+            <th>Right<br>Remain</th>
             <th>Price/litre</th>
             <th>Airport</th>
             <th>FBO</th>
@@ -27,10 +27,10 @@
         <tr [pSelectableRow]="fuelLog">
             <td [pTooltip]="dateTooltip">{{fuelLog.date | date: 'yy/M/d'}}</td>
             <td>{{fuelLog.transactionType == 'REFUEL' ? 'Refuel' : 'Flight'}}</td>
-            <td>{{fuelLog.left}}</td>
-            <td>{{fuelLog.right}}</td>
-            <td>{{fuelLog.changeInLeft}}</td>
-            <td>{{fuelLog.changeInRight}}</td>
+            <td [width]="10">{{fuelLog.left}}/{{fuelLog.changeInLeft}}</td>
+            <td>{{fuelLog.left + fuelLog.changeInLeft}}</td>
+            <td [width]="10">{{fuelLog.right}}/{{fuelLog.changeInRight}}</td>
+            <td>{{fuelLog.right + fuelLog.changeInRight}}</td>
             <td>{{fuelLog.fuelPrice?.pricePerLitre}}</td>
             <td>{{fuelLog.fuelPrice?.airport}}</td>
             <td>{{fuelLog.fuelPrice?.fbo}}</td>
