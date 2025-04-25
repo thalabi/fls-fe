@@ -10,13 +10,19 @@
     </ng-template>
     <ng-template #header>
         <tr>
+            <th></th>
+            <th></th>
+            <th colspan="2" style="text-align: center;">Left</th>
+            <th colspan="2" style="text-align: center;">Right</th>
+        </tr>
+        <tr>
             <th>Date</th>
             <th>Trans</th>
-            <th [width]="10">Left<br>Initial/Change</th>
-            <th>Left<br>Used/Remain</th>
-            <th [width]="10">Right<br>Initial/Change</th>
-            <th>Right<br>Used/Remain</th>
-            <th>Price/litre</th>
+            <th [width]="10">Initial/Change</th>
+            <th [width]="10">Used/Remain</th>
+            <th [width]="10">Initial/Change</th>
+            <th [width]="10">Used/Remain</th>
+            <th style="padding-left: 2rem;">Price/litre</th>
             <th>Airport</th>
             <th>FBO</th>
             <th>Comment</th>
@@ -27,17 +33,17 @@
         <tr [pSelectableRow]="fuelLog">
             <td [pTooltip]="dateTooltip">{{fuelLog.date | date: 'yy/M/d'}}</td>
             <td>{{fuelLog.transactionType == 'REFUEL' ? 'Refuel' : 'Flight'}}</td>
-            <td [width]="10">{{fuelLog.left}}/{{fuelLog.changeInLeft}}</td>
-            <td>
+            <td style="border-left: 1px solid; border-right: 1px solid;">{{fuelLog.left}}/{{fuelLog.changeInLeft}}</td>
+            <td style="border-right: double;">
                 {{acParameters.eachTankCapacity - (fuelLog.left + fuelLog.changeInLeft) | number:
                 '1.0-1'}}/{{fuelLog.left + fuelLog.changeInLeft | number: '1.0-1'}}
             </td>
-            <td [width]="10">{{fuelLog.right}}/{{fuelLog.changeInRight}}</td>
-            <td>
+            <td style="border-right: 1px solid;">{{fuelLog.right}}/{{fuelLog.changeInRight}}</td>
+            <td style="border-right: 1px solid;">
                 {{acParameters.eachTankCapacity - (fuelLog.right + fuelLog.changeInRight) | number:
                 '1.0-1'}}/{{fuelLog.right + fuelLog.changeInRight | number: '1.0-1'}}
             </td>
-            <td>{{fuelLog.fuelPrice?.pricePerLitre}}</td>
+            <td style="padding-left: 2rem;">{{fuelLog.fuelPrice?.pricePerLitre}}</td>
             <td>{{fuelLog.fuelPrice?.airport}}</td>
             <td>{{fuelLog.fuelPrice?.fbo}}</td>
             <td>{{fuelLog.fuelPrice?.comment}}</td>
