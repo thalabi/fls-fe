@@ -13,9 +13,9 @@
             <th>Date</th>
             <th>Trans</th>
             <th [width]="10">Left<br>Initial/Change</th>
-            <th>Left<br>Remain</th>
+            <th>Left<br>Used/Remain</th>
             <th [width]="10">Right<br>Initial/Change</th>
-            <th>Right<br>Remain</th>
+            <th>Right<br>Used/Remain</th>
             <th>Price/litre</th>
             <th>Airport</th>
             <th>FBO</th>
@@ -28,9 +28,15 @@
             <td [pTooltip]="dateTooltip">{{fuelLog.date | date: 'yy/M/d'}}</td>
             <td>{{fuelLog.transactionType == 'REFUEL' ? 'Refuel' : 'Flight'}}</td>
             <td [width]="10">{{fuelLog.left}}/{{fuelLog.changeInLeft}}</td>
-            <td>{{fuelLog.left + fuelLog.changeInLeft | number: '1.0-1'}}</td>
+            <td>
+                {{acParameters.eachTankCapacity - (fuelLog.left + fuelLog.changeInLeft) | number:
+                '1.0-1'}}/{{fuelLog.left + fuelLog.changeInLeft | number: '1.0-1'}}
+            </td>
             <td [width]="10">{{fuelLog.right}}/{{fuelLog.changeInRight}}</td>
-            <td>{{fuelLog.right + fuelLog.changeInRight | number: '1.0-1'}}</td>
+            <td>
+                {{acParameters.eachTankCapacity - (fuelLog.right + fuelLog.changeInRight) | number:
+                '1.0-1'}}/{{fuelLog.right + fuelLog.changeInRight | number: '1.0-1'}}
+            </td>
             <td>{{fuelLog.fuelPrice?.pricePerLitre}}</td>
             <td>{{fuelLog.fuelPrice?.airport}}</td>
             <td>{{fuelLog.fuelPrice?.fbo}}</td>
