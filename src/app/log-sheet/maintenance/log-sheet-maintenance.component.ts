@@ -20,8 +20,9 @@ import { LogSheetRequest } from '../../request/log-sheet-request';
 import { BackendStacktraceDisplayComponent } from '../../backend-stacktrace-display/backend-stacktrace-display.component';
 import { MessagesModule } from 'primeng/messages';
 import { CheckboxModule } from 'primeng/checkbox';
-import { filter, take } from 'rxjs';
+import { debounceTime, filter, take } from 'rxjs';
 import { TooltipModule } from 'primeng/tooltip';
+import { AirportService } from '../../service/airport.service';
 
 @Component({
     selector: 'app-log-sheet-maintenance',
@@ -63,11 +64,16 @@ export class LogSheetMaintenanceComponent implements OnInit {
     constructor(
         private messageService: MessageService,
         private restService: RestService,
+        private airportService: AirportService,
         private sessionService: SessionService
     ) { }
 
     ngOnInit() {
         this.messageService.clear()
+
+        this.form.controls.from.valueChanges.pipe(debounceTime(300)).subscribe(value => this.airportService.validateAirportIdentifier(value!, this.form.controls.from))
+        this.form.controls.to.valueChanges.pipe(debounceTime(300)).subscribe(value => this.airportService.validateAirportIdentifier(value!, this.form.controls.to))
+
         this.sessionService.setDisableParentMessages(false)
     }
     onLazyLoad(lazyLoadEvent: TableLazyLoadEvent) {

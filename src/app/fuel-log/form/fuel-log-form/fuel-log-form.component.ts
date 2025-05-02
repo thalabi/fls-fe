@@ -11,6 +11,8 @@ import { CommonModule } from '@angular/common';
 import { FuelLog, FuelTransactionTypeEnum } from '../../../domain/FuelLog';
 import { AcParameters } from '../../../domain/AcParameters';
 import { FuelPrice } from '../../../domain/FuelPrice';
+import { AirportService } from '../../../service/airport.service';
+import { debounceTime } from 'rxjs';
 
 export enum PriceTypeOptionEnum {
     PER_LITRE = 'Per litre', TOTAL = 'Total'
@@ -106,7 +108,10 @@ export class FuelLogFormComponent {
         deleteFuelPrice: new FormControl<boolean>(false)
     });
 
-    constructor() {
+    constructor(
+        private airportService: AirportService
+    ) {
+        this.form.controls.airport.valueChanges.pipe(debounceTime(300)).subscribe(value => this.airportService.validateAirportIdentifier(value!, this.form.controls.airport))
     }
 
     private fillInFormWithValues() {

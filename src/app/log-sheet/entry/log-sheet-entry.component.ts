@@ -9,7 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RestService } from '../../service/rest.service';
 import { AcParameters } from '../../domain/AcParameters';
 import { AcParametersResponse } from '../../response/AcParametersResponse';
-import { forkJoin } from 'rxjs';
+import { debounceTime, forkJoin } from 'rxjs';
 import { FuelLog } from '../../domain/FuelLog';
 import { LogSheetAndFuelLogRequest } from '../../request/log-sheet-and-fuel-log-request'
 import { SessionService } from '../../service/session.service';
@@ -17,6 +17,9 @@ import { TsnVResponse } from '../../response/TsnVResponse';
 import { TsnV } from '../../domain/TsnV';
 import { TsmohVResponse } from '../../response/TsmohVResponse';
 import { TsmohV } from '../../domain/TsmohV';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ValidateAirportIdentifierResponse } from '../../response/ValidateAirportIdentifierResponse';
+import { AirportService } from '../../service/airport.service';
 
 @Component({
     selector: 'app-log-sheet',
@@ -79,6 +82,7 @@ export class LogSheetComponent implements OnInit {
 
     constructor(
         private restService: RestService,
+        private airportService: AirportService,
         private messageService: MessageService,
         private sessionService: SessionService
     ) { }
@@ -87,6 +91,9 @@ export class LogSheetComponent implements OnInit {
         this.messageService.clear()
         this.initTimesForm()
         this.initFuelForm()
+
+        this.timesForm.controls.from.valueChanges.pipe(debounceTime(300)).subscribe(value => this.airportService.validateAirportIdentifier(value!, this.timesForm.controls.from))
+        this.timesForm.controls.to.valueChanges.pipe(debounceTime(300)).subscribe(value => this.airportService.validateAirportIdentifier(value!, this.timesForm.controls.to))
 
         this.getFuelBeforeFlight()
         this.sessionService.setDisableParentMessages(false)

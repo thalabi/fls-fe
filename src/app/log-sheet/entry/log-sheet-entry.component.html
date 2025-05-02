@@ -22,6 +22,7 @@
                 <label for="from">From/To</label>
             </div>
             <div class="col-2">
+                <!--  (keyup)="fromBlur($event, 'from')" -->
                 <input type="text" pInputText inputId="from" formControlName="from" pSize="small" size="small"
                     maxlength="4" style="text-transform:uppercase; width: 4rem;" />
             </div>
@@ -212,7 +213,7 @@
         <div class="formgroup-inline">
             <div class="field">
                 <button pButton type="submit" label="Calc Fuel" icon="pi pi-check"
-                    [disabled]="timesForm.invalid"></button>
+                    [disabled]="fuelForm.invalid"></button>
             </div>
             <div class="field">
                 <button pButton type="reset" label="Reset Fuel" (click)="onResetFuelForm()"></button>

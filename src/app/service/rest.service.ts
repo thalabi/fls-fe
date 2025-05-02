@@ -86,6 +86,10 @@ export class RestService {
         return this.httpClient.patch<HttpResponse<any>>(`${this.serviceUrl}/protected/data-rest/engineLogs/${engineLogRequest.id}`, engineLogRequest);
     }
 
+    validateAirportIdentifier(identifier: string): Observable<any> {
+        return this.httpClient.get(`${this.serviceUrl}/protected/airportController/isIdentifierValid?identifier=${identifier}`);
+    }
+
     public static toCamelCase(tableName: string): string {
         return tableName.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase()); // convert to camel case
     }

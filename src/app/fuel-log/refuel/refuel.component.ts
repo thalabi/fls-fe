@@ -28,7 +28,7 @@ export class RefuelComponent implements OnInit {
     fuelLog: FuelLog = {} as FuelLog
     fuelLogToForm!: FuelLog
 
-    constructor(private messageService: MessageService, private restService: RestService, private router: Router, private activatedRoute: ActivatedRoute) { }
+    constructor(private messageService: MessageService, private restService: RestService, private router: Router) { }
 
     ngOnInit(): void {
         this.messageService.clear()
@@ -97,10 +97,8 @@ export class RefuelComponent implements OnInit {
 
     onChildFormCancel() {
         const currentPath = this.router.url;
-        console.log('this.activatedRoute', this.activatedRoute)
         this.router.navigateByUrl('/', {
             skipLocationChange: true,
-
         }).then(() => {
             this.router.navigateByUrl(currentPath)
         })
