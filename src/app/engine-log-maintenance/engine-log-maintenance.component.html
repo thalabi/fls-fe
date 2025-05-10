@@ -21,7 +21,8 @@
             <td [pTooltip]="dateTooltip">{{engineLog.date | date: 'yy/M/d'}}</td>
             <td>{{engineLog.airtime}}</td>
             <td>{{engineLog.tsmoh}}</td>
-            <td [pEditableColumn]="engineLog.comment" pEditableColumnField="comment">
+            <td [pEditableColumn]="engineLog.comment" pEditableColumnField="comment"
+                [pEditableColumnRowIndex]="rowIndex">
                 <p-cellEditor>
                     <ng-template #input>
                         <input pInputText type="text" [(ngModel)]="engineLog.comment" />

@@ -29,7 +29,8 @@
             <td>{{journeyLog.landingTime | date: 'yy/M/d H:mm':"+0000"}}</td>
             <td>{{journeyLog.airtime}}</td>
             <td>{{journeyLog.tsn}}</td>
-            <td [pEditableColumn]="journeyLog.comment" pEditableColumnField="comment" style="background-color: snow;">
+            <td [pEditableColumn]="journeyLog.comment" pEditableColumnField="comment"
+                [pEditableColumnRowIndex]="rowIndex">
                 <p-cellEditor>
                     <ng-template #input>
                         <input pInputText type="text" [(ngModel)]="journeyLog.comment" />
