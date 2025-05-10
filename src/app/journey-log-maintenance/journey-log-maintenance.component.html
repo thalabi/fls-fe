@@ -21,7 +21,7 @@
         </tr>
     </ng-template>
     <ng-template #body let-journeyLog let-editing="editing" let-rowIndex="rowIndex">
-        <tr [pSelectableRow]="journeyLog">
+        <tr>
             <td [pTooltip]="dateTooltip">{{journeyLog.date | date: 'yy/M/d'}}</td>
             <td>{{journeyLog.from}}</td>
             <td>{{journeyLog.to}}</td>
@@ -29,11 +29,10 @@
             <td>{{journeyLog.landingTime | date: 'yy/M/d H:mm':"+0000"}}</td>
             <td>{{journeyLog.airtime}}</td>
             <td>{{journeyLog.tsn}}</td>
-            <td [pEditableColumn]="journeyLog.comment" pEditableColumnField="comment"
-                [pEditableColumnRowIndex]="rowIndex" style="background-color: snow;">
+            <td [pEditableColumn]="journeyLog.comment" pEditableColumnField="comment" style="background-color: snow;">
                 <p-cellEditor>
                     <ng-template #input>
-                        <input pInputText type=" text" [(ngModel)]="journeyLog.comment" />
+                        <input pInputText type="text" [(ngModel)]="journeyLog.comment" />
                     </ng-template>
                     <ng-template #output>
                         <span class="pi pi-pencil">{{ journeyLog.comment }}</span>
