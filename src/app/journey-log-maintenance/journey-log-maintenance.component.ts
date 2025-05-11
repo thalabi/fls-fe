@@ -110,8 +110,9 @@ export class JourneyLogMaintenanceComponent implements OnInit {
     onCommentEditComplete(event: TableEditCompleteEvent) {
         console.log('event', event)
         console.log('event.index', event.index)
-        console.log('will need to update', this.journeyLogVArray[event.index!])
-        const journeyLogV: JourneyLogV = this.journeyLogVArray[event.index!]
+        console.log('page', this.page)
+        console.log('will need to update', this.journeyLogVArray[event.index! - this.page.number * this.page.size])
+        const journeyLogV: JourneyLogV = this.journeyLogVArray[event.index! - this.page.number * this.page.size]
 
         const journeyLogRequest: JourneyLogRequest = {
             id: journeyLogV.id,

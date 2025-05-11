@@ -112,8 +112,9 @@ export class EngineLogMaintenanceComponent {
     onCommentEditComplete(event: TableEditCompleteEvent) {
         console.log('event', event)
         console.log('event.index', event.index)
-        console.log('will need to update', this.engineLogVArray[event.index!])
-        const engineLogV: EngineLogV = this.engineLogVArray[event.index!]
+        console.log('page', this.page)
+        console.log('will need to update', this.engineLogVArray[event.index! - this.page.number * this.page.size])
+        const engineLogV: EngineLogV = this.engineLogVArray[event.index! - this.page.number * this.page.size]
 
         const engineLogRequest: EngineLogRequest = {
             id: engineLogV.id,
