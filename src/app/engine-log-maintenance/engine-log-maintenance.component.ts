@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableEditCompleteEvent, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { CrudEnum } from '../crud-enum';
-import { EngineLog } from '../domain/EngineLog';
 import { HalResponseLinks } from '../response/hal/hal-response-links';
 import { HalResponsePage } from '../response/hal/hal-response-page';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -26,18 +25,17 @@ export class EngineLogMaintenanceComponent {
     readonly AC_REGISTRATION: string = 'C-GQGD'
     readonly VIEW_NAME: string = 'engine_log_v'
 
-    page: HalResponsePage = {} as HalResponsePage;
-    links: HalResponseLinks = {} as HalResponseLinks;
-    readonly ROWS_PER_PAGE: number = 10; // default rows per page
-    firstRowOfTable!: number; // triggers a page change, zero based. 0 -> first page, 1 -> second page, ...
-    pageNumber: number = 0;
-    engineLogVArray!: Array<EngineLogV>;
-    selectedEngineLog!: EngineLogV
-    crudMode!: CrudEnum;
-    crudEnum = CrudEnum; // Used in html to refere to enum
-    modifyAndDeleteButtonsDisable: boolean = true;
+    page: HalResponsePage = {} as HalResponsePage
+    links: HalResponseLinks = {} as HalResponseLinks
+    readonly ROWS_PER_PAGE: number = 10 // default rows per page
+    firstRowOfTable!: number // triggers a page change, zero based. 0 -> first page, 1 -> second page, ...
+    pageNumber: number = 0
+    engineLogVArray!: Array<EngineLogV>
+    crudMode!: CrudEnum
+    crudEnum = CrudEnum // Used in html to refere to enum
+    modifyAndDeleteButtonsDisable: boolean = true
     displayDialog: boolean = false
-    loadingStatus!: boolean;
+    loadingStatus!: boolean
 
     constructor(
         private messageService: MessageService,
@@ -48,6 +46,23 @@ export class EngineLogMaintenanceComponent {
     ngOnInit() {
         this.messageService.clear()
         this.sessionService.setDisableParentMessages(false)
+
+        this.setFirstRowOfTable()
+    }
+
+    private setFirstRowOfTable() {
+        // set the firstRowOfTable to the first row of the last page
+        this.restService.getRecordCount(this.VIEW_NAME).subscribe({
+            next: data => {
+                let rowCount: number = data;
+                console.log('rowCount', rowCount);
+                let pageNumber: number = Math.floor(rowCount / this.ROWS_PER_PAGE);
+                if (rowCount % this.ROWS_PER_PAGE != 0) pageNumber++;
+                this.firstRowOfTable = (pageNumber - 1) * this.ROWS_PER_PAGE;
+                console.log('this.firstRowOfTable', this.firstRowOfTable);
+
+            }
+        })
     }
 
     onLazyLoad(lazyLoadEvent: TableLazyLoadEvent) {
@@ -93,7 +108,7 @@ export class EngineLogMaintenanceComponent {
                         this.engineLogVArray = engineLogVResponse._embedded.simpleModels || new Array<EngineLogV>
 
                         this.page = engineLogVResponse.page;
-                        this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
+                        //this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
                         this.links = engineLogVResponse._links;
                     },
                     complete: () => {
