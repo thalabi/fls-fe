@@ -11,10 +11,11 @@ import { IGenericEntity } from '../domain/i-gerneric-entity';
 import { MessageService } from 'primeng/api';
 import { AcParametersResponse } from '../response/AcParametersResponse';
 import { AcParameters } from '../domain/AcParameters';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
     selector: 'app-aircraft-parameters',
-    imports: [CommonModule, ReactiveFormsModule, InputNumberModule, ButtonModule],
+    imports: [CommonModule, ReactiveFormsModule, InputTextModule, InputNumberModule, ButtonModule],
     templateUrl: './ac-parameters.component.html',
     styleUrl: './ac-parameters.component.css'
 })
@@ -30,6 +31,7 @@ export class AcParametersComponent implements OnInit {
     acParameters!: AcParameters
 
     form = new FormGroup({
+        makeModel: new FormControl<string>('', Validators.required),
         initialTsn: new FormControl<number | null>(null, Validators.required),
         initialTsmoh: new FormControl<number | null>(null, Validators.required),
         eachTankCapacity: new FormControl<number | null>(null, Validators.required),
@@ -66,6 +68,7 @@ export class AcParametersComponent implements OnInit {
     }
     private initForm() {
         if (this.acParameters) {
+            this.form.controls.makeModel.patchValue(this.acParameters.makeModel)
             this.form.controls.initialTsn.patchValue(this.acParameters.initialTsn)
             this.form.controls.initialTsmoh.patchValue(this.acParameters.initialTsmoh)
             this.form.controls.eachTankCapacity.patchValue(this.acParameters.eachTankCapacity)
@@ -80,6 +83,7 @@ export class AcParametersComponent implements OnInit {
         let acParameters: AcParameters = {} as AcParameters
         acParameters.id = this.acParameters.id
         acParameters.registration = this.AC_REGISTRATION
+        acParameters.makeModel = this.form.controls.makeModel.value || ''
         acParameters.initialTsn = this.form.controls.initialTsn.value || 0
         acParameters.initialTsmoh = this.form.controls.initialTsmoh.value || 0
         acParameters.eachTankCapacity = this.form.controls.eachTankCapacity.value || 0
