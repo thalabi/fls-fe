@@ -75,7 +75,27 @@ export class LogSheetMaintenanceComponent implements OnInit {
         this.form.controls.to.valueChanges.pipe(debounceTime(300)).subscribe(value => this.airportService.validateAirportIdentifier(value!, this.form.controls.to))
 
         this.sessionService.setDisableParentMessages(false)
+
+        this.setFirstRowOfTable()
+
     }
+
+    private setFirstRowOfTable() {
+        // set the firstRowOfTable to the first row of the last page
+        this.restService.getRecordCount(this.TABLE_NAME).subscribe({
+            next: data => {
+                let rowCount: number = data;
+                console.log('rowCount', rowCount);
+                let pageNumber: number = Math.floor(rowCount / this.ROWS_PER_PAGE);
+                if (rowCount % this.ROWS_PER_PAGE != 0) pageNumber++;
+                this.firstRowOfTable = (pageNumber - 1) * this.ROWS_PER_PAGE;
+                console.log('this.firstRowOfTable', this.firstRowOfTable);
+
+            }
+        })
+    }
+
+
     onLazyLoad(lazyLoadEvent: TableLazyLoadEvent) {
         this.savedTableLazyLoadEvent = lazyLoadEvent;
         this.fetchPage(lazyLoadEvent)
@@ -119,7 +139,7 @@ export class LogSheetMaintenanceComponent implements OnInit {
                         this.logSheetArray = logSheetResponse._embedded.simpleModels || new Array<LogSheet>
 
                         this.page = logSheetResponse.page;
-                        this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
+                        // this.firstRowOfTable = this.page.number * this.ROWS_PER_PAGE;
                         this.links = logSheetResponse._links;
                     },
                     complete: () => {
